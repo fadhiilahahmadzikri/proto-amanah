@@ -14,7 +14,7 @@ export function PhoneFrame(props: {
   const isDark = props.isDarkContent ?? false;
   const screenRef = React.useRef<HTMLDivElement>(null);
 
-  // Dual Edge Swipe Navigation (Swipe from Left or Right edge to navigate / dismiss)
+  // Dual Edge Swipe Navigation (Swipe from Left or Right edge to dismiss / go back)
   const [edgeSwipe, setEdgeSwipe] = React.useState<{
     active: boolean;
     side: 'left' | 'right' | null;
@@ -38,7 +38,7 @@ export function PhoneFrame(props: {
   });
 
   const handlePointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
-    // If user clicks on an interactive button, link, or input, do NOT hijack with edge swipe
+    // If user clicks on an interactive button, link, or input, do NOT start edge swipe
     const target = e.target as HTMLElement | null;
     if (target?.closest('button, a, input, textarea, select, [role="button"]')) {
       swipeStartRef.current = { x: 0, y: 350, side: null };
@@ -54,10 +54,10 @@ export function PhoneFrame(props: {
     const relY = e.clientY - rect.top;
     const width = rect.width;
 
-    // Detect if pointer started from Left edge (< 40px) or Right edge (> width - 40px)
-    if (relX <= 40) {
+    // Detect if pointer started from Left edge (< 45px) or Right edge (> width - 45px)
+    if (relX <= 45) {
       swipeStartRef.current = { x: e.clientX, y: relY, side: 'left' };
-    } else if (relX >= width - 40) {
+    } else if (relX >= width - 45) {
       swipeStartRef.current = { x: e.clientX, y: relY, side: 'right' };
     } else {
       swipeStartRef.current = { x: 0, y: 350, side: null };
@@ -78,9 +78,9 @@ export function PhoneFrame(props: {
   };
 
   const handlePointerUp = () => {
-    if (swipeStartRef.current.side === 'left' && edgeSwipe.deltaX > 45) {
+    if (swipeStartRef.current.side === 'left' && edgeSwipe.deltaX > 35) {
       props.onSwipeBack?.();
-    } else if (swipeStartRef.current.side === 'right' && Math.abs(edgeSwipe.deltaX) > 45) {
+    } else if (swipeStartRef.current.side === 'right' && Math.abs(edgeSwipe.deltaX) > 35) {
       props.onSwipeBack?.();
     }
 
@@ -141,14 +141,14 @@ export function PhoneFrame(props: {
               className="pointer-events-none absolute left-0 z-50 -translate-y-1/2 will-change-transform"
               style={{
                 top: `${edgeSwipe.y}px`,
-                transform: `translate3d(${Math.min(edgeSwipe.deltaX * 0.45, 36) - 40}px, 0, 0)`,
+                transform: `translate3d(${Math.min(edgeSwipe.deltaX * 0.5, 36) - 40}px, 0, 0)`,
                 transition: edgeSwipe.deltaX === 0 ? 'transform 200ms ease-out' : 'none',
               }}
             >
               <div
                 className={cn(
                   'flex h-12 w-10 items-center justify-center rounded-r-2xl border-y border-r shadow-2xl transition-all',
-                  edgeSwipe.deltaX > 45
+                  edgeSwipe.deltaX > 35
                     ? 'bg-neutral-900/95 text-white border-white/50 ring-2 ring-white/30 scale-105'
                     : 'bg-neutral-900/80 text-white/90 border-white/25',
                 )}
@@ -168,14 +168,14 @@ export function PhoneFrame(props: {
               className="pointer-events-none absolute right-0 z-50 -translate-y-1/2 will-change-transform"
               style={{
                 top: `${edgeSwipe.y}px`,
-                transform: `translate3d(${40 - Math.min(Math.abs(edgeSwipe.deltaX) * 0.45, 36)}px, 0, 0)`,
+                transform: `translate3d(${40 - Math.min(Math.abs(edgeSwipe.deltaX) * 0.5, 36)}px, 0, 0)`,
                 transition: edgeSwipe.deltaX === 0 ? 'transform 200ms ease-out' : 'none',
               }}
             >
               <div
                 className={cn(
                   'flex h-12 w-10 items-center justify-center rounded-l-2xl border-y border-l shadow-2xl transition-all',
-                  Math.abs(edgeSwipe.deltaX) > 45
+                  Math.abs(edgeSwipe.deltaX) > 35
                     ? 'bg-neutral-900/95 text-white border-white/50 ring-2 ring-white/30 scale-105'
                     : 'bg-neutral-900/80 text-white/90 border-white/25',
                 )}
@@ -247,7 +247,7 @@ export function PhoneFrame(props: {
                 className="shrink-0"
               >
                 <path
-                  d="M7.5 10.5C8.05228 10.5 8.5 10.0523 8.5 9.5C8.5 8.94772 8.05228 8.5 7.5 10.5Z"
+                  d="M7.5 10.5C8.05228 10.5 8.5 10.0523 8.5 9.5C8.5 8.94772 8.05228 8.5 7.5 8.5C6.94772 8.5 6.5 8.94772 6.5 9.5C6.5 10.0523 6.94772 10.5 7.5 10.5Z"
                   fill="currentColor"
                 />
                 <path

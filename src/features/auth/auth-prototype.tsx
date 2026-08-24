@@ -42,7 +42,7 @@ export function AuthPrototype() {
     setTheme(prev => (prev === 'dark' ? 'light' : 'dark'));
   };
 
-  // Mobile Hold & Edge Swipe Navigation (Back & Forward)
+
   const handleSwipeBack = () => {
     if (currentScreen === 'login' || currentScreen === 'signup') {
       navigateTo('onboarding');

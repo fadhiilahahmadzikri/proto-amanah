@@ -20,6 +20,7 @@ export function MobileAuthTemplate(props: {
   const startYRef = React.useRef(0);
   const startXRef = React.useRef(0);
   const currentDragYRef = React.useRef(0);
+  const currentDragXRef = React.useRef(0);
   const isDraggingRef = React.useRef(false);
   const isClosingRef = React.useRef(false);
 
@@ -47,7 +48,7 @@ export function MobileAuthTemplate(props: {
     );
   }, []);
 
-  // GSAP Ultra-Smooth Slide Down Exit Animation
+  // Single Unified GSAP Slide Down Exit Animation
   const triggerClose = React.useCallback(() => {
     if (isClosingRef.current || !drawerRef.current) {
       return;
@@ -56,8 +57,9 @@ export function MobileAuthTemplate(props: {
 
     gsap.to(drawerRef.current, {
       y: '100%',
-      duration: 0.32,
-      ease: 'power3.in',
+      opacity: 0.9,
+      duration: 0.36,
+      ease: 'power3.inOut',
       onComplete: () => {
         props.onClose?.();
         isClosingRef.current = false;
@@ -65,23 +67,24 @@ export function MobileAuthTemplate(props: {
     });
   }, [props]);
 
-  const triggerBack = () => {
+  // Single Unified GSAP Back Animation
+  const triggerBack = React.useCallback(() => {
     if (isClosingRef.current || !drawerRef.current) {
       return;
     }
     isClosingRef.current = true;
 
     gsap.to(drawerRef.current, {
-      x: '30%',
-      opacity: 0.6,
-      duration: 0.25,
-      ease: 'power2.in',
+      x: '100%',
+      opacity: 0.7,
+      duration: 0.3,
+      ease: 'power3.in',
       onComplete: () => {
         props.onBack?.();
         isClosingRef.current = false;
       },
     });
-  };
+  }, [props]);
 
   const handlePointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
     const target = e.target as HTMLElement | null;
@@ -92,6 +95,7 @@ export function MobileAuthTemplate(props: {
     startYRef.current = e.clientY;
     startXRef.current = e.clientX;
     currentDragYRef.current = 0;
+    currentDragXRef.current = 0;
 
     if (!contentRef.current || contentRef.current.scrollTop <= 0) {
       isDraggingRef.current = true;
@@ -105,9 +109,13 @@ export function MobileAuthTemplate(props: {
     const deltaY = e.clientY - startYRef.current;
     const deltaX = e.clientX - startXRef.current;
 
-    if (deltaY > 4 && deltaY > Math.abs(deltaX) * 0.7) {
-      currentDragYRef.current = deltaY;
-      gsap.set(drawerRef.current, { y: deltaY });
+    // Track vertical drag and edge swipe seamlessly
+    if (deltaY > 3 || Math.abs(deltaX) > 10) {
+      // Calculate smooth translation
+      const effectiveY = Math.max(0, deltaY) + (Math.abs(deltaX) * 0.35);
+      currentDragYRef.current = effectiveY;
+      currentDragXRef.current = deltaX;
+      gsap.set(drawerRef.current, { y: effectiveY });
     } else if (deltaY < 0 && currentDragYRef.current > 0) {
       currentDragYRef.current = deltaY * 0.15;
       gsap.set(drawerRef.current, { y: currentDragYRef.current });
@@ -120,18 +128,20 @@ export function MobileAuthTemplate(props: {
     }
     isDraggingRef.current = false;
 
-    if (currentDragYRef.current > 60) {
-      // Exceeded threshold -> slide down smoothly with GSAP
+    if (currentDragYRef.current > 50 || Math.abs(currentDragXRef.current) > 60) {
+      // Exceeded threshold -> close smoothly using unified GSAP exit
       triggerClose();
     } else {
       // Spring bounce back to 0 with GSAP physics
       gsap.to(drawerRef.current, {
         y: 0,
+        x: 0,
         duration: 0.42,
         ease: 'elastic.out(1, 0.75)',
       });
     }
     currentDragYRef.current = 0;
+    currentDragXRef.current = 0;
   };
 
   return (
@@ -151,7 +161,8 @@ export function MobileAuthTemplate(props: {
         role="button"
         tabIndex={0}
         aria-label="Tarik ke bawah untuk menutup"
-        onClick={() => {
+        onClick={(e) => {
+          e.stopPropagation();
           triggerClose();
         }}
         className="flex w-full cursor-grab active:cursor-grabbing flex-col items-center justify-center pt-3.5 pb-1 shrink-0 touch-none select-none hover:bg-neutral-50/50 transition-colors"
