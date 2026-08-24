@@ -57,14 +57,6 @@ export function AuthPrototype() {
     }
   };
 
-  const handleSwipeForward = () => {
-    if (currentScreen === 'onboarding') {
-      navigateTo('login');
-    } else if (currentScreen === 'login') {
-      navigateTo('signup');
-    }
-  };
-
   return (
     <div
       className={cn(
@@ -100,7 +92,6 @@ export function AuthPrototype() {
         <PhoneFrame
           isDarkContent={isDarkScreen}
           onSwipeBack={handleSwipeBack}
-          onSwipeForward={handleSwipeForward}
         >
           {currentScreen === 'onboarding' ? (
             <OnboardingScreen
