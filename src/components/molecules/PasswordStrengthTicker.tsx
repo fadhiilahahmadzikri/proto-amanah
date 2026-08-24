@@ -1,26 +1,18 @@
 'use client';
 
 import { gsap } from 'gsap';
-import { Check, ShieldCheck } from 'lucide-react';
+import { Check, ShieldAlert, ShieldCheck } from 'lucide-react';
 import React from 'react';
 import { cn } from '@/lib/utils';
-
-interface CriteriaItem {
-  id: string;
-  label: string;
-  isMet: boolean;
-}
 
 export function PasswordStrengthTicker(props: {
   password?: string;
   className?: string;
 }) {
   const password = props.password ?? '';
-  const [currentIndex, setCurrentIndex] = React.useState(0);
-  const containerRef = React.useRef<HTMLDivElement>(null);
   const itemRef = React.useRef<HTMLDivElement>(null);
 
-  const criteria: CriteriaItem[] = React.useMemo(() => {
+  const criteria = React.useMemo(() => {
     return [
       {
         id: 'min8',
@@ -29,139 +21,127 @@ export function PasswordStrengthTicker(props: {
       },
       {
         id: 'uppercase',
-        label: 'Huruf besar (A-Z)',
+        label: 'Gunakan huruf besar (A-Z)',
         isMet: /[A-Z]/.test(password),
       },
       {
-        id: 'lowercase',
-        label: 'Huruf kecil (a-z)',
-        isMet: /[a-z]/.test(password),
-      },
-      {
         id: 'number',
-        label: 'Kombinasi angka (0-9)',
+        label: 'Gunakan kombinasi angka (0-9)',
         isMet: /\d/.test(password),
       },
       {
         id: 'special',
-        label: 'Karakter spesial (!@#$%)',
+        label: 'Gunakan karakter spesial (!@#$%)',
         isMet: /[!@#$%^&*(),.?":{}|<>]/.test(password),
       },
     ];
   }, [password]);
 
-  // Periodic GSAP sliding down + blur animation to swap context
-  React.useEffect(() => {
-    const interval = setInterval(() => {
-      if (!itemRef.current) {
-        return;
-      }
-
-      // GSAP Exit Animation: Slide down with blurry motion
-      gsap.to(itemRef.current, {
-        y: 10,
-        opacity: 0,
-        filter: 'blur(5px)',
-        duration: 0.28,
-        ease: 'power2.in',
-        onComplete: () => {
-          setCurrentIndex(prev => (prev + 1) % criteria.length);
-
-          // GSAP Enter Animation: Slide in from top with smooth blur resolution
-          gsap.fromTo(
-            itemRef.current,
-            {
-              y: -10,
-              opacity: 0,
-              filter: 'blur(5px)',
-            },
-            {
-              y: 0,
-              opacity: 1,
-              filter: 'blur(0px)',
-              duration: 0.32,
-              ease: 'power2.out',
-            },
-          );
-        },
-      });
-    }, 2400);
-
-    return () => {
-      clearInterval(interval);
-    };
-  }, [criteria.length]);
-
-  const activeItem = criteria[currentIndex] ?? criteria[0];
-
-  if (!activeItem) {
-    return null;
-  }
-
-  const allMet = criteria.every(c => c.isMet);
+  // Find the first unmet requirement in the sequence
+  const firstUnmetIndex = criteria.findIndex(c => !c.isMet);
+  const allMet = firstUnmetIndex === -1;
+  const currentStep = allMet ? criteria.length : firstUnmetIndex;
   const metCount = criteria.filter(c => c.isMet).length;
+
+  const [displayedStep, setDisplayedStep] = React.useState(currentStep);
+  const prevStepRef = React.useRef(currentStep);
+
+  // When user satisfies the current rule, trigger smooth GSAP slide-down & blur transition to the next rule
+  React.useEffect(() => {
+    if (currentStep === prevStepRef.current) {
+      return;
+    }
+    prevStepRef.current = currentStep;
+
+    if (!itemRef.current) {
+      setDisplayedStep(currentStep);
+      return;
+    }
+
+    // GSAP Exit: Slide current rule down with subtle blur morph
+    gsap.to(itemRef.current, {
+      y: 10,
+      opacity: 0,
+      filter: 'blur(5px)',
+      duration: 0.22,
+      ease: 'power2.in',
+      onComplete: () => {
+        setDisplayedStep(currentStep);
+
+        // GSAP Enter: Slide next target rule down from top into place
+        gsap.fromTo(
+          itemRef.current,
+          {
+            y: -10,
+            opacity: 0,
+            filter: 'blur(5px)',
+          },
+          {
+            y: 0,
+            opacity: 1,
+            filter: 'blur(0px)',
+            duration: 0.28,
+            ease: 'power2.out',
+          },
+        );
+      },
+    });
+  }, [currentStep]);
+
+  const activeRequirement = criteria[displayedStep] ?? null;
 
   return (
     <div
-      ref={containerRef}
       className={cn(
         'relative flex items-center justify-between overflow-hidden rounded-xl px-3 py-1.5 transition-colors duration-300',
         allMet
-          ? 'bg-emerald-50/90 border border-emerald-200/70'
+          ? 'bg-emerald-50/90 border border-emerald-200/80 text-emerald-900'
           : metCount > 0
-            ? 'bg-neutral-50/90 border border-neutral-200/70'
-            : 'bg-neutral-50/60 border border-neutral-100',
+            ? 'bg-neutral-50/95 border border-neutral-200/80 text-neutral-800'
+            : 'bg-neutral-50/70 border border-neutral-100 text-neutral-700',
         props.className,
       )}
     >
-      {/* 1 Single Context Swap Ticker Area with GSAP Animations */}
+      {/* 1 Single Target Rule Swap Container (GSAP Sliding & Blurring on Rule Fulfilled) */}
       <div
         ref={itemRef}
         className="flex items-center gap-2 will-change-transform"
       >
-        <div
-          className={cn(
-            'flex h-4 w-4 shrink-0 items-center justify-center rounded-full transition-colors duration-200',
-            activeItem.isMet
-              ? 'bg-emerald-600 text-white'
-              : 'bg-neutral-200 text-neutral-500',
-          )}
-        >
-          {activeItem.isMet ? (
-            <Check className="h-2.5 w-2.5 stroke-[3]" />
-          ) : (
-            <div className="h-1.5 w-1.5 rounded-full bg-neutral-400" />
-          )}
-        </div>
-        <span
-          className={cn(
-            'text-[11px] font-medium leading-none tracking-normal transition-colors duration-200',
-            activeItem.isMet ? 'text-emerald-800' : 'text-neutral-600',
-          )}
-        >
-          {activeItem.label}
-        </span>
+        {allMet ? (
+          <>
+            <div className="flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-emerald-600 text-white shadow-xs">
+              <Check className="h-2.5 w-2.5 stroke-[3]" />
+            </div>
+            <span className="text-[11px] font-semibold text-emerald-800">
+              Password kuat & memenuhi syarat
+            </span>
+          </>
+        ) : (
+          <>
+            <div className="flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-neutral-200 text-neutral-600">
+              <div className="h-1.5 w-1.5 rounded-full bg-neutral-500" />
+            </div>
+            <span className="text-[11px] font-medium text-neutral-700">
+              {activeRequirement?.label}
+            </span>
+          </>
+        )}
       </div>
 
-      {/* Right Progress Capsule */}
+      {/* Progress Metric */}
       <div className="flex items-center gap-1 shrink-0 pl-2">
-        <ShieldCheck
-          className={cn(
-            'h-3.5 w-3.5 transition-colors',
-            allMet
-              ? 'text-emerald-600'
-              : metCount >= 3
-                ? 'text-amber-500'
-                : 'text-neutral-400',
-          )}
-        />
+        {allMet ? (
+          <ShieldCheck className="h-3.5 w-3.5 text-emerald-600" />
+        ) : (
+          <ShieldAlert className="h-3.5 w-3.5 text-neutral-400" />
+        )}
         <span
           className={cn(
             'text-[10px] font-semibold tabular-nums',
             allMet
               ? 'text-emerald-700'
-              : metCount >= 3
-                ? 'text-amber-600'
+              : metCount > 0
+                ? 'text-neutral-700'
                 : 'text-neutral-500',
           )}
         >

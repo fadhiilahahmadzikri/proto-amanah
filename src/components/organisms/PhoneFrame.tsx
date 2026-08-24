@@ -1,6 +1,6 @@
 'use client';
 
-import { ChevronLeft } from 'lucide-react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import React from 'react';
 import { GlassTouchCursor } from '@/components/atoms/GlassTouchCursor';
 import { cn } from '@/lib/utils';
@@ -14,18 +14,27 @@ export function PhoneFrame(props: {
   const isDark = props.isDarkContent ?? false;
   const screenRef = React.useRef<HTMLDivElement>(null);
 
-  // Left Edge Swipe Navigation State (Swipe from left edge to navigate back)
+  // Dual Edge Swipe Navigation (Swipe from either Left or Right edge to navigate / dismiss)
   const [edgeSwipe, setEdgeSwipe] = React.useState<{
     active: boolean;
+    side: 'left' | 'right' | null;
     deltaX: number;
+    y: number;
   }>({
     active: false,
+    side: null,
     deltaX: 0,
+    y: 350,
   });
 
-  const swipeStartRef = React.useRef<{ x: number; isLeftEdge: boolean }>({
+  const swipeStartRef = React.useRef<{
+    x: number;
+    y: number;
+    side: 'left' | 'right' | null;
+  }>({
     x: 0,
-    isLeftEdge: false,
+    y: 350,
+    side: null,
   });
 
   const handlePointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
@@ -35,34 +44,59 @@ export function PhoneFrame(props: {
     }
     const rect = screen.getBoundingClientRect();
     const relX = e.clientX - rect.left;
+    const relY = e.clientY - rect.top;
+    const width = rect.width;
 
-    // Detect if pointer started from left edge (< 32px)
-    if (relX < 32) {
-      swipeStartRef.current = { x: e.clientX, isLeftEdge: true };
-      setEdgeSwipe({ active: true, deltaX: 0 });
+    // Detect if pointer started from Left edge (< 48px) or Right edge (> width - 48px)
+    if (relX <= 48) {
+      swipeStartRef.current = { x: e.clientX, y: relY, side: 'left' };
+      setEdgeSwipe({ active: true, side: 'left', deltaX: 0, y: relY });
+      try {
+        e.currentTarget.setPointerCapture(e.pointerId);
+      } catch {
+        // ignore
+      }
+    } else if (relX >= width - 48) {
+      swipeStartRef.current = { x: e.clientX, y: relY, side: 'right' };
+      setEdgeSwipe({ active: true, side: 'right', deltaX: 0, y: relY });
+      try {
+        e.currentTarget.setPointerCapture(e.pointerId);
+      } catch {
+        // ignore
+      }
     } else {
-      swipeStartRef.current = { x: 0, isLeftEdge: false };
+      swipeStartRef.current = { x: 0, y: 350, side: null };
     }
   };
 
   const handlePointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
-    if (!swipeStartRef.current.isLeftEdge) {
+    if (!swipeStartRef.current.side) {
       return;
     }
     const delta = e.clientX - swipeStartRef.current.x;
 
-    if (delta > 0) {
-      setEdgeSwipe({ active: true, deltaX: delta });
+    if (swipeStartRef.current.side === 'left' && delta > 0) {
+      setEdgeSwipe(prev => ({ ...prev, active: true, deltaX: delta }));
+    } else if (swipeStartRef.current.side === 'right' && delta < 0) {
+      setEdgeSwipe(prev => ({ ...prev, active: true, deltaX: delta }));
     }
   };
 
-  const handlePointerUp = () => {
-    if (swipeStartRef.current.isLeftEdge && edgeSwipe.deltaX > 50) {
+  const handlePointerUp = (e: React.PointerEvent<HTMLDivElement>) => {
+    try {
+      e.currentTarget.releasePointerCapture(e.pointerId);
+    } catch {
+      // ignore
+    }
+
+    if (swipeStartRef.current.side === 'left' && edgeSwipe.deltaX > 45) {
+      props.onSwipeBack?.();
+    } else if (swipeStartRef.current.side === 'right' && Math.abs(edgeSwipe.deltaX) > 45) {
       props.onSwipeBack?.();
     }
 
-    swipeStartRef.current = { x: 0, isLeftEdge: false };
-    setEdgeSwipe({ active: false, deltaX: 0 });
+    swipeStartRef.current = { x: 0, y: 350, side: null };
+    setEdgeSwipe({ active: false, side: null, deltaX: 0, y: 350 });
   };
 
   return (
@@ -107,33 +141,61 @@ export function PhoneFrame(props: {
           onPointerMove={handlePointerMove}
           onPointerUp={handlePointerUp}
           onPointerCancel={handlePointerUp}
-          className="relative flex h-full w-full flex-col overflow-hidden rounded-[42px] bg-neutral-950 shadow-inner sm:rounded-[46px] cursor-none"
+          className="relative flex h-full w-full flex-col overflow-hidden rounded-[42px] bg-neutral-950 shadow-inner sm:rounded-[46px] cursor-none touch-none"
         >
           {/* Authentic iOS Liquid Glass Touch Cursor */}
           <GlassTouchCursor containerRef={screenRef} isDark={isDark} />
 
-          {/* Left Edge Swipe Gesture Navigation Indicator (Back) */}
-          {edgeSwipe.active && edgeSwipe.deltaX > 8 && (
+          {/* Left Edge Swipe Gesture Indicator */}
+          {edgeSwipe.active && edgeSwipe.side === 'left' && edgeSwipe.deltaX > 4 && (
             <div
-              className="pointer-events-none absolute left-0 top-1/2 z-50 -translate-y-1/2 will-change-transform"
+              className="pointer-events-none absolute left-0 z-50 -translate-y-1/2 will-change-transform"
               style={{
-                transform: `translate3d(${Math.min(edgeSwipe.deltaX * 0.4, 28) - 32}px, -50%, 0)`,
+                top: `${edgeSwipe.y}px`,
+                transform: `translate3d(${Math.min(edgeSwipe.deltaX * 0.45, 36) - 40}px, 0, 0)`,
                 transition: edgeSwipe.deltaX === 0 ? 'transform 200ms ease-out' : 'none',
               }}
             >
               <div
                 className={cn(
-                  'flex h-11 w-9 items-center justify-center rounded-r-xl border-y border-r backdrop-blur-xl shadow-lg transition-colors',
-                  edgeSwipe.deltaX > 50
-                    ? 'bg-neutral-900/90 text-white border-white/40 ring-1 ring-white/30'
-                    : 'bg-neutral-900/70 text-white/90 border-white/20',
+                  'flex h-12 w-10 items-center justify-center rounded-r-2xl border-y border-r shadow-2xl transition-all',
+                  edgeSwipe.deltaX > 45
+                    ? 'bg-neutral-900/95 text-white border-white/50 ring-2 ring-white/30 scale-105'
+                    : 'bg-neutral-900/80 text-white/90 border-white/25',
                 )}
                 style={{
-                  backdropFilter: 'blur(16px) saturate(180%)',
-                  WebkitBackdropFilter: 'blur(16px) saturate(180%)',
+                  backdropFilter: 'blur(20px) saturate(180%)',
+                  WebkitBackdropFilter: 'blur(20px) saturate(180%)',
                 }}
               >
-                <ChevronLeft className="h-4 w-4 stroke-[2.5]" />
+                <ChevronLeft className="h-5 w-5 stroke-[2.5]" />
+              </div>
+            </div>
+          )}
+
+          {/* Right Edge Swipe Gesture Indicator */}
+          {edgeSwipe.active && edgeSwipe.side === 'right' && edgeSwipe.deltaX < -4 && (
+            <div
+              className="pointer-events-none absolute right-0 z-50 -translate-y-1/2 will-change-transform"
+              style={{
+                top: `${edgeSwipe.y}px`,
+                transform: `translate3d(${40 - Math.min(Math.abs(edgeSwipe.deltaX) * 0.45, 36)}px, 0, 0)`,
+                transition: edgeSwipe.deltaX === 0 ? 'transform 200ms ease-out' : 'none',
+              }}
+            >
+              <div
+                className={cn(
+                  'flex h-12 w-10 items-center justify-center rounded-l-2xl border-y border-l shadow-2xl transition-all',
+                  Math.abs(edgeSwipe.deltaX) > 45
+                    ? 'bg-neutral-900/95 text-white border-white/50 ring-2 ring-white/30 scale-105'
+                    : 'bg-neutral-900/80 text-white/90 border-white/25',
+                )}
+                style={{
+                  backdropFilter: 'blur(20px) saturate(180%)',
+                  WebkitBackdropFilter: 'blur(20px) saturate(180%)',
+                }}
+              >
+                <ChevronRight className="h-5 w-5 stroke-[2.5]" />
               </div>
             </div>
           )}
