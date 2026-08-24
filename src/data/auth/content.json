@@ -1,0 +1,64 @@
+{
+  "onboarding": {
+    "title": "Sehat Bersama Amanah",
+    "subtitle": "Temukan layanan kesehatan dan perawatan terbaik yang dirancang khusus untuk kebutuhanmu.",
+    "getStarted": "Mulai Sekarang",
+    "alreadyHaveAccount": "Saya Sudah Punya Akun",
+    "termsNotice": "Dengan melanjutkan, kamu menyetujui Ketentuan Layanan dan Kebijakan Privasi."
+  },
+  "login": {
+    "title": "Selamat Datang Kembali",
+    "subtitle": "Masuk untuk melanjutkan ke akunmu.",
+    "emailOrPhonePlaceholder": "Email atau nomor telepon",
+    "passwordPlaceholder": "Password",
+    "forgotPasswordLink": "Lupa password?",
+    "submitButton": "Masuk",
+    "continueWithGoogle": "Lanjutkan dengan Google",
+    "dividerText": "atau masuk dengan",
+    "dontHaveAccount": "Belum punya akun?",
+    "signUpLink": "Daftar"
+  },
+  "signUp": {
+    "title": "Buat Akun Barumu",
+    "subtitle": "Mulai pengalaman kesehatan yang dipersonalisasi.",
+    "fullNamePlaceholder": "Nama lengkap",
+    "emailPlaceholder": "Email",
+    "phonePlaceholder": "Nomor telepon",
+    "passwordPlaceholder": "Password",
+    "confirmPasswordPlaceholder": "Konfirmasi password",
+    "submitButton": "Daftar",
+    "continueWithGoogle": "Lanjutkan dengan Google",
+    "dividerText": "atau daftar dengan",
+    "alreadyHaveAccount": "Sudah punya akun?",
+    "signInLink": "Masuk"
+  },
+  "forgotPassword": {
+    "title": "Lupa password",
+    "subtitle": "Masukkan emailmu, kita akan mengirim OTP ke sana",
+    "emailPlaceholder": "Masukkan emailmu",
+    "submitButton": "Kirim OTP",
+    "loadingText": "Mengirimkan kode OTP..."
+  },
+  "otp": {
+    "title": "Masukkan kode",
+    "subtitle": "Kode OTP telah dikirimkan ke emailmu",
+    "resendCountdownPrefix": "Kirim ulang kode dalam",
+    "resendButton": "Resend",
+    "submitButton": "Verifikasi OTP",
+    "loadingText": "Memvalidasi kode OTP...",
+    "resendingText": "Mengirim ulang kode OTP..."
+  },
+  "changePassword": {
+    "title": "Ganti password",
+    "subtitle": "Silakan masukkan password baru kamu di bawah ini.",
+    "newPasswordPlaceholder": "password baru",
+    "confirmPasswordPlaceholder": "confirm password",
+    "submitButton": "Ganti Password",
+    "loadingText": "Menyimpan password baru..."
+  },
+  "success": {
+    "title": "Password berhasil di ganti",
+    "subtitle": "Silahkan masukkan password baru untuk masuk",
+    "loginButton": "Masuk"
+  }
+}

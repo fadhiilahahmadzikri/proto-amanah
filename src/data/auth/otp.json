@@ -1,0 +1,5 @@
+{
+  "defaultOtp": "123456",
+  "expiresInSeconds": 60,
+  "digitsCount": 6
+}
