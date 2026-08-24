@@ -4,6 +4,7 @@ import { cn } from '@/lib/utils';
 export function IconButton(props: {
   children: React.ReactNode;
   onClick?: (event: React.MouseEvent<HTMLButtonElement>) => void;
+  onPointerDown?: (event: React.PointerEvent<HTMLButtonElement>) => void;
   ariaLabel: string;
   className?: string;
   variant?: 'ghost' | 'filled' | 'outline';
@@ -24,6 +25,7 @@ export function IconButton(props: {
       type="button"
       aria-label={props.ariaLabel}
       onClick={props.onClick}
+      onPointerDown={props.onPointerDown}
       disabled={props.disabled}
       className={cn(
         'inline-flex h-9 w-9 items-center justify-center rounded-full transition-all duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-neutral-900 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer active:scale-95',

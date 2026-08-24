@@ -14,7 +14,7 @@ export function PhoneFrame(props: {
   const isDark = props.isDarkContent ?? false;
   const screenRef = React.useRef<HTMLDivElement>(null);
 
-  // Dual Edge Swipe Navigation (Swipe from either Left or Right edge to navigate / dismiss)
+  // Dual Edge Swipe Navigation (Swipe from Left or Right edge to navigate / dismiss)
   const [edgeSwipe, setEdgeSwipe] = React.useState<{
     active: boolean;
     side: 'left' | 'right' | null;
@@ -38,6 +38,13 @@ export function PhoneFrame(props: {
   });
 
   const handlePointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
+    // If user clicks on an interactive button, link, or input, do NOT hijack with edge swipe
+    const target = e.target as HTMLElement | null;
+    if (target?.closest('button, a, input, textarea, select, [role="button"]')) {
+      swipeStartRef.current = { x: 0, y: 350, side: null };
+      return;
+    }
+
     const screen = screenRef.current;
     if (!screen) {
       return;
@@ -47,23 +54,11 @@ export function PhoneFrame(props: {
     const relY = e.clientY - rect.top;
     const width = rect.width;
 
-    // Detect if pointer started from Left edge (< 48px) or Right edge (> width - 48px)
-    if (relX <= 48) {
+    // Detect if pointer started from Left edge (< 40px) or Right edge (> width - 40px)
+    if (relX <= 40) {
       swipeStartRef.current = { x: e.clientX, y: relY, side: 'left' };
-      setEdgeSwipe({ active: true, side: 'left', deltaX: 0, y: relY });
-      try {
-        e.currentTarget.setPointerCapture(e.pointerId);
-      } catch {
-        // ignore
-      }
-    } else if (relX >= width - 48) {
+    } else if (relX >= width - 40) {
       swipeStartRef.current = { x: e.clientX, y: relY, side: 'right' };
-      setEdgeSwipe({ active: true, side: 'right', deltaX: 0, y: relY });
-      try {
-        e.currentTarget.setPointerCapture(e.pointerId);
-      } catch {
-        // ignore
-      }
     } else {
       swipeStartRef.current = { x: 0, y: 350, side: null };
     }
@@ -76,19 +71,13 @@ export function PhoneFrame(props: {
     const delta = e.clientX - swipeStartRef.current.x;
 
     if (swipeStartRef.current.side === 'left' && delta > 0) {
-      setEdgeSwipe(prev => ({ ...prev, active: true, deltaX: delta }));
+      setEdgeSwipe({ active: true, side: 'left', deltaX: delta, y: swipeStartRef.current.y });
     } else if (swipeStartRef.current.side === 'right' && delta < 0) {
-      setEdgeSwipe(prev => ({ ...prev, active: true, deltaX: delta }));
+      setEdgeSwipe({ active: true, side: 'right', deltaX: delta, y: swipeStartRef.current.y });
     }
   };
 
-  const handlePointerUp = (e: React.PointerEvent<HTMLDivElement>) => {
-    try {
-      e.currentTarget.releasePointerCapture(e.pointerId);
-    } catch {
-      // ignore
-    }
-
+  const handlePointerUp = () => {
     if (swipeStartRef.current.side === 'left' && edgeSwipe.deltaX > 45) {
       props.onSwipeBack?.();
     } else if (swipeStartRef.current.side === 'right' && Math.abs(edgeSwipe.deltaX) > 45) {
@@ -141,7 +130,7 @@ export function PhoneFrame(props: {
           onPointerMove={handlePointerMove}
           onPointerUp={handlePointerUp}
           onPointerCancel={handlePointerUp}
-          className="relative flex h-full w-full flex-col overflow-hidden rounded-[42px] bg-neutral-950 shadow-inner sm:rounded-[46px] cursor-none touch-none"
+          className="relative flex h-full w-full flex-col overflow-hidden rounded-[42px] bg-neutral-950 shadow-inner sm:rounded-[46px] cursor-none"
         >
           {/* Authentic iOS Liquid Glass Touch Cursor */}
           <GlassTouchCursor containerRef={screenRef} isDark={isDark} />
@@ -258,7 +247,7 @@ export function PhoneFrame(props: {
                 className="shrink-0"
               >
                 <path
-                  d="M7.5 10.5C8.05228 10.5 8.5 10.0523 8.5 9.5C8.5 8.94772 8.05228 8.5 7.5 8.5C6.94772 8.5 6.5 8.94772 6.5 9.5C6.5 10.0523 6.94772 10.5 7.5 10.5Z"
+                  d="M7.5 10.5C8.05228 10.5 8.5 10.0523 8.5 9.5C8.5 8.94772 8.05228 8.5 7.5 10.5Z"
                   fill="currentColor"
                 />
                 <path

@@ -171,7 +171,13 @@ export function MobileAuthTemplate(props: {
           {showBack && props.onBack && (
             <IconButton
               ariaLabel="Kembali ke halaman sebelumnya"
-              onClick={triggerBack}
+              onClick={(e) => {
+                e.stopPropagation();
+                triggerBack();
+              }}
+              onPointerDown={(e) => {
+                e.stopPropagation();
+              }}
               variant="ghost"
               className="text-neutral-700 hover:text-neutral-950 -ml-1 cursor-pointer"
             >
@@ -188,7 +194,13 @@ export function MobileAuthTemplate(props: {
           {showClose && props.onClose && (
             <IconButton
               ariaLabel="Tutup"
-              onClick={triggerClose}
+              onClick={(e) => {
+                e.stopPropagation();
+                triggerClose();
+              }}
+              onPointerDown={(e) => {
+                e.stopPropagation();
+              }}
               variant="ghost"
               className="bg-neutral-100/80 text-neutral-500 hover:text-neutral-900 -mr-1 cursor-pointer"
             >
