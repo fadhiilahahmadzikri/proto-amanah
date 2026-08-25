@@ -1,7 +1,9 @@
 'use client';
 
 import React from 'react';
+import { ConfigButton } from '@/components/atoms/ConfigButton';
 import { ThemeSwitcher } from '@/components/atoms/ThemeSwitcher';
+import { CredentialsConfigModal } from '@/components/molecules/CredentialsConfigModal';
 import { ChangePasswordScreen } from '@/components/organisms/ChangePasswordScreen';
 import { DoctorDashboardScreen } from '@/components/organisms/DoctorDashboardScreen';
 import { ForgotPasswordScreen } from '@/components/organisms/ForgotPasswordScreen';
@@ -16,6 +18,7 @@ import { cn } from '@/lib/utils';
 
 export function AuthPrototype() {
   const [theme, setTheme] = React.useState<'dark' | 'light'>('dark');
+  const [isConfigOpen, setIsConfigOpen] = React.useState(false);
 
   const {
     currentScreen,
@@ -60,6 +63,20 @@ export function AuthPrototype() {
     }
   };
 
+  const handleSelectCredential = (user: {
+    name: string;
+    email: string;
+    phone: string;
+    password: string;
+  }) => {
+    handleInputChange('emailOrPhone', user.email);
+    handleInputChange('email', user.email);
+    handleInputChange('phone', user.phone);
+    handleInputChange('password', user.password);
+    handleInputChange('confirmPassword', user.password);
+    handleInputChange('fullName', user.name);
+  };
+
   return (
     <div
       className={cn(
@@ -69,10 +86,23 @@ export function AuthPrototype() {
           : 'bg-gradient-to-br from-[#f8fafc] via-[#f1f5f9] to-[#e2e8f0] text-neutral-900',
       )}
     >
-      {/* Top Right Liquid Glass Theme Switcher (Moon / Sun Switcher) */}
-      <div className="fixed top-4 right-4 z-50 sm:top-6 sm:right-6">
+      {/* Top Right Studio Controls: Theme Switcher & Config Button */}
+      <div className="fixed top-4 right-4 z-50 flex flex-col gap-2.5 sm:top-6 sm:right-6">
         <ThemeSwitcher theme={theme} onToggle={toggleTheme} />
+        <ConfigButton
+          theme={theme}
+          isOpen={isConfigOpen}
+          onClick={() => setIsConfigOpen(prev => !prev)}
+        />
       </div>
+
+      {/* Prototype Credentials Config Modal */}
+      <CredentialsConfigModal
+        isOpen={isConfigOpen}
+        onClose={() => setIsConfigOpen(false)}
+        onSelectUser={handleSelectCredential}
+        theme={theme}
+      />
 
       {/* Apple Studio Frosted Glass Blurry Ambient Mesh Layers */}
       {theme === 'dark' ? (
