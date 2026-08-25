@@ -6,17 +6,26 @@ export type BottomNavTab = 'home' | 'schedule' | 'qr' | 'notification' | 'accoun
 export function BottomNavBar(props: {
   activeTab?: BottomNavTab;
   onTabChange?: (tab: BottomNavTab) => void;
+  theme?: 'dark' | 'light';
   className?: string;
 }) {
   const activeTab = props.activeTab ?? 'home';
+  const isDark = props.theme === 'dark';
 
   return (
     <nav
       aria-label="Navigasi Utama"
       className={cn(
-        'absolute bottom-0 w-full bg-white px-3 pt-2 pb-6 border-t border-gray-100 flex justify-around items-end shadow-[0_-10px_30px_rgba(0,0,0,0.03)] z-40 rounded-b-[32px] sm:rounded-b-[36px] select-none',
+        'absolute bottom-0 w-full px-3 pt-2 pb-6 flex justify-around items-end z-40 rounded-b-[32px] sm:rounded-b-[36px] select-none transition-colors duration-300',
+        isDark
+          ? 'bg-neutral-950/85 border-t border-white/10 shadow-[0_-10px_30px_rgba(0,0,0,0.4)] backdrop-blur-2xl'
+          : 'bg-white border-t border-gray-100 shadow-[0_-10px_30px_rgba(0,0,0,0.03)]',
         props.className,
       )}
+      style={{
+        backdropFilter: 'blur(24px) saturate(180%)',
+        WebkitBackdropFilter: 'blur(24px) saturate(180%)',
+      }}
     >
       {/* 1. Home Tab */}
       <button
@@ -25,8 +34,8 @@ export function BottomNavBar(props: {
         className={cn(
           'flex flex-col items-center gap-1 w-14 pb-1 transition-all cursor-pointer focus:outline-none',
           activeTab === 'home'
-            ? 'text-[#1C1645] font-bold'
-            : 'text-[#9CA3AF] hover:text-slate-600 font-medium',
+            ? isDark ? 'text-cyan-400 font-bold scale-105' : 'text-[#1C1645] font-bold scale-105'
+            : isDark ? 'text-neutral-500 hover:text-neutral-300 font-medium' : 'text-[#9CA3AF] hover:text-slate-600 font-medium',
         )}
       >
         <Home className="h-6 w-6 stroke-[2.2]" />
@@ -40,8 +49,8 @@ export function BottomNavBar(props: {
         className={cn(
           'flex flex-col items-center gap-1 w-14 pb-1 transition-all cursor-pointer focus:outline-none',
           activeTab === 'schedule'
-            ? 'text-[#1C1645] font-bold'
-            : 'text-[#9CA3AF] hover:text-slate-600 font-medium',
+            ? isDark ? 'text-cyan-400 font-bold scale-105' : 'text-[#1C1645] font-bold scale-105'
+            : isDark ? 'text-neutral-500 hover:text-neutral-300 font-medium' : 'text-[#9CA3AF] hover:text-slate-600 font-medium',
         )}
       >
         <Calendar className="h-6 w-6 stroke-[2.2]" />
@@ -54,7 +63,13 @@ export function BottomNavBar(props: {
           type="button"
           aria-label="Pindai QR Presensi"
           onClick={() => props.onTabChange?.('qr')}
-          className="absolute bottom-1 w-14 h-14 bg-[#14103B] rounded-[20px] flex items-center justify-center text-white text-2xl shadow-lg shadow-[#14103B]/30 transform hover:scale-105 active:scale-95 transition-all cursor-pointer focus:outline-none ring-4 ring-white"
+          className={cn(
+            'absolute bottom-1 w-14 h-14 rounded-[20px] flex items-center justify-center text-white text-2xl shadow-lg transform hover:scale-105 active:scale-95 transition-all cursor-pointer focus:outline-none',
+            activeTab === 'qr' && 'ring-2 ring-cyan-400',
+            isDark
+              ? 'bg-blue-600 shadow-blue-600/30 ring-4 ring-neutral-900'
+              : 'bg-[#14103B] shadow-[#14103B]/30 ring-4 ring-white',
+          )}
         >
           <QrCode className="h-7 w-7 stroke-[2]" />
         </button>
@@ -67,8 +82,8 @@ export function BottomNavBar(props: {
         className={cn(
           'flex flex-col items-center gap-1 w-14 pb-1 transition-all cursor-pointer focus:outline-none',
           activeTab === 'notification'
-            ? 'text-[#1C1645] font-bold'
-            : 'text-[#9CA3AF] hover:text-slate-600 font-medium',
+            ? isDark ? 'text-cyan-400 font-bold scale-105' : 'text-[#1C1645] font-bold scale-105'
+            : isDark ? 'text-neutral-500 hover:text-neutral-300 font-medium' : 'text-[#9CA3AF] hover:text-slate-600 font-medium',
         )}
       >
         <Bell className="h-6 w-6 stroke-[2.2]" />
@@ -82,8 +97,8 @@ export function BottomNavBar(props: {
         className={cn(
           'flex flex-col items-center gap-1 w-14 pb-1 transition-all cursor-pointer focus:outline-none',
           activeTab === 'account'
-            ? 'text-[#1C1645] font-bold'
-            : 'text-[#9CA3AF] hover:text-slate-600 font-medium',
+            ? isDark ? 'text-cyan-400 font-bold scale-105' : 'text-[#1C1645] font-bold scale-105'
+            : isDark ? 'text-neutral-500 hover:text-neutral-300 font-medium' : 'text-[#9CA3AF] hover:text-slate-600 font-medium',
         )}
       >
         <User className="h-6 w-6 stroke-[2.2]" />

@@ -1,12 +1,18 @@
+'use client';
+
+import React from 'react';
 import { cn } from '@/lib/utils';
 
 export function DoctorAvatar(props: {
-  src: string;
+  src?: string;
   alt: string;
   size?: number;
   className?: string;
 }) {
   const size = props.size ?? 52;
+  const [hasError, setHasError] = React.useState(false);
+  const fallbackSrc = '/assets/images/woman-signin-hero.png';
+  const displaySrc = !hasError && props.src ? props.src : fallbackSrc;
 
   return (
     <div
@@ -20,9 +26,10 @@ export function DoctorAvatar(props: {
       }}
     >
       <img
-        src={props.src}
+        src={displaySrc}
         alt={props.alt}
-        className="w-full h-full object-cover"
+        onError={() => setHasError(true)}
+        className="w-full h-full object-cover object-top"
         loading="eager"
       />
     </div>

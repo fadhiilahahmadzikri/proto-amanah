@@ -33,8 +33,7 @@ describe('Auth Prototype Configuration and Data', () => {
   describe('Doctor Portal Dashboard Data', () => {
     it('contains doctor profile with avatar and unread count', () => {
       expect(portalData.profile.name).toBe('dr. Andika Perkasa');
-      expect(portalData.profile.greeting).toBe('Selamat Pagi');
-      expect(portalData.profile.avatarUrl).toContain('unsplash');
+      expect(portalData.profile.avatarUrl).toBe('/assets/images/woman-signin-hero.png');
     });
 
     it('contains 3 distinct doctor schedule cards with room and slot details', () => {

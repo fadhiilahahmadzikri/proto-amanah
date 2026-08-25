@@ -7,6 +7,7 @@ import type { DoctorSchedule } from '@/types/portal.types';
 
 export function ScheduleCardStack(props: {
   schedules: DoctorSchedule[];
+  theme?: 'dark' | 'light';
   className?: string;
 }) {
   const [currentIndex, setCurrentIndex] = React.useState(0);
@@ -149,9 +150,9 @@ export function ScheduleCardStack(props: {
       >
         <ScheduleCard
           schedule={schedule}
+          theme={props.theme}
           onDismiss={isFront ? handleDismiss : undefined}
           className={cn(
-            'shadow-[0_15px_35px_-10px_rgba(0,0,0,0.08)]',
             isFront ? 'cursor-grab active:cursor-grabbing' : 'pointer-events-none',
           )}
         />

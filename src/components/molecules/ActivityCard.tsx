@@ -6,15 +6,20 @@ import type { ActivityMetric } from '@/types/portal.types';
 export function ActivityCard(props: {
   item: ActivityMetric;
   onClick?: () => void;
+  theme?: 'dark' | 'light';
   className?: string;
 }) {
+  const isDark = props.theme === 'dark';
   const isBlue = props.item.glowVariant === 'blue';
 
   return (
     <div
       onClick={props.onClick}
       className={cn(
-        'flex-1 relative overflow-hidden bg-white rounded-[24px] p-4 shadow-[0_8px_20px_-6px_rgba(0,0,0,0.04)] border border-slate-100 group cursor-pointer hover:shadow-[0_8px_25px_-5px_rgba(0,0,0,0.08)] active:scale-[0.98] transition-all duration-200 select-none',
+        'flex-1 relative overflow-hidden rounded-[24px] p-4 border group cursor-pointer active:scale-[0.98] transition-all duration-300 select-none',
+        isDark
+          ? 'bg-neutral-900/90 border-white/15 text-white shadow-2xl shadow-black/50 backdrop-blur-xl hover:border-white/25'
+          : 'bg-white border-slate-100 text-slate-900 shadow-[0_8px_20px_-6px_rgba(0,0,0,0.04)] hover:shadow-[0_8px_25px_-5px_rgba(0,0,0,0.08)]',
         props.className,
       )}
     >
@@ -34,7 +39,9 @@ export function ActivityCard(props: {
           <div
             className={cn(
               'w-9 h-9 rounded-full flex items-center justify-center shrink-0',
-              isBlue ? 'bg-blue-50 text-[#0A44FF]' : 'bg-emerald-50 text-emerald-500',
+              isBlue
+                ? 'bg-blue-50 text-[#0A44FF] dark:bg-blue-950/50 dark:text-cyan-400'
+                : 'bg-emerald-50 text-emerald-500 dark:bg-emerald-950/50 dark:text-emerald-400',
             )}
           >
             {props.item.icon === 'users' ? (
@@ -52,14 +59,29 @@ export function ActivityCard(props: {
 
         {/* Counter Metric */}
         <div className="flex flex-col mt-1">
-          <span className="text-slate-500 text-[11px] font-semibold mb-1">
+          <span
+            className={cn(
+              'text-[11px] font-semibold mb-1',
+              isDark ? 'text-neutral-400' : 'text-slate-500',
+            )}
+          >
             {props.item.title}
           </span>
           <div className="flex items-end gap-1.5">
-            <span className="font-black text-slate-800 text-[32px] leading-none tracking-tighter tabular-nums">
+            <span
+              className={cn(
+                'font-black text-[32px] leading-none tracking-tighter tabular-nums',
+                isDark ? 'text-white' : 'text-slate-800',
+              )}
+            >
               {props.item.count}
             </span>
-            <span className="text-slate-400 text-[11px] font-medium pb-0.5">
+            <span
+              className={cn(
+                'text-[11px] font-medium pb-0.5',
+                isDark ? 'text-neutral-400' : 'text-slate-400',
+              )}
+            >
               {props.item.unit}
             </span>
           </div>

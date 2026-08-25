@@ -5,6 +5,7 @@ import type { QuickActionItem } from '@/types/portal.types';
 export function QuickAccessSection(props: {
   actions: QuickActionItem[];
   onActionClick?: (actionId: string) => void;
+  theme?: 'dark' | 'light';
   className?: string;
 }) {
   return (
@@ -18,6 +19,7 @@ export function QuickAccessSection(props: {
         <QuickActionButton
           key={action.id}
           item={action}
+          theme={props.theme}
           onClick={() => props.onActionClick?.(action.id)}
         />
       ))}

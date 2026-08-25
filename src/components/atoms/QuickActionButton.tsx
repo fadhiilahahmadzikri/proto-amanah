@@ -5,8 +5,11 @@ import type { QuickActionItem } from '@/types/portal.types';
 export function QuickActionButton(props: {
   item: QuickActionItem;
   onClick?: () => void;
+  theme?: 'dark' | 'light';
   className?: string;
 }) {
+  const isDark = props.theme === 'dark';
+
   const renderIcon = () => {
     switch (props.item.icon) {
       case 'presence':
@@ -31,10 +34,22 @@ export function QuickActionButton(props: {
         props.className,
       )}
     >
-      <div className="w-[60px] h-[60px] bg-white rounded-[20px] flex items-center justify-center shadow-[0_8px_20px_-6px_rgba(0,0,0,0.08)] border border-slate-50 text-[#0A44FF]">
+      <div
+        className={cn(
+          'w-[60px] h-[60px] rounded-[20px] flex items-center justify-center border transition-all duration-300',
+          isDark
+            ? 'bg-neutral-900/90 border-white/15 text-cyan-400 shadow-xl shadow-black/40 backdrop-blur-xl'
+            : 'bg-white border-slate-50 text-[#0A44FF] shadow-[0_8px_20px_-6px_rgba(0,0,0,0.08)]',
+        )}
+      >
         {renderIcon()}
       </div>
-      <span className="text-[#4a4f63] text-[11px] font-bold tracking-tight text-center">
+      <span
+        className={cn(
+          'text-[11px] font-bold tracking-tight text-center transition-colors',
+          isDark ? 'text-neutral-300' : 'text-[#4a4f63]',
+        )}
+      >
         {props.item.label}
       </span>
     </button>

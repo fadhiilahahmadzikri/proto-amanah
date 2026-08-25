@@ -136,7 +136,10 @@ export function AuthPrototype() {
               }}
             />
           ) : currentScreen === 'dashboard' ? (
-            <DoctorDashboardScreen onLogout={handleLogout} />
+            <DoctorDashboardScreen
+              theme={theme}
+              onLogout={handleLogout}
+            />
           ) : (
             <div className="relative flex h-full w-full flex-col justify-end overflow-hidden bg-neutral-950">
               {/* Underlying Hero Background Image */}

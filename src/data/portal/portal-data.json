@@ -4,7 +4,7 @@
     "name": "dr. Andika Perkasa",
     "role": "Dokter Spesialis Anak",
     "greeting": "Selamat Pagi",
-    "avatarUrl": "https://images.unsplash.com/photo-1612349317150-e410f624c427?q=80&w=150&auto=format&fit=crop",
+    "avatarUrl": "/assets/images/woman-signin-hero.png",
     "unreadNotifications": 3
   },
   "schedules": [
