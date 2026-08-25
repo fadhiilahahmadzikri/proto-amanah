@@ -24,6 +24,9 @@ export function ScheduleTabScreen(props: {
     { day: 'Sab', date: '25' },
   ];
 
+  const ticketPath =
+    'M 0 20 A 20 20 0 0 1 20 0 L 320 0 A 20 20 0 0 1 340 20 L 340 70 A 9 9 0 0 0 340 88 L 340 128 A 20 20 0 0 1 320 148 L 20 148 A 20 20 0 0 1 0 128 L 0 88 A 9 9 0 0 0 0 70 Z';
+
   return (
     <div className={cn('flex flex-col gap-5 pt-2 pb-28 select-text', props.className)}>
       {/* Title Header */}
@@ -57,7 +60,7 @@ export function ScheduleTabScreen(props: {
                   : 'bg-white/10 hover:bg-white/20 text-white/80 font-medium backdrop-blur-md border border-white/15',
               )}
             >
-              <span className="text-[10px] uppercase tracking-wider">{d.day}</span>
+              <span className="text-[10px] font-medium tracking-wide">{d.day}</span>
               <span className="text-sm font-black mt-0.5 tabular-nums">{d.date}</span>
             </button>
           );
@@ -68,96 +71,133 @@ export function ScheduleTabScreen(props: {
       <div className="flex flex-col gap-3.5 mt-1">
         <h3
           className={cn(
-            'text-xs font-bold uppercase tracking-wider px-1',
+            'text-xs font-bold tracking-tight px-1',
             isDark ? 'text-neutral-400' : 'text-slate-600',
           )}
         >
-          Sesi Praktek Tersedia
+          Sesi praktek tersedia
         </h3>
 
-        {schedules.map((sch) => (
-          <div
-            key={sch.id}
-            className={cn(
-              'rounded-[22px] p-4.5 border transition-all select-none',
-              isDark
-                ? 'bg-neutral-900/80 border-white/10 text-white shadow-lg'
-                : 'bg-white border-slate-100 text-slate-900 shadow-[0_8px_20px_-6px_rgba(0,0,0,0.05)]',
-            )}
-          >
-            <div className="flex justify-between items-start mb-3">
-              <div>
-                <span
-                  className={cn(
-                    'text-sm font-bold block',
-                    isDark ? 'text-white' : 'text-slate-800',
-                  )}
-                >
-                  {sch.title}
-                </span>
-                <span
-                  className={cn(
-                    'text-[11px]',
-                    isDark ? 'text-neutral-400' : 'text-slate-500',
-                  )}
-                >
-                  {sch.date}
-                </span>
-              </div>
-              <StatusBadge
-                variant={sch.badgeVariant}
-                text={sch.badge}
-              />
-            </div>
+        {schedules.map((sch) => {
+          const cardClipId = `sch-clip-${sch.id}`;
 
+          return (
             <div
-              className={cn(
-                'flex items-center justify-between text-xs pt-2 border-t border-dashed',
-                isDark ? 'border-white/10' : 'border-neutral-200/60',
-              )}
+              key={sch.id}
+              className="relative w-full h-[148px] select-none drop-shadow-[0_8px_20px_rgba(0,0,0,0.05)]"
             >
-              <div
-                className={cn(
-                  'flex items-center gap-1.5 font-semibold',
-                  isDark ? 'text-cyan-400' : 'text-blue-600',
-                )}
+              {/* True SVG Ticket Silhouette with C Cutout Notches */}
+              <svg
+                className="absolute inset-0 w-full h-full pointer-events-none"
+                viewBox="0 0 340 148"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
               >
-                <Clock className="h-3.5 w-3.5" />
-                <span>{sch.time}</span>
-              </div>
-              <div
-                className={cn(
-                  'flex items-center gap-1 text-[11px]',
-                  isDark ? 'text-neutral-400' : 'text-slate-500',
-                )}
-              >
-                <MapPin className="h-3.5 w-3.5" />
-                <span>{sch.poli} • {sch.room}</span>
-              </div>
-            </div>
+                <defs>
+                  <clipPath id={cardClipId}>
+                    <path d={ticketPath} />
+                  </clipPath>
+                </defs>
 
-            <div className="flex items-center justify-between mt-2.5 pt-2 text-[11px]">
-              <div
-                className={cn(
-                  'flex items-center gap-1 font-semibold',
-                  isDark ? 'text-emerald-400' : 'text-emerald-600',
-                )}
-              >
-                <Users className="h-3.5 w-3.5" />
-                <span>{sch.slotCount} Pasien</span>
+                {/* Card Background Fill & Border Contour */}
+                <path
+                  d={ticketPath}
+                  fill={isDark ? 'rgba(23, 23, 23, 0.92)' : 'rgba(255, 255, 255, 0.98)'}
+                  stroke={isDark ? 'rgba(255, 255, 255, 0.12)' : 'rgba(226, 232, 240, 0.9)'}
+                  strokeWidth="1.2"
+                />
+
+                {/* Wall-to-Wall Perforated Connector Line between the "C" Notches */}
+                <g clipPath={`url(#${cardClipId})`}>
+                  <line
+                    x1="9"
+                    y1="79"
+                    x2="331"
+                    y2="79"
+                    stroke={isDark ? 'rgba(255, 255, 255, 0.18)' : 'rgba(203, 213, 225, 0.9)'}
+                    strokeWidth="1.5"
+                    strokeDasharray="4 4"
+                  />
+                </g>
+              </svg>
+
+              {/* Foreground Content */}
+              <div className="relative z-10 flex flex-col justify-between h-full p-4">
+                {/* Top Section */}
+                <div className="flex justify-between items-start">
+                  <div>
+                    <span
+                      className={cn(
+                        'text-sm font-bold block',
+                        isDark ? 'text-white' : 'text-slate-800',
+                      )}
+                    >
+                      {sch.title}
+                    </span>
+                    <span
+                      className={cn(
+                        'text-[11px] font-medium',
+                        isDark ? 'text-neutral-400' : 'text-slate-500',
+                      )}
+                    >
+                      {sch.date}
+                    </span>
+                  </div>
+                  <StatusBadge
+                    variant={sch.badgeVariant}
+                    text={sch.badge}
+                    theme={props.theme}
+                  />
+                </div>
+
+                {/* Bottom Section */}
+                <div>
+                  <div className="flex items-center justify-between text-xs mb-1.5">
+                    <div
+                      className={cn(
+                        'flex items-center gap-1.5 font-semibold',
+                        isDark ? 'text-cyan-400' : 'text-blue-600',
+                      )}
+                    >
+                      <Clock className="h-3.5 w-3.5" />
+                      <span>{sch.time}</span>
+                    </div>
+                    <div
+                      className={cn(
+                        'flex items-center gap-1 text-[11px]',
+                        isDark ? 'text-neutral-400' : 'text-slate-500',
+                      )}
+                    >
+                      <MapPin className="h-3.5 w-3.5" />
+                      <span>{sch.poli} • {sch.room}</span>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-between pt-1 text-[11px] border-t border-slate-100 dark:border-white/5">
+                    <div
+                      className={cn(
+                        'flex items-center gap-1 font-semibold',
+                        isDark ? 'text-emerald-400' : 'text-emerald-600',
+                      )}
+                    >
+                      <Users className="h-3.5 w-3.5" />
+                      <span>{sch.slotCount} Pasien</span>
+                    </div>
+                    <button
+                      type="button"
+                      className={cn(
+                        'text-[10px] font-bold hover:underline cursor-pointer',
+                        isDark ? 'text-cyan-400' : 'text-blue-600',
+                      )}
+                    >
+                      Kelola antrean →
+                    </button>
+                  </div>
+                </div>
               </div>
-              <button
-                type="button"
-                className={cn(
-                  'text-[10px] font-bold hover:underline cursor-pointer',
-                  isDark ? 'text-cyan-400' : 'text-blue-600',
-                )}
-              >
-                Kelola Antrean →
-              </button>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );

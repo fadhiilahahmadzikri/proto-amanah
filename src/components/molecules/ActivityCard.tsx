@@ -58,6 +58,7 @@ export function ActivityCard(props: {
           <StatusBadge
             variant={props.item.badgeType}
             text={props.item.badgeText}
+            theme={props.theme}
           />
         </div>
 
