@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { prototypeConfig } from '@/config/prototype.config';
 import otpConfig from '@/data/auth/otp.json';
 import type {
   AuthFormData,
@@ -29,7 +30,9 @@ const delay = async (ms: number) => {
 };
 
 export function useAuthPrototype() {
-  const [currentScreen, setCurrentScreen] = React.useState<AuthScreen>('onboarding');
+  const [currentScreen, setCurrentScreen] = React.useState<AuthScreen>(
+    prototypeConfig.initialScreen ?? 'dashboard',
+  );
   const [formData, setFormData] = React.useState<AuthFormData>(INITIAL_FORM_DATA);
   const [errors, setErrors] = React.useState<AuthValidationErrors>({});
   const [isLoading, setIsLoading] = React.useState(false);

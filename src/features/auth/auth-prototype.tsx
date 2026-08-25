@@ -3,7 +3,9 @@
 import React from 'react';
 import { ConfigButton } from '@/components/atoms/ConfigButton';
 import { ThemeSwitcher } from '@/components/atoms/ThemeSwitcher';
+import type { BottomNavTab } from '@/components/molecules/BottomNavBar';
 import { CredentialsConfigModal } from '@/components/molecules/CredentialsConfigModal';
+import { DevToolsRouteSwitcher } from '@/components/molecules/DevToolsRouteSwitcher';
 import { ChangePasswordScreen } from '@/components/organisms/ChangePasswordScreen';
 import { DoctorDashboardScreen } from '@/components/organisms/DoctorDashboardScreen';
 import { ForgotPasswordScreen } from '@/components/organisms/ForgotPasswordScreen';
@@ -13,11 +15,17 @@ import { OtpScreen } from '@/components/organisms/OtpScreen';
 import { PhoneFrame } from '@/components/organisms/PhoneFrame';
 import { SignUpScreen } from '@/components/organisms/SignUpScreen';
 import { SuccessScreen } from '@/components/organisms/SuccessScreen';
+import { prototypeConfig } from '@/config/prototype.config';
 import { useAuthPrototype } from '@/features/auth/hooks/use-auth-prototype';
 import { cn } from '@/lib/utils';
 
 export function AuthPrototype() {
-  const [theme, setTheme] = React.useState<'dark' | 'light'>('dark');
+  const [theme, setTheme] = React.useState<'dark' | 'light'>(
+    prototypeConfig.initialTheme ?? 'dark',
+  );
+  const [dashboardTab, setDashboardTab] = React.useState<BottomNavTab>(
+    prototypeConfig.initialDashboardTab ?? 'home',
+  );
   const [isConfigOpen, setIsConfigOpen] = React.useState(false);
 
   const {
@@ -86,6 +94,21 @@ export function AuthPrototype() {
           : 'bg-gradient-to-br from-[#f8fafc] via-[#f1f5f9] to-[#e2e8f0] text-neutral-900',
       )}
     >
+      {/* Top Left Floating DevTools Route Switcher (Configurable) */}
+      {prototypeConfig.enableDevTools && (
+        <div className="fixed top-4 left-4 z-50 sm:top-6 sm:left-6">
+          <DevToolsRouteSwitcher
+            currentScreen={currentScreen}
+            activeTab={dashboardTab}
+            onNavigateScreen={navigateTo}
+            onNavigateTab={setDashboardTab}
+            theme={theme}
+            onToggleTheme={toggleTheme}
+            onOpenCredentialsModal={() => setIsConfigOpen(true)}
+          />
+        </div>
+      )}
+
       {/* Top Right Studio Controls: Theme Switcher & Config Button */}
       <div className="fixed top-4 right-4 z-50 flex flex-col gap-2.5 sm:top-6 sm:right-6">
         <ThemeSwitcher theme={theme} onToggle={toggleTheme} />
@@ -138,6 +161,8 @@ export function AuthPrototype() {
           ) : currentScreen === 'dashboard' ? (
             <DoctorDashboardScreen
               theme={theme}
+              activeTab={dashboardTab}
+              onTabChange={setDashboardTab}
               onLogout={handleLogout}
             />
           ) : (

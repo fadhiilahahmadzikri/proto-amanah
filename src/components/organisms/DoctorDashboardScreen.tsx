@@ -10,6 +10,7 @@ import { QuickAccessSection } from '@/components/organisms/QuickAccessSection';
 import { ScheduleCardStack } from '@/components/organisms/ScheduleCardStack';
 import { ScheduleTabScreen } from '@/components/organisms/ScheduleTabScreen';
 import { TodayActivitySection } from '@/components/organisms/TodayActivitySection';
+import { prototypeConfig } from '@/config/prototype.config';
 import portalData from '@/data/portal/portal-data.json';
 import { cn } from '@/lib/utils';
 import type { PortalData } from '@/types/portal.types';
@@ -18,11 +19,18 @@ export function DoctorDashboardScreen(props: {
   data?: PortalData;
   theme?: 'dark' | 'light';
   onLogout?: () => void;
+  activeTab?: BottomNavTab;
+  onTabChange?: (tab: BottomNavTab) => void;
   className?: string;
 }) {
   const data = (props.data ?? portalData) as PortalData;
   const isDark = props.theme === 'dark';
-  const [activeTab, setActiveTab] = React.useState<BottomNavTab>('home');
+  const [internalTab, setInternalTab] = React.useState<BottomNavTab>(
+    props.activeTab ?? prototypeConfig.initialDashboardTab ?? 'home',
+  );
+
+  const activeTab = props.activeTab ?? internalTab;
+
   const [toastMessage, setToastMessage] = React.useState<string | null>(null);
 
   const showToast = (message: string) => {
@@ -33,18 +41,19 @@ export function DoctorDashboardScreen(props: {
   };
 
   const handleTabChange = (tab: BottomNavTab) => {
-    setActiveTab(tab);
+    setInternalTab(tab);
+    props.onTabChange?.(tab);
   };
 
   const handleQuickAction = (id: string) => {
     if (id === 'presensi') {
-      setActiveTab('qr');
+      handleTabChange('qr');
     } else if (id === 'jadwal-saya') {
-      setActiveTab('schedule');
+      handleTabChange('schedule');
     } else if (id === 'cari-visit') {
       showToast('Fitur Cari Visit Pasien');
     } else if (id === 'kartu-id') {
-      setActiveTab('account');
+      handleTabChange('account');
     }
   };
 
@@ -101,8 +110,8 @@ export function DoctorDashboardScreen(props: {
             {/* 1. Doctor Profile Header */}
             <DoctorProfileHeader
               profile={data.profile}
-              onNotificationClick={() => setActiveTab('notification')}
-              onProfileClick={() => setActiveTab('account')}
+              onNotificationClick={() => handleTabChange('notification')}
+              onProfileClick={() => handleTabChange('account')}
             />
 
             {/* 2. 3D Stack of Schedule Cards with Wave Petal Texture */}
@@ -122,7 +131,7 @@ export function DoctorDashboardScreen(props: {
             <TodayActivitySection
               activities={data.activities}
               theme={props.theme}
-              onDetailClick={() => setActiveTab('schedule')}
+              onDetailClick={() => handleTabChange('schedule')}
               onActivityClick={() => showToast('Membuka rincian aktivitas')}
             />
           </div>
