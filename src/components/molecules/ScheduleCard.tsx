@@ -14,13 +14,14 @@ export function ScheduleCard(props: {
   const isDark = props.theme === 'dark';
   const clipId = React.useId().replace(/:/g, '-');
 
+  // Inset by 1px so strokeWidth=1.2 is 100% visible and never clipped
   const ticketPath =
-    'M 0 24 A 24 24 0 0 1 24 0 L 316 0 A 24 24 0 0 1 340 24 L 340 104 A 10 10 0 0 0 340 124 L 340 148 A 24 24 0 0 1 316 172 L 24 172 A 24 24 0 0 1 0 148 L 0 124 A 10 10 0 0 0 0 104 Z';
+    'M 1 25 A 24 24 0 0 1 25 1 L 315 1 A 24 24 0 0 1 339 25 L 339 103 A 11 11 0 0 0 339 125 L 339 147 A 24 24 0 0 1 315 171 L 25 171 A 24 24 0 0 1 1 147 L 1 125 A 11 11 0 0 0 1 103 Z';
 
   return (
     <div
       className={cn(
-        'relative w-full h-[172px] select-none transition-colors duration-300 drop-shadow-[0_15px_30px_rgba(0,0,0,0.08)]',
+        'relative w-full h-[172px] select-none transition-colors duration-300 drop-shadow-[0_12px_28px_rgba(0,0,0,0.06)]',
         props.className,
       )}
       style={props.style}
@@ -38,21 +39,21 @@ export function ScheduleCard(props: {
             <path d={ticketPath} />
           </clipPath>
 
-          {/* Light Theme White-on-White Wave Gradients */}
+          {/* Light Theme Pure White-on-White Wave Gradients */}
           <linearGradient id={`${clipId}-wave-1-light`} x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#f1f5f9" stopOpacity="0.8" />
-            <stop offset="50%" stopColor="#e2e8f0" stopOpacity="0.45" />
-            <stop offset="100%" stopColor="#cbd5e1" stopOpacity="0.2" />
+            <stop offset="0%" stopColor="#ffffff" stopOpacity="0.95" />
+            <stop offset="50%" stopColor="#f8faff" stopOpacity="0.5" />
+            <stop offset="100%" stopColor="#f1f5f9" stopOpacity="0.2" />
           </linearGradient>
           <linearGradient id={`${clipId}-wave-2-light`} x1="100%" y1="0%" x2="0%" y2="100%">
-            <stop offset="0%" stopColor="#ffffff" stopOpacity="0.9" />
-            <stop offset="60%" stopColor="#f8fafc" stopOpacity="0.6" />
-            <stop offset="100%" stopColor="#e2e8f0" stopOpacity="0.2" />
+            <stop offset="0%" stopColor="#ffffff" stopOpacity="0.95" />
+            <stop offset="60%" stopColor="#f8faff" stopOpacity="0.6" />
+            <stop offset="100%" stopColor="#f1f5f9" stopOpacity="0.2" />
           </linearGradient>
           <linearGradient id={`${clipId}-stroke-light`} x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#ffffff" stopOpacity="0.9" />
-            <stop offset="50%" stopColor="#e2e8f0" stopOpacity="0.5" />
-            <stop offset="100%" stopColor="#cbd5e1" stopOpacity="0.2" />
+            <stop offset="0%" stopColor="#ffffff" stopOpacity="0.95" />
+            <stop offset="50%" stopColor="#f1f5f9" stopOpacity="0.6" />
+            <stop offset="100%" stopColor="#cbd5e1" stopOpacity="0.3" />
           </linearGradient>
 
           {/* Dark Theme Obsidian Gradients */}
@@ -66,11 +67,11 @@ export function ScheduleCard(props: {
           </linearGradient>
         </defs>
 
-        {/* Card Background Fill & Border Contour (Curving smoothly through "C" notches) */}
+        {/* Card Background Fill & Crisp Border Contour */}
         <path
           d={ticketPath}
-          fill={isDark ? 'rgba(23, 23, 23, 0.95)' : 'rgba(255, 255, 255, 0.98)'}
-          stroke={isDark ? 'rgba(255, 255, 255, 0.16)' : 'rgba(226, 232, 240, 0.9)'}
+          fill={isDark ? 'rgba(23, 23, 23, 0.95)' : '#ffffff'}
+          stroke={isDark ? 'rgba(255, 255, 255, 0.16)' : 'rgba(203, 213, 225, 0.9)'}
           strokeWidth="1.2"
         />
 

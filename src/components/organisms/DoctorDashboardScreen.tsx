@@ -52,40 +52,46 @@ export function DoctorDashboardScreen(props: {
     <div
       className={cn(
         'relative flex h-full w-full flex-col overflow-hidden select-text transition-colors duration-500 overscroll-none touch-pan-x',
-        isDark ? 'bg-[#0a0e1a] text-white' : 'bg-[#f8faff] text-neutral-900',
+        isDark
+          ? 'bg-[#0a0e1a] text-white'
+          : activeTab === 'home'
+            ? 'bg-[#f8faff] text-neutral-900'
+            : 'bg-white text-neutral-900',
         props.className,
       )}
     >
-      {/* Dynamic Aurora Ambient Blur Glow (Observes Light & Dark Themes) */}
-      <div
-        className="absolute top-0 left-0 w-full h-[550px] z-0 pointer-events-none"
-        style={{
-          maskImage: 'linear-gradient(to bottom, black 40%, transparent 100%)',
-          WebkitMaskImage: 'linear-gradient(to bottom, black 40%, transparent 100%)',
-        }}
-      >
-        {isDark ? (
-          <>
-            {/* Deep Cosmic Sapphire Glow */}
-            <div className="absolute -top-[15%] -left-[20%] w-[140%] h-[380px] bg-[#07247a] rounded-full filter blur-[100px] opacity-90 transition-all duration-700" />
-            {/* Electric Cyan/Teal Glow */}
-            <div className="absolute top-[5%] -right-[20%] w-[100%] h-[260px] bg-[#0088cc] rounded-full filter blur-[90px] opacity-70 transition-all duration-700" />
-          </>
-        ) : (
-          <>
-            {/* Vibrant Apple/Amanah Blue Base */}
-            <div className="absolute -top-[10%] -left-[20%] w-[140%] h-[350px] bg-[#0A44FF] rounded-full filter blur-[100px] opacity-90 transition-all duration-700" />
-            {/* Radiant Cyan Glow */}
-            <div className="absolute top-[5%] -right-[20%] w-[100%] h-[250px] bg-[#00D4FF] rounded-full filter blur-[90px] opacity-80 transition-all duration-700" />
-          </>
-        )}
-      </div>
+      {/* Dynamic Aurora Ambient Glow (Rendered EXCLUSIVELY on Home) */}
+      {activeTab === 'home' && (
+        <div
+          className="absolute top-0 left-0 w-full h-[550px] z-0 pointer-events-none"
+          style={{
+            maskImage: 'linear-gradient(to bottom, black 40%, transparent 100%)',
+            WebkitMaskImage: 'linear-gradient(to bottom, black 40%, transparent 100%)',
+          }}
+        >
+          {isDark ? (
+            <>
+              {/* Deep Cosmic Sapphire Glow */}
+              <div className="absolute -top-[15%] -left-[20%] w-[140%] h-[380px] bg-[#07247a] rounded-full filter blur-[100px] opacity-90 transition-all duration-700" />
+              {/* Electric Cyan/Teal Glow */}
+              <div className="absolute top-[5%] -right-[20%] w-[100%] h-[260px] bg-[#0088cc] rounded-full filter blur-[90px] opacity-70 transition-all duration-700" />
+            </>
+          ) : (
+            <>
+              {/* Vibrant Apple/Amanah Blue Base */}
+              <div className="absolute -top-[10%] -left-[20%] w-[140%] h-[350px] bg-[#0A44FF] rounded-full filter blur-[100px] opacity-90 transition-all duration-700" />
+              {/* Radiant Cyan Glow */}
+              <div className="absolute top-[5%] -right-[20%] w-[100%] h-[250px] bg-[#00D4FF] rounded-full filter blur-[90px] opacity-80 transition-all duration-700" />
+            </>
+          )}
+        </div>
+      )}
 
       {/* Content Viewport Container */}
       <div
         className={cn(
           'relative z-10 flex-1 px-5 pt-2',
-          activeTab === 'home'
+          activeTab === 'home' || activeTab === 'account' || activeTab === 'qr'
             ? 'h-full flex flex-col justify-start overflow-hidden pb-24 overscroll-none touch-pan-x select-none'
             : 'overflow-y-auto pb-32 no-scrollbar overscroll-contain',
         )}

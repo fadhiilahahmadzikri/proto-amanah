@@ -24,22 +24,40 @@ export function ScheduleTabScreen(props: {
     { day: 'Sab', date: '25' },
   ];
 
+  // Inset by 1px so strokeWidth=1.5 is never clipped
   const ticketPath =
-    'M 0 20 A 20 20 0 0 1 20 0 L 320 0 A 20 20 0 0 1 340 20 L 340 70 A 9 9 0 0 0 340 88 L 340 128 A 20 20 0 0 1 320 148 L 20 148 A 20 20 0 0 1 0 128 L 0 88 A 9 9 0 0 0 0 70 Z';
+    'M 1 21 A 20 20 0 0 1 21 1 L 319 1 A 20 20 0 0 1 339 21 L 339 69 A 10 10 0 0 0 339 89 L 339 127 A 20 20 0 0 1 319 147 L 21 147 A 20 20 0 0 1 1 127 L 1 89 A 10 10 0 0 0 1 69 Z';
 
   return (
     <div className={cn('flex flex-col gap-5 pt-2 pb-28 select-text', props.className)}>
       {/* Title Header */}
       <div className="flex justify-between items-center px-1">
         <div>
-          <h2 className="text-xl font-bold tracking-tight text-white">
+          <h2
+            className={cn(
+              'text-xl font-bold tracking-tight',
+              isDark ? 'text-white' : 'text-slate-900',
+            )}
+          >
             Jadwal Praktek
           </h2>
-          <p className="text-xs text-white/80 mt-0.5">
-            Mei 2026 • Rumah Sakit Amanah
+          <p
+            className={cn(
+              'text-xs mt-0.5',
+              isDark ? 'text-neutral-400' : 'text-slate-500',
+            )}
+          >
+            Mei 2026
           </p>
         </div>
-        <div className="p-2 rounded-xl bg-white/10 backdrop-blur-md border border-white/20 text-white">
+        <div
+          className={cn(
+            'p-2 rounded-xl border backdrop-blur-md',
+            isDark
+              ? 'bg-white/10 border-white/20 text-white'
+              : 'bg-blue-50 border-blue-100 text-blue-600',
+          )}
+        >
           <Calendar className="h-4 w-4" />
         </div>
       </div>
@@ -56,8 +74,10 @@ export function ScheduleTabScreen(props: {
               className={cn(
                 'flex flex-col items-center justify-center py-2.5 px-2 rounded-2xl flex-1 transition-all cursor-pointer select-none',
                 isSelected
-                  ? 'bg-white text-blue-600 font-bold shadow-md shadow-black/10 scale-105'
-                  : 'bg-white/10 hover:bg-white/20 text-white/80 font-medium backdrop-blur-md border border-white/15',
+                  ? 'bg-blue-600 text-white font-bold shadow-md shadow-blue-500/25 scale-105'
+                  : isDark
+                    ? 'bg-white/10 hover:bg-white/20 text-white/80 font-medium backdrop-blur-md border border-white/15'
+                    : 'bg-slate-50 hover:bg-slate-100 text-slate-600 font-medium border border-slate-200/60',
               )}
             >
               <span className="text-[10px] font-medium tracking-wide">{d.day}</span>
@@ -71,8 +91,8 @@ export function ScheduleTabScreen(props: {
       <div className="flex flex-col gap-3.5 mt-1">
         <h3
           className={cn(
-            'text-xs font-bold tracking-tight px-1',
-            isDark ? 'text-neutral-400' : 'text-slate-600',
+            'text-xs font-semibold tracking-tight px-1',
+            isDark ? 'text-slate-400' : 'text-slate-600',
           )}
         >
           Sesi praktek tersedia
@@ -84,9 +104,9 @@ export function ScheduleTabScreen(props: {
           return (
             <div
               key={sch.id}
-              className="relative w-full h-[148px] select-none drop-shadow-[0_8px_20px_rgba(0,0,0,0.05)]"
+              className="relative w-full h-[148px] select-none drop-shadow-[0_4px_16px_rgba(0,0,0,0.06)]"
             >
-              {/* True SVG Ticket Silhouette with C Cutout Notches */}
+              {/* True SVG Ticket Silhouette with 100% Unclipped Stroke */}
               <svg
                 className="absolute inset-0 w-full h-full pointer-events-none"
                 viewBox="0 0 340 148"
@@ -99,22 +119,22 @@ export function ScheduleTabScreen(props: {
                   </clipPath>
                 </defs>
 
-                {/* Card Background Fill & Border Contour */}
+                {/* Card Background Fill & Crisp Border Contour */}
                 <path
                   d={ticketPath}
-                  fill={isDark ? 'rgba(23, 23, 23, 0.92)' : 'rgba(255, 255, 255, 0.98)'}
-                  stroke={isDark ? 'rgba(255, 255, 255, 0.12)' : 'rgba(226, 232, 240, 0.9)'}
+                  fill={isDark ? 'rgba(23, 23, 23, 0.95)' : '#ffffff'}
+                  stroke={isDark ? 'rgba(255, 255, 255, 0.16)' : 'rgba(203, 213, 225, 0.9)'}
                   strokeWidth="1.2"
                 />
 
                 {/* Wall-to-Wall Perforated Connector Line between the "C" Notches */}
                 <g clipPath={`url(#${cardClipId})`}>
                   <line
-                    x1="9"
+                    x1="10"
                     y1="79"
-                    x2="331"
+                    x2="330"
                     y2="79"
-                    stroke={isDark ? 'rgba(255, 255, 255, 0.18)' : 'rgba(203, 213, 225, 0.9)'}
+                    stroke={isDark ? 'rgba(255, 255, 255, 0.2)' : 'rgba(203, 213, 225, 0.95)'}
                     strokeWidth="1.5"
                     strokeDasharray="4 4"
                   />

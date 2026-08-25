@@ -41,16 +41,31 @@ export function NotificationTabScreen(props: {
       {/* Title Header */}
       <div className="flex justify-between items-center px-1 mb-1">
         <div>
-          <h2 className="text-xl font-bold tracking-tight text-white">
+          <h2
+            className={cn(
+              'text-xl font-bold tracking-tight',
+              isDark ? 'text-white' : 'text-slate-900',
+            )}
+          >
             Pusat Notifikasi
           </h2>
-          <p className="text-xs text-white/80 mt-0.5">
+          <p
+            className={cn(
+              'text-xs mt-0.5',
+              isDark ? 'text-neutral-400' : 'text-slate-500',
+            )}
+          >
             2 notifikasi baru belum dibaca
           </p>
         </div>
         <button
           type="button"
-          className="flex items-center gap-1 text-[11px] font-bold text-white/90 bg-white/10 hover:bg-white/20 border border-white/20 py-1.5 px-3 rounded-full backdrop-blur-md transition-colors cursor-pointer"
+          className={cn(
+            'flex items-center gap-1 text-[11px] font-bold py-1.5 px-3 rounded-full backdrop-blur-md transition-colors cursor-pointer border',
+            isDark
+              ? 'text-white/90 bg-white/10 hover:bg-white/20 border-white/20'
+              : 'text-blue-600 bg-blue-50 hover:bg-blue-100 border-blue-100',
+          )}
         >
           <CheckCheck className="h-3.5 w-3.5" />
           <span>Tandai Baca</span>
@@ -71,7 +86,7 @@ export function NotificationTabScreen(props: {
                     : 'bg-white border-blue-200/80 text-slate-900 shadow-sm ring-1 ring-blue-500/10'
                   : isDark
                     ? 'bg-neutral-900/50 border-white/5 text-neutral-300'
-                    : 'bg-white/80 border-slate-100 text-slate-700',
+                    : 'bg-white border-slate-100 text-slate-700 shadow-xs',
               )}
             >
               <div
