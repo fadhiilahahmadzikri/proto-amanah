@@ -65,7 +65,9 @@ export function DoctorDashboardScreen(props: {
           ? 'bg-[#0a0e1a] text-white'
           : activeTab === 'home'
             ? 'bg-[#f8faff] text-neutral-900'
-            : 'bg-white text-neutral-900',
+            : activeTab === 'qr'
+              ? 'bg-[#0a0f18] text-white'
+              : 'bg-white text-neutral-900',
         props.className,
       )}
     >
@@ -99,10 +101,12 @@ export function DoctorDashboardScreen(props: {
       {/* Content Viewport Container */}
       <div
         className={cn(
-          'relative z-10 flex-1 px-5 pt-2',
-          activeTab === 'home' || activeTab === 'account' || activeTab === 'qr'
-            ? 'h-full flex flex-col justify-start overflow-hidden pb-24 overscroll-none touch-pan-x select-none'
-            : 'overflow-y-auto pb-32 no-scrollbar overscroll-contain',
+          'relative z-10 flex-1',
+          activeTab === 'qr'
+            ? 'h-full p-0 overflow-hidden select-none'
+            : activeTab === 'home' || activeTab === 'account'
+              ? 'px-5 pt-2 h-full flex flex-col justify-start overflow-hidden pb-24 overscroll-none touch-pan-x select-none'
+              : 'px-5 pt-2 overflow-y-auto pb-32 no-scrollbar overscroll-contain',
         )}
       >
         {activeTab === 'home' && (
@@ -142,7 +146,10 @@ export function DoctorDashboardScreen(props: {
         )}
 
         {activeTab === 'qr' && (
-          <QrScannerTabScreen theme={props.theme} />
+          <QrScannerTabScreen
+            theme={props.theme}
+            onBack={() => handleTabChange('home')}
+          />
         )}
 
         {activeTab === 'notification' && (

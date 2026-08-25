@@ -11,9 +11,11 @@ export function OtpInput(props: {
   disabled?: boolean;
   error?: string;
   className?: string;
+  theme?: 'dark' | 'light';
 }) {
   const digitsCount = props.length ?? 6;
   const inputRefs = React.useRef<(HTMLInputElement | null)[]>([]);
+  const isDark = props.theme === 'dark';
 
   const otpArray = Array.from({ length: digitsCount }, (_, i) => {
     return props.value[i] ?? '';
@@ -116,20 +118,24 @@ export function OtpInput(props: {
               aria-label={`Digit ke ${index + 1}`}
               className={cn(
                 'h-13 w-11 sm:h-14 sm:w-12 text-center text-xl font-bold rounded-2xl border transition-all duration-200 focus:outline-none',
-                isFilled
-                  ? 'border-neutral-900 bg-neutral-50 text-neutral-950 shadow-2xs ring-1 ring-neutral-900/10'
-                  : 'border-neutral-200/90 bg-neutral-50/70 text-neutral-900 hover:border-neutral-300',
+                isDark
+                  ? isFilled
+                    ? 'border-cyan-400/60 bg-neutral-800 text-white shadow-2xs ring-1 ring-cyan-400/20'
+                    : 'border-white/20 bg-neutral-850/90 text-white hover:border-white/30 focus:border-cyan-400 focus:bg-neutral-800'
+                  : isFilled
+                    ? 'border-neutral-900 bg-neutral-50 text-neutral-950 shadow-2xs ring-1 ring-neutral-900/10'
+                    : 'border-neutral-300 bg-white text-neutral-900 hover:border-neutral-400 focus:border-blue-600 focus:bg-white',
                 props.error
                   ? 'border-red-400 bg-red-50/40 text-red-700 ring-2 ring-red-500/20'
-                  : 'focus:border-neutral-950 focus:bg-white focus:ring-2 focus:ring-neutral-950/15',
-                props.disabled ? 'opacity-50 cursor-not-allowed bg-neutral-100' : '',
+                  : 'focus:ring-2 focus:ring-cyan-500/20',
+                props.disabled ? 'opacity-50 cursor-not-allowed bg-neutral-100 dark:bg-neutral-800' : '',
               )}
             />
           );
         })}
       </div>
       {props.error && (
-        <p className="mt-1 text-center text-xs font-medium text-red-600 animate-in fade-in slide-in-from-top-1">
+        <p className="mt-1 text-center text-xs font-medium text-red-600 dark:text-red-400 animate-in fade-in slide-in-from-top-1">
           {props.error}
         </p>
       )}

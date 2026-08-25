@@ -34,3 +34,23 @@ body {
   -webkit-overflow-scrolling: touch;
   overscroll-behavior-y: contain;
 }
+
+/* Retro CRT Scanner Laser Sweep Animation (Edge-to-edge, Naik-Turun) */
+@keyframes retroLaserSweep {
+  0% {
+    top: 2%;
+    opacity: 0.85;
+  }
+  50% {
+    top: 70%;
+    opacity: 1;
+  }
+  100% {
+    top: 2%;
+    opacity: 0.85;
+  }
+}
+
+.animate-retro-laser {
+  animation: retroLaserSweep 3.2s ease-in-out infinite;
+}
