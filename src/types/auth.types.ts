@@ -5,7 +5,8 @@ export type AuthScreen =
   | 'forgot-password'
   | 'otp'
   | 'change-password'
-  | 'success';
+  | 'success'
+  | 'dashboard';
 
 export type AuthFormData = {
   fullName: string;

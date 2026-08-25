@@ -3,6 +3,7 @@
 import React from 'react';
 import { ThemeSwitcher } from '@/components/atoms/ThemeSwitcher';
 import { ChangePasswordScreen } from '@/components/organisms/ChangePasswordScreen';
+import { DoctorDashboardScreen } from '@/components/organisms/DoctorDashboardScreen';
 import { ForgotPasswordScreen } from '@/components/organisms/ForgotPasswordScreen';
 import { LoginScreen } from '@/components/organisms/LoginScreen';
 import { OnboardingScreen } from '@/components/organisms/OnboardingScreen';
@@ -34,14 +35,14 @@ export function AuthPrototype() {
     handleOtpSubmit,
     handleChangePasswordSubmit,
     handleSuccessLogin,
+    handleLogout,
   } = useAuthPrototype();
 
-  const isDarkScreen = currentScreen === 'onboarding';
+  const isDarkScreen = currentScreen === 'onboarding' || currentScreen === 'dashboard';
 
   const toggleTheme = () => {
     setTheme(prev => (prev === 'dark' ? 'light' : 'dark'));
   };
-
 
   const handleSwipeBack = () => {
     if (currentScreen === 'login' || currentScreen === 'signup') {
@@ -54,6 +55,8 @@ export function AuthPrototype() {
       navigateTo('otp');
     } else if (currentScreen === 'success') {
       navigateTo('login');
+    } else if (currentScreen === 'dashboard') {
+      navigateTo('onboarding');
     }
   };
 
@@ -102,6 +105,8 @@ export function AuthPrototype() {
                 navigateTo('login');
               }}
             />
+          ) : currentScreen === 'dashboard' ? (
+            <DoctorDashboardScreen onLogout={handleLogout} />
           ) : (
             <div className="relative flex h-full w-full flex-col justify-end overflow-hidden bg-neutral-950">
               {/* Underlying Hero Background Image */}
@@ -218,8 +223,14 @@ export function AuthPrototype() {
 
               {currentScreen === 'success' && (
                 <SuccessScreen
-                  onLogin={handleSuccessLogin}
-                  onClose={handleSuccessLogin}
+                  onLogin={() => {
+                    handleSuccessLogin();
+                    navigateTo('login');
+                  }}
+                  onClose={() => {
+                    handleSuccessLogin();
+                    navigateTo('login');
+                  }}
                 />
               )}
             </div>

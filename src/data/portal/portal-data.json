@@ -1,0 +1,92 @@
+{
+  "profile": {
+    "id": "doc_001",
+    "name": "dr. Andika Perkasa",
+    "role": "Dokter Spesialis Anak",
+    "greeting": "Selamat Pagi",
+    "avatarUrl": "https://images.unsplash.com/photo-1612349317150-e410f624c427?q=80&w=150&auto=format&fit=crop",
+    "unreadNotifications": 3
+  },
+  "schedules": [
+    {
+      "id": "sch_001",
+      "title": "Jadwal Hari Ini",
+      "date": "Selasa, 21 Mei 2026",
+      "time": "07:30 - 11:30",
+      "poli": "Poli Anak",
+      "room": "Room 102",
+      "slotCount": "16 / 30",
+      "slotText": "Slot Tersedia",
+      "badge": "Buka",
+      "badgeVariant": "success"
+    },
+    {
+      "id": "sch_002",
+      "title": "Jadwal Siang",
+      "date": "Rabu, 22 Mei 2026",
+      "time": "13:00 - 16:00",
+      "poli": "Poli Umum",
+      "room": "Room 105",
+      "slotCount": "5 / 30",
+      "slotText": "Slot Tersedia",
+      "badge": "Aktif",
+      "badgeVariant": "primary"
+    },
+    {
+      "id": "sch_003",
+      "title": "Jadwal Esok",
+      "date": "Kamis, 23 Mei 2026",
+      "time": "09:00 - 12:00",
+      "poli": "Poli Gigi",
+      "room": "Room 201",
+      "slotCount": "20 / 30",
+      "slotText": "Slot Tersedia",
+      "badge": "Buka",
+      "badgeVariant": "success"
+    }
+  ],
+  "quickActions": [
+    {
+      "id": "presensi",
+      "label": "Presensi",
+      "icon": "presence"
+    },
+    {
+      "id": "jadwal-saya",
+      "label": "Jadwal Saya",
+      "icon": "schedule"
+    },
+    {
+      "id": "cari-visit",
+      "label": "Cari Visit",
+      "icon": "search"
+    },
+    {
+      "id": "kartu-id",
+      "label": "Kartu ID",
+      "icon": "idCard"
+    }
+  ],
+  "activities": [
+    {
+      "id": "antrean-aktif",
+      "title": "Antrean Aktif",
+      "count": "23",
+      "unit": "Pasien",
+      "badgeText": "Live",
+      "badgeType": "live",
+      "icon": "users",
+      "glowVariant": "blue"
+    },
+    {
+      "id": "total-selesai",
+      "title": "Total Selesai",
+      "count": "45",
+      "unit": "Pasien",
+      "badgeText": "+12%",
+      "badgeType": "trend",
+      "icon": "stethoscope",
+      "glowVariant": "emerald"
+    }
+  ]
+}

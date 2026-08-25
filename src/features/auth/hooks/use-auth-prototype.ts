@@ -104,6 +104,7 @@ export function useAuthPrototype() {
 
     setIsLoading(false);
     setStatusMessage('Berhasil masuk!');
+    navigateTo('dashboard');
   };
 
   // 2. Submit Sign Up
@@ -250,6 +251,13 @@ export function useAuthPrototype() {
     navigateTo('login');
   };
 
+  // 8. Logout -> Return to Onboarding
+  const handleLogout = () => {
+    setFormData(INITIAL_FORM_DATA);
+    setStatusMessage(null);
+    navigateTo('onboarding');
+  };
+
   return {
     currentScreen,
     formData,
@@ -269,5 +277,6 @@ export function useAuthPrototype() {
     handleOtpSubmit,
     handleChangePasswordSubmit,
     handleSuccessLogin,
+    handleLogout,
   };
 }

@@ -5,6 +5,16 @@
 
 @theme {
   --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+
+  /* Amanah Portal Aurora & Brand Design Tokens */
+  --color-portal-bg: #f8faff;
+  --color-portal-brand: #0a44ff;
+  --color-portal-cyan: #00d4ff;
+  --color-portal-emerald: #38c474;
+  --color-portal-navy: #1c1645;
+  --color-portal-dark-navy: #14103b;
+  --color-portal-heading: #1a1d2e;
+  --color-portal-muted: #4a4f63;
 }
 
 body {

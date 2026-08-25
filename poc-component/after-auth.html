@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Klinik App</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #e2e8f0;
+        }
+        ::-webkit-scrollbar {
+            width: 0px;
+            background: transparent;
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen py-8">
+
+    <div class="relative w-[375px] h-[812px] bg-[#f8faff] rounded-[40px] shadow-2xl overflow-hidden border-[6px] border-white ring-4 ring-gray-900/10">
+        
+        <!-- Background Aurora Biru yang memudar sangat halus (Smooth Integration) -->
+        <div class="absolute top-0 left-0 w-full h-[550px] z-0 pointer-events-none" style="-webkit-mask-image: linear-gradient(to bottom, black 40%, transparent 100%); mask-image: linear-gradient(to bottom, black 40%, transparent 100%);">
+            <!-- Deep Blue Base -->
+            <div class="absolute -top-[10%] left-[-20%] w-[140%] h-[350px] bg-[#0A44FF] rounded-full filter blur-[100px] opacity-90"></div>
+            <!-- Vibrant Cyan Glow -->
+            <div class="absolute top-[5%] right-[-20%] w-[100%] h-[250px] bg-[#00D4FF] rounded-full filter blur-[90px] opacity-80"></div>
+        </div>
+        
+        <div class="flex justify-between items-center px-6 pt-4 pb-2 text-[13px] font-semibold text-white z-50 relative bg-transparent">
+            <span>9:41</span>
+            <div class="flex items-center gap-1.5 text-lg">
+                <i class="ph-fill ph-cell-signal-full"></i>
+                <i class="ph-fill ph-wifi-high"></i>
+                <i class="ph-fill ph-battery-full"></i>
+            </div>
+        </div>
+
+        <!-- Main Content Scrollable Area -->
+        <div class="h-full overflow-y-auto px-5 pb-32 relative z-10">
+            
+            <!-- Header Baru: Foto di kiri, nama di atas -->
+            <div class="flex justify-between items-center mt-4 mb-8">
+                <div class="flex items-center gap-3.5">
+                    <div class="w-[52px] h-[52px] rounded-full overflow-hidden bg-white/20 border-2 border-white/40 shadow-sm shrink-0 backdrop-blur-md">
+                        <img src="https://images.unsplash.com/photo-1612349317150-e410f624c427?q=80&w=150&auto=format&fit=crop" alt="Profile" class="w-full h-full object-cover">
+                    </div>
+                    <div class="flex flex-col">
+                        <span class="font-extrabold text-white text-[19px] tracking-tight mb-0.5 shadow-sm">dr. Andika Perkasa</span>
+                        <span class="text-white/90 font-medium text-[13px]">Selamat Pagi</span>
+                    </div>
+                </div>
+                <button class="w-11 h-11 rounded-full border border-white/30 bg-white/10 flex items-center justify-center text-white hover:bg-white/20 shrink-0 transition-colors shadow-sm backdrop-blur-md">
+                    <i class="ph ph-bell text-[22px]"></i>
+                </button>
+            </div>
+
+            <!-- Container Jadwal Bertumpuk -->
+            <div id="schedule-stack" class="relative w-full h-[175px] mb-12 select-none" style="perspective: 1000px;">
+                <!-- Card elements akan diisi oleh JS -->
+            </div>
+
+            <!-- Quick Access Menu -->
+            <div class="flex justify-between px-1 mb-10">
+                <button class="flex flex-col items-center gap-2.5 hover:opacity-80 transition-opacity">
+                    <div class="w-[60px] h-[60px] bg-white rounded-[20px] flex items-center justify-center shadow-[0_8px_20px_-6px_rgba(0,0,0,0.08)] border border-slate-50 text-[#0A44FF] text-[26px]">
+                        <i class="ph ph-check-square-offset"></i>
+                    </div>
+                    <span class="text-[#4a4f63] text-[11px] font-bold">Presensi</span>
+                </button>
+                <button class="flex flex-col items-center gap-2.5 hover:opacity-80 transition-opacity">
+                    <div class="w-[60px] h-[60px] bg-white rounded-[20px] flex items-center justify-center shadow-[0_8px_20px_-6px_rgba(0,0,0,0.08)] border border-slate-50 text-[#0A44FF] text-[26px]">
+                        <i class="ph ph-calendar-blank"></i>
+                    </div>
+                    <span class="text-[#4a4f63] text-[11px] font-bold">Jadwal Saya</span>
+                </button>
+                <button class="flex flex-col items-center gap-2.5 hover:opacity-80 transition-opacity">
+                    <div class="w-[60px] h-[60px] bg-white rounded-[20px] flex items-center justify-center shadow-[0_8px_20px_-6px_rgba(0,0,0,0.08)] border border-slate-50 text-[#0A44FF] text-[26px]">
+                        <i class="ph ph-magnifying-glass"></i>
+                    </div>
+                    <span class="text-[#4a4f63] text-[11px] font-bold">Cari Visit</span>
+                </button>
+                <button class="flex flex-col items-center gap-2.5 hover:opacity-80 transition-opacity">
+                    <div class="w-[60px] h-[60px] bg-white rounded-[20px] flex items-center justify-center shadow-[0_8px_20px_-6px_rgba(0,0,0,0.08)] border border-slate-50 text-[#0A44FF] text-[26px]">
+                        <i class="ph ph-identification-card"></i>
+                    </div>
+                    <span class="text-[#4a4f63] text-[11px] font-bold">Kartu ID</span>
+                </button>
+            </div>
+
+            <!-- Aktivitas Hari Ini -->
+            <div class="flex flex-col gap-4 mb-4">
+                <div class="flex justify-between items-center px-1">
+                    <h3 class="font-extrabold text-[#1a1d2e] text-[16px] tracking-tight">Aktivitas hari ini</h3>
+                    <button class="bg-white border border-gray-200 text-[#0A44FF] px-3 py-1.5 rounded-full text-[11px] font-bold shadow-sm hover:bg-gray-50 transition-colors flex items-center gap-1">
+                        Detail
+                        <i class="ph-bold ph-caret-right text-[10px]"></i>
+                    </button>
+                </div>
+                
+                <div class="flex gap-3 px-1">
+                    <!-- Kartu Putih 1: Antrean -->
+                    <div class="flex-1 relative overflow-hidden bg-white rounded-[24px] p-4 shadow-[0_8px_20px_-6px_rgba(0,0,0,0.04)] border border-slate-100 group cursor-pointer hover:shadow-[0_8px_25px_-5px_rgba(0,0,0,0.08)] transition-all">
+                        <!-- Corner Gradient Glow -->
+                        <div class="absolute -right-6 -top-6 w-28 h-28 bg-gradient-to-br from-[#0A44FF]/20 to-[#00D4FF]/10 rounded-full blur-[20px] group-hover:scale-125 transition-transform duration-700 pointer-events-none"></div>
+                        
+                        <div class="relative z-10 flex flex-col justify-between h-full gap-4">
+                            <div class="flex justify-between items-start">
+                                <div class="w-9 h-9 rounded-full bg-blue-50 flex items-center justify-center text-[#0A44FF]">
+                                    <i class="ph-bold ph-users text-[18px]"></i>
+                                </div>
+                                <div class="bg-red-50 text-red-500 px-2 py-1 rounded-md flex items-center gap-1.5 border border-red-100">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse"></span>
+                                    <span class="text-[9px] font-black tracking-wider uppercase">Live</span>
+                                </div>
+                            </div>
+                            
+                            <div class="flex flex-col mt-2">
+                                <span class="text-slate-500 text-[11px] font-semibold mb-1">Antrean Aktif</span>
+                                <div class="flex items-end gap-1.5">
+                                    <span class="font-black text-slate-800 text-[32px] leading-none tracking-tighter">23</span>
+                                    <span class="text-slate-400 text-[11px] font-medium pb-1">Pasien</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Kartu Putih 2: Kunjungan -->
+                    <div class="flex-1 relative overflow-hidden bg-white rounded-[24px] p-4 shadow-[0_8px_20px_-6px_rgba(0,0,0,0.04)] border border-slate-100 group cursor-pointer hover:shadow-[0_8px_25px_-5px_rgba(0,0,0,0.08)] transition-all">
+                        <!-- Corner Gradient Glow -->
+                        <div class="absolute -right-6 -bottom-6 w-28 h-28 bg-gradient-to-tl from-[#00D4FF]/10 to-[#38c474]/20 rounded-full blur-[20px] group-hover:scale-125 transition-transform duration-700 pointer-events-none"></div>
+                        
+                        <div class="relative z-10 flex flex-col justify-between h-full gap-4">
+                            <div class="flex justify-between items-start">
+                                <div class="w-9 h-9 rounded-full bg-emerald-50 flex items-center justify-center text-emerald-500">
+                                    <i class="ph-bold ph-stethoscope text-[18px]"></i>
+                                </div>
+                                <div class="bg-emerald-50 text-emerald-600 px-2 py-1 rounded-md flex items-center gap-1 border border-emerald-100">
+                                    <i class="ph-bold ph-trend-up text-[10px]"></i>
+                                    <span class="text-[9px] font-black tracking-wider">+12%</span>
+                                </div>
+                            </div>
+                            
+                            <div class="flex flex-col mt-2">
+                                <span class="text-slate-500 text-[11px] font-semibold mb-1">Total Selesai</span>
+                                <div class="flex items-end gap-1.5">
+                                    <span class="font-black text-slate-800 text-[32px] leading-none tracking-tighter">45</span>
+                                    <span class="text-slate-400 text-[11px] font-medium pb-1">Pasien</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="absolute bottom-0 w-full bg-white px-2 pt-2 pb-6 border-t border-gray-100 flex justify-around items-end shadow-[0_-10px_30px_rgba(0,0,0,0.03)] z-40 rounded-b-[32px]">
+            <button class="flex flex-col items-center gap-1 w-14 pb-1">
+                <i class="ph-fill ph-house text-[#1C1645] text-2xl"></i>
+                <span class="text-[#1C1645] font-bold text-[10px]">Home</span>
+            </button>
+            <button class="flex flex-col items-center gap-1 w-14 pb-1 text-[#9CA3AF] hover:text-slate-600">
+                <i class="ph ph-calendar-blank text-2xl"></i>
+                <span class="text-[10px] font-medium">Jadwal</span>
+            </button>
+            <div class="relative w-16 flex justify-center">
+                <button class="absolute bottom-1 w-14 h-14 bg-[#14103B] rounded-[20px] flex items-center justify-center text-white text-2xl shadow-lg shadow-[#14103B]/30 transform hover:scale-105 transition-transform">
+                    <i class="ph ph-qr-code"></i>
+                </button>
+            </div>
+            <button class="flex flex-col items-center gap-1 w-14 pb-1 text-[#9CA3AF] hover:text-slate-600">
+                <i class="ph ph-bell text-2xl"></i>
+                <span class="text-[10px] font-medium">Notifikasi</span>
+            </button>
+            <button class="flex flex-col items-center gap-1 w-14 pb-1 text-[#9CA3AF] hover:text-slate-600">
+                <i class="ph ph-user text-2xl"></i>
+                <span class="text-[10px] font-medium">Akun</span>
+            </button>
+        </div>
+
+    </div>
+
+    <script>
+        const schedules = [
+            {
+                title: "Jadwal Mari Inl",
+                date: "Kaiasa, 21 Me 3026",
+                time: "07:30 - 11:30",
+                poli: "Poll Anak",
+                room: "Foom 102",
+                slotCount: "16 / 30",
+                slotText: "Slot Terseda",
+                badge: "Buka",
+                badgeClass: "bg-[#38c474] text-white"
+            },
+            {
+                title: "Jadwal Siang",
+                date: "Rabu, 22 Mei 3026",
+                time: "13:00 - 16:00",
+                poli: "Poli Umum",
+                room: "Room 105",
+                slotCount: "5 / 30",
+                slotText: "Slot Tersedia",
+                badge: "Aktif",
+                badgeClass: "bg-blue-500 text-white"
+            },
+            {
+                title: "Jadwal Esok",
+                date: "Kamis, 23 Mei 3026",
+                time: "09:00 - 12:00",
+                poli: "Poli Gigi",
+                room: "Room 201",
+                slotCount: "20 / 30",
+                slotText: "Slot Tersedia",
+                badge: "Buka",
+                badgeClass: "bg-[#38c474] text-white"
+            }
+        ];
+
+        const container = document.getElementById('schedule-stack');
+        let currentIndex = 0;
+
+        function renderCards() {
+            container.innerHTML = '';
+            for (let i = 2; i >= 0; i--) { 
+                const dataIndex = (currentIndex + i) % schedules.length;
+                const data = schedules[dataIndex];
+                
+                const card = document.createElement('div');
+                card.className = `absolute top-0 left-0 w-full rounded-[24px] p-5 transition-all duration-300 ease-out cursor-grab active:cursor-grabbing bg-white border border-slate-100 shadow-[0_15px_35px_-10px_rgba(0,0,0,0.08)]`;
+                
+                if (i === 0) {
+                    card.style.transform = `translateY(0px) scale(1)`;
+                    card.style.zIndex = 30;
+                    card.style.opacity = 1;
+                    card.classList.add('front-card');
+                } else if (i === 1) {
+                    card.style.transform = `translateY(14px) scale(0.92)`;
+                    card.style.zIndex = 20;
+                    card.style.opacity = 0.95;
+                } else {
+                    card.style.transform = `translateY(28px) scale(0.84)`;
+                    card.style.zIndex = 10;
+                    card.style.opacity = 0.8;
+                }
+
+                card.innerHTML = `
+                    <div class="flex justify-between items-start mb-5">
+                        <div class="flex flex-col">
+                            <span class="text-[14px] font-bold text-slate-800">${data.title}</span>
+                            <span class="text-[11px] font-medium text-slate-500 mt-0.5">${data.date}</span>
+                        </div>
+                        <i class="ph ph-x text-lg text-slate-400 hover:text-slate-600 transition-colors cursor-pointer"></i>
+                    </div>
+                    <div class="flex justify-between items-center mb-5">
+                        <span class="text-[26px] font-extrabold tracking-wide text-slate-900">${data.time}</span>
+                        <span class="${data.badgeClass} px-3 py-1 rounded-full text-[10px] font-bold tracking-wide shadow-sm">${data.badge}</span>
+                    </div>
+                    <div class="flex justify-between items-end">
+                        <div class="flex flex-col gap-0.5">
+                            <span class="font-bold text-[13px] text-slate-800">${data.poli}</span>
+                            <span class="text-[11px] font-medium text-slate-500">${data.room}</span>
+                        </div>
+                        <div class="flex flex-col gap-0.5 text-right">
+                            <span class="font-bold text-[13px] text-slate-800">${data.slotCount}</span>
+                            <span class="text-[11px] font-medium text-slate-500">${data.slotText}</span>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(card);
+            }
+        }
+
+        renderCards();
+
+        let startX = 0;
+        let currentX = 0;
+        let isDragging = false;
+
+        container.style.touchAction = 'none';
+
+        container.addEventListener('pointerdown', (e) => {
+            startX = e.clientX;
+            isDragging = true;
+            const frontCard = container.querySelector('.front-card');
+            if (frontCard) {
+                frontCard.style.transition = 'none';
+                try { frontCard.setPointerCapture(e.pointerId); } catch(err){}
+            }
+        });
+
+        container.addEventListener('pointermove', (e) => {
+            if (!isDragging) return;
+            currentX = e.clientX;
+            const diffX = currentX - startX;
+            const frontCard = container.querySelector('.front-card');
+            if (frontCard) {
+                const rotate = diffX * 0.04;
+                frontCard.style.transform = `translateY(0px) translateX(${diffX}px) scale(1) rotate(${rotate}deg)`;
+            }
+        });
+
+        const handlePointerEnd = (e) => {
+            if (!isDragging) return;
+            isDragging = false;
+            
+            const diffX = currentX - startX;
+            const frontCard = container.querySelector('.front-card');
+            
+            if (frontCard) {
+                frontCard.style.transition = 'all 0.3s ease-out';
+                try { frontCard.releasePointerCapture(e.pointerId); } catch(err){}
+            }
+            
+            if (Math.abs(diffX) > 70) { 
+                if (frontCard) {
+                    const sign = diffX > 0 ? 1 : -1;
+                    frontCard.style.transform = `translateY(0px) translateX(${sign * window.innerWidth}px) scale(1) rotate(${sign * 15}deg)`;
+                    frontCard.style.opacity = 0;
+                }
+                
+                setTimeout(() => {
+                    if (diffX > 0) {
+                        currentIndex = (currentIndex - 1 + schedules.length) % schedules.length;
+                    } else {
+                        currentIndex = (currentIndex + 1) % schedules.length;
+                    }
+                    renderCards();
+                }, 250);
+            } else {
+                renderCards();
+            }
+            
+            startX = 0;
+            currentX = 0;
+        };
+
+        container.addEventListener('pointerup', handlePointerEnd);
+        container.addEventListener('pointercancel', handlePointerEnd);
+    </script>
+</body>
+</html>
