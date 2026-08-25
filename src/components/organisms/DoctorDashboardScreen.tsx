@@ -51,7 +51,7 @@ export function DoctorDashboardScreen(props: {
   return (
     <div
       className={cn(
-        'relative flex h-full w-full flex-col overflow-hidden select-text transition-colors duration-500',
+        'relative flex h-full w-full flex-col overflow-hidden select-text transition-colors duration-500 overscroll-none touch-pan-x',
         isDark ? 'bg-[#0a0e1a] text-white' : 'bg-[#f8faff] text-neutral-900',
         props.className,
       )}
@@ -81,38 +81,45 @@ export function DoctorDashboardScreen(props: {
         )}
       </div>
 
-      {/* Main Content Scrollable Area */}
-      <div className="relative z-10 flex-1 overflow-y-auto px-5 pt-2 pb-32 no-scrollbar">
+      {/* Content Viewport Container */}
+      <div
+        className={cn(
+          'relative z-10 flex-1 px-5 pt-2',
+          activeTab === 'home'
+            ? 'h-full flex flex-col justify-start overflow-hidden pb-24 overscroll-none touch-pan-x select-none'
+            : 'overflow-y-auto pb-32 no-scrollbar overscroll-contain',
+        )}
+      >
         {activeTab === 'home' && (
-          <>
-            {/* Doctor Profile Header */}
+          <div className="flex flex-col h-full justify-between">
+            {/* 1. Doctor Profile Header */}
             <DoctorProfileHeader
               profile={data.profile}
               onNotificationClick={() => setActiveTab('notification')}
               onProfileClick={() => setActiveTab('account')}
             />
 
-            {/* 3D Stack of Schedule Cards with Swipe & Drag Gesture */}
+            {/* 2. 3D Stack of Schedule Cards with Wave Petal Texture */}
             <ScheduleCardStack
               schedules={data.schedules}
               theme={props.theme}
             />
 
-            {/* Quick Access Menu Grid */}
+            {/* 3. Quick Access Menu Grid */}
             <QuickAccessSection
               actions={data.quickActions}
               theme={props.theme}
               onActionClick={handleQuickAction}
             />
 
-            {/* Today's Activity Stat Cards */}
+            {/* 4. Today's Activity Stat Cards */}
             <TodayActivitySection
               activities={data.activities}
               theme={props.theme}
               onDetailClick={() => setActiveTab('schedule')}
               onActivityClick={() => showToast('Membuka rincian aktivitas')}
             />
-          </>
+          </div>
         )}
 
         {activeTab === 'schedule' && (
