@@ -32,36 +32,43 @@ export function AccountTabScreen(props: {
   return (
     <div className={cn('flex flex-col justify-between h-full select-text w-full', props.className)}>
       <div>
-        {/* Full-Bleed Profile Header with Scenic Nature Cover (No border/shadow separation) */}
+        {/* Full-Bleed Profile Header with Smooth Top-to-Bottom Nature Masking */}
         <div
           className={cn(
             'relative w-[calc(100%+40px)] -mx-5 -mt-2 overflow-hidden transition-all select-none',
-            isDark
-              ? 'bg-neutral-900/90 text-white'
-              : 'bg-white text-slate-900',
+            isDark ? 'bg-[#0a0e1a] text-white' : 'bg-white text-slate-900',
           )}
         >
-          {/* Scenic Nature Atmospheric Cover Banner */}
+          {/* Scenic Nature Background Image with Linear Mask */}
           <div
-            className="relative h-[125px] w-full overflow-hidden bg-cover bg-center bg-no-repeat"
+            className="relative h-[145px] w-full overflow-hidden bg-cover bg-center bg-no-repeat"
             style={{
               backgroundImage:
-                'url(https://images.unsplash.com/photo-1534088568595-a066f410bcda?q=80&w=800&auto=format&fit=crop)',
+                'url(https://images.unsplash.com/photo-1506744038136-46273834b3fb?q=80&w=800&auto=format&fit=crop)',
+              maskImage: 'linear-gradient(to bottom, black 35%, transparent 100%)',
+              WebkitMaskImage: 'linear-gradient(to bottom, black 35%, transparent 100%)',
             }}
-          >
-            {/* Subtle Ambient Vignette Overlay */}
-            <div className="absolute inset-0 bg-gradient-to-b from-black/15 via-transparent to-black/25" />
-          </div>
+          />
 
-          {/* Profile Identity Body (Blends seamlessly into canvas) */}
-          <div className="relative px-5 pt-0 pb-3.5">
+          {/* Theme Gradient Overlay for Seamless Color Fade */}
+          <div
+            className={cn(
+              'absolute inset-x-0 top-0 h-[145px] pointer-events-none',
+              isDark
+                ? 'bg-gradient-to-b from-transparent via-[#0a0e1a]/30 to-[#0a0e1a]'
+                : 'bg-gradient-to-b from-transparent via-white/30 to-white',
+            )}
+          />
+
+          {/* Profile Identity Body */}
+          <div className="relative px-5 pt-0 pb-3">
             {/* Overlapping Avatar with Solid Pure White Ring */}
-            <div className="flex items-end justify-between -mt-10 mb-2">
+            <div className="flex items-end justify-between -mt-12 mb-2">
               <DoctorAvatar
                 src={profile.avatarUrl}
                 alt={profile.name}
-                size={72}
-                className="ring-4 ring-white bg-white shadow-md"
+                size={74}
+                className="ring-4 ring-white bg-white shadow-lg"
               />
             </div>
 
