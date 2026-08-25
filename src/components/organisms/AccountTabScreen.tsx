@@ -39,7 +39,12 @@ export function AccountTabScreen(props: {
           className="mb-3 ring-4 ring-blue-500/20"
         />
         <h2 className="text-lg font-bold tracking-tight">{profile.name}</h2>
-        <span className="text-xs text-blue-600 dark:text-blue-400 font-semibold mt-0.5">
+        <span
+          className={cn(
+            'text-xs font-semibold mt-0.5',
+            isDark ? 'text-cyan-400' : 'text-blue-600',
+          )}
+        >
           {profile.role}
         </span>
         <span className="text-[11px] text-neutral-400 mt-1">
@@ -68,7 +73,14 @@ export function AccountTabScreen(props: {
               )}
             >
               <div className="flex items-center gap-3">
-                <div className="p-2 rounded-xl bg-blue-50 text-blue-600 dark:bg-blue-950/40 dark:text-blue-400">
+                <div
+                  className={cn(
+                    'p-2 rounded-xl',
+                    isDark
+                      ? 'bg-blue-950/60 text-cyan-400'
+                      : 'bg-blue-50 text-blue-600',
+                  )}
+                >
                   <Icon className="h-4 w-4" />
                 </div>
                 <div>
@@ -91,7 +103,12 @@ export function AccountTabScreen(props: {
         <button
           type="button"
           onClick={props.onLogout}
-          className="flex items-center justify-center gap-2 py-3.5 px-4 rounded-2xl bg-red-500/10 hover:bg-red-500/20 text-red-600 dark:text-red-400 border border-red-500/20 text-xs font-bold transition-all cursor-pointer select-none"
+          className={cn(
+            'flex items-center justify-center gap-2 py-3.5 px-4 rounded-2xl border text-xs font-bold transition-all cursor-pointer select-none',
+            isDark
+              ? 'bg-red-500/15 hover:bg-red-500/25 text-red-400 border-red-500/30'
+              : 'bg-red-50 hover:bg-red-100 text-red-600 border-red-200',
+          )}
         >
           <LogOut className="h-4 w-4" />
           <span>Keluar dari Akun Dokter</span>

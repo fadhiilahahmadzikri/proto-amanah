@@ -77,11 +77,17 @@ export function NotificationTabScreen(props: {
               <div
                 className={cn(
                   'h-10 w-10 rounded-2xl flex items-center justify-center shrink-0 mt-0.5',
-                  item.type === 'queue'
-                    ? 'bg-blue-50 text-blue-600 dark:bg-blue-950/50 dark:text-blue-400'
-                    : item.type === 'lab'
-                      ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-950/50 dark:text-emerald-400'
-                      : 'bg-amber-50 text-amber-600 dark:bg-amber-950/50 dark:text-amber-400',
+                  isDark
+                    ? item.type === 'queue'
+                      ? 'bg-blue-950/60 text-cyan-400'
+                      : item.type === 'lab'
+                        ? 'bg-emerald-950/60 text-emerald-400'
+                        : 'bg-amber-950/60 text-amber-400'
+                    : item.type === 'queue'
+                      ? 'bg-blue-50 text-blue-600'
+                      : item.type === 'lab'
+                        ? 'bg-emerald-50 text-emerald-600'
+                        : 'bg-amber-50 text-amber-600',
                 )}
               >
                 {item.type === 'queue' ? (
@@ -100,7 +106,12 @@ export function NotificationTabScreen(props: {
                     {item.time}
                   </span>
                 </div>
-                <p className="text-[11px] text-neutral-500 dark:text-neutral-400 mt-1 leading-relaxed">
+                <p
+                  className={cn(
+                    'text-[11px] mt-1 leading-relaxed',
+                    isDark ? 'text-neutral-400' : 'text-neutral-500',
+                  )}
+                >
                   {item.desc}
                 </p>
               </div>

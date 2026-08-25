@@ -110,8 +110,18 @@ export function ScheduleTabScreen(props: {
               />
             </div>
 
-            <div className="flex items-center justify-between text-xs pt-2 border-t border-dashed border-neutral-200/50 dark:border-white/10">
-              <div className="flex items-center gap-1.5 text-blue-500 font-semibold">
+            <div
+              className={cn(
+                'flex items-center justify-between text-xs pt-2 border-t border-dashed',
+                isDark ? 'border-white/10' : 'border-neutral-200/60',
+              )}
+            >
+              <div
+                className={cn(
+                  'flex items-center gap-1.5 font-semibold',
+                  isDark ? 'text-cyan-400' : 'text-blue-600',
+                )}
+              >
                 <Clock className="h-3.5 w-3.5" />
                 <span>{sch.time}</span>
               </div>
@@ -127,13 +137,21 @@ export function ScheduleTabScreen(props: {
             </div>
 
             <div className="flex items-center justify-between mt-2.5 pt-2 text-[11px]">
-              <div className="flex items-center gap-1 text-emerald-600 dark:text-emerald-400 font-semibold">
+              <div
+                className={cn(
+                  'flex items-center gap-1 font-semibold',
+                  isDark ? 'text-emerald-400' : 'text-emerald-600',
+                )}
+              >
                 <Users className="h-3.5 w-3.5" />
                 <span>{sch.slotCount} Pasien</span>
               </div>
               <button
                 type="button"
-                className="text-[10px] font-bold text-blue-600 dark:text-blue-400 hover:underline cursor-pointer"
+                className={cn(
+                  'text-[10px] font-bold hover:underline cursor-pointer',
+                  isDark ? 'text-cyan-400' : 'text-blue-600',
+                )}
               >
                 Kelola Antrean →
               </button>

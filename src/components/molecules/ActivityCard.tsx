@@ -38,10 +38,14 @@ export function ActivityCard(props: {
         <div className="flex justify-between items-start">
           <div
             className={cn(
-              'w-9 h-9 rounded-full flex items-center justify-center shrink-0',
-              isBlue
-                ? 'bg-blue-50 text-[#0A44FF] dark:bg-blue-950/50 dark:text-cyan-400'
-                : 'bg-emerald-50 text-emerald-500 dark:bg-emerald-950/50 dark:text-emerald-400',
+              'w-9 h-9 rounded-full flex items-center justify-center shrink-0 transition-colors',
+              isDark
+                ? isBlue
+                  ? 'bg-blue-950/70 text-cyan-400 border border-blue-500/25'
+                  : 'bg-emerald-950/70 text-emerald-400 border border-emerald-500/25'
+                : isBlue
+                  ? 'bg-blue-50 text-[#0A44FF]'
+                  : 'bg-emerald-50 text-[#38c474]',
             )}
           >
             {props.item.icon === 'users' ? (
