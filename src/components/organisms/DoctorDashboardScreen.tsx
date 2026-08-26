@@ -105,9 +105,9 @@ export function DoctorDashboardScreen(props: {
       <div
         className={cn(
           'relative z-10 flex-1 min-h-0 w-full overflow-hidden',
-          showPresenceHistory || activeTab === 'qr' || activeTab === 'schedule' || activeTab === 'notification'
+          showPresenceHistory || activeTab === 'qr' || activeTab === 'schedule' || activeTab === 'notification' || activeTab === 'account'
             ? 'p-0 select-none'
-            : activeTab === 'home' || activeTab === 'account'
+            : activeTab === 'home'
               ? 'px-5 pt-2 flex flex-col justify-start overflow-hidden pb-24 overscroll-none touch-pan-x select-none'
               : 'px-5 pt-2 overflow-y-auto pb-32 no-scrollbar overscroll-contain',
         )}

@@ -6,6 +6,7 @@ import { cn } from '@/lib/utils';
 
 export function ScreenHeader(props: {
   title: string;
+  subtitle?: string;
   onBack?: () => void;
   rightAction?: React.ReactNode;
   theme?: 'dark' | 'light';
@@ -48,15 +49,27 @@ export function ScreenHeader(props: {
         )}
       </div>
 
-      {/* 2. Center: Prominent Screen Title (Rata Tengah, No Subtitle) */}
-      <h2
-        className={cn(
-          'text-base sm:text-lg font-bold tracking-tight text-center truncate px-2',
-          isDark ? 'text-white' : 'text-[#14103B]',
+      {/* 2. Center: Prominent Screen Title & Optional Subtitle */}
+      <div className="flex flex-col items-center justify-center truncate px-2 min-w-0">
+        <h2
+          className={cn(
+            'text-base sm:text-lg font-bold tracking-tight text-center truncate leading-tight',
+            isDark ? 'text-white' : 'text-[#14103B]',
+          )}
+        >
+          {props.title}
+        </h2>
+        {props.subtitle && (
+          <span
+            className={cn(
+              'text-[11px] font-medium tracking-tight text-center truncate mt-0.5',
+              isDark ? 'text-neutral-400' : 'text-slate-500',
+            )}
+          >
+            {props.subtitle}
+          </span>
         )}
-      >
-        {props.title}
-      </h2>
+      </div>
 
       {/* 3. Trailing / End (Optional Action or Balance Spacer) */}
       <div className="flex items-center justify-end min-w-9">

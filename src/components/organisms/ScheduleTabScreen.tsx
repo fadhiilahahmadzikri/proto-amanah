@@ -110,7 +110,7 @@ const ToggleSwitch = (props: {
   >
     <span
       className={cn(
-        'pointer-events-none inline-block h-[22px] w-[22px] transform rounded-full bg-white shadow-[0_2px_5px_rgba(0,0,0,0.2)] transition-transform duration-500 ease-[cubic-bezier(0.34,1.8,0.64,1)]',
+        'pointer-events-none inline-block h-[22px] w-[22px] transform rounded-full bg-white shadow-[0_2px_5px_rgba(0,0,0,0.2)] transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)]',
         props.active ? 'translate-x-[20px]' : 'translate-x-[0px]',
       )}
     />
@@ -280,29 +280,40 @@ const SelectionModal = (props: {
     <div className="absolute inset-0 z-60 overflow-hidden flex flex-col justify-end select-text">
       {/* Absolute Backdrop inside frame */}
       <div
-        className="absolute -inset-10 bg-black/60 backdrop-blur-xs transition-opacity duration-200"
+        className="absolute inset-0 bg-black/60 backdrop-blur-xs transition-opacity duration-300 animate-in fade-in"
         onClick={triggerClose}
       />
 
-      {/* Nested Sheet Drawer inside iPhone frame with bottom navigation clearance */}
+      {/* Master Drawer Bottom Sheet */}
       <div
         ref={sheetRef}
         className={cn(
-          'relative z-10 w-full max-h-[88%] rounded-t-[36px] border-t p-5 pb-28 sm:pb-32 shadow-2xl transition-colors flex flex-col gap-3.5 will-change-transform backdrop-blur-2xl overflow-hidden',
+          'relative z-10 w-full max-h-[90%] flex flex-col rounded-t-[32px] sm:rounded-t-[36px] shadow-[0_-12px_45px_rgba(0,0,0,0.25)] border-t will-change-transform backdrop-blur-2xl overflow-hidden',
           props.isDark
-            ? 'bg-[#0a0e1a] border-white/15 text-white shadow-black/80'
-            : 'bg-white border-slate-200 text-slate-900 shadow-2xl',
+            ? 'bg-[#0a0e1a] border-white/10 text-white shadow-black/80'
+            : 'bg-white border-neutral-100 text-slate-900 shadow-[0_-12px_45px_rgba(0,0,0,0.25)]',
         )}
       >
-        {/* Drag Handle */}
-        <div className={cn('w-12 h-1.5 rounded-full mx-auto mb-1 shrink-0', props.isDark ? 'bg-white/25' : 'bg-slate-300')} />
+        {/* Interactive Drag Handle */}
+        <div
+          role="button"
+          tabIndex={0}
+          aria-label="Tarik ke bawah untuk menutup"
+          onClick={(e) => {
+            e.stopPropagation();
+            triggerClose();
+          }}
+          className="flex w-full cursor-grab active:cursor-grabbing flex-col items-center justify-center pt-3.5 pb-1 shrink-0 touch-none select-none hover:bg-neutral-50/50 dark:hover:bg-white/5 transition-colors"
+        >
+          <div className={cn('h-1.25 w-11 rounded-full transition-colors duration-150', props.isDark ? 'bg-white/25 hover:bg-white/40 active:bg-white/50' : 'bg-neutral-300 hover:bg-neutral-400 active:bg-neutral-500')} />
+        </div>
 
-        {/* Header */}
-        <div className="flex items-center justify-between pb-2 border-b shrink-0" style={{ borderColor: props.isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.06)' }}>
+        {/* Master Header */}
+        <div className="relative z-20 flex items-center justify-between px-6 pt-0.5 pb-2.5 shrink-0 border-b border-inherit">
           <div>
-            <h3 className="text-sm font-bold tracking-tight">{props.title}</h3>
+            <h3 className={cn('text-base font-bold tracking-tight', props.isDark ? 'text-white' : 'text-slate-900')}>{props.title}</h3>
             {props.subtitle && (
-              <p className={cn('text-[11px] mt-0.5', props.isDark ? 'text-neutral-400' : 'text-slate-500')}>
+              <p className={cn('text-[11px] font-medium mt-0.5', props.isDark ? 'text-neutral-400' : 'text-slate-500')}>
                 {props.subtitle}
               </p>
             )}
@@ -312,16 +323,18 @@ const SelectionModal = (props: {
             aria-label="Tutup"
             onClick={triggerClose}
             className={cn(
-              'p-1.5 rounded-full transition-colors cursor-pointer',
-              props.isDark ? 'text-neutral-400 hover:text-white hover:bg-white/10' : 'text-slate-400 hover:text-slate-900 hover:bg-slate-100',
+              'p-1.5 -mr-2 rounded-full transition-colors cursor-pointer flex items-center justify-center shrink-0',
+              props.isDark ? 'bg-white/10 text-neutral-300 hover:text-white hover:bg-white/20' : 'bg-neutral-100/80 text-neutral-600 hover:text-neutral-900 hover:bg-slate-200',
             )}
           >
-            <X className="w-4 h-4" />
+            <X className="h-4 w-4" />
           </button>
         </div>
 
-        {/* Manual Input / Search Field */}
-        <form onSubmit={handleManualSubmit} className="flex gap-2 shrink-0">
+        {/* Scrollable Content Body */}
+        <div className="flex w-full flex-1 flex-col px-6 pt-3 pb-8 overflow-y-auto no-scrollbar select-text gap-3.5">
+          {/* Manual Input / Search Field */}
+          <form onSubmit={handleManualSubmit} className="flex gap-2 shrink-0">
           <div className="relative flex-1">
             <Search className={cn('w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2', props.isDark ? 'text-neutral-400' : 'text-slate-400')} />
             <input
@@ -343,7 +356,7 @@ const SelectionModal = (props: {
               className={cn(
                 'px-3 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer shrink-0 active:scale-95',
                 props.isDark
-                  ? 'bg-cyan-500 text-neutral-950 hover:bg-cyan-400'
+                  ? 'bg-cyan-500 text-cyan-950 hover:bg-cyan-400'
                   : 'bg-blue-600 text-white hover:bg-blue-700',
               )}
             >
@@ -402,6 +415,7 @@ const SelectionModal = (props: {
               </div>
             )}
           </div>
+        </div>
         </div>
       </div>
     </div>
@@ -699,30 +713,6 @@ export function ScheduleTabScreen(props: {
   const detailDrawerRef = React.useRef<HTMLDivElement>(null);
   const isClosingDetailRef = React.useRef(false);
 
-  // Patient List Sheet Drawer State (Daftar Pasien Booking)
-  const [isPatientListDrawerOpen, setIsPatientListDrawerOpen] = React.useState(false);
-  const patientListDrawerRef = React.useRef<HTMLDivElement>(null);
-  const isClosingPatientListRef = React.useRef(false);
-
-  const triggerClosePatientListDrawer = React.useCallback(() => {
-    if (isClosingPatientListRef.current || !patientListDrawerRef.current) {
-      setIsPatientListDrawerOpen(false);
-      return;
-    }
-    isClosingPatientListRef.current = true;
-
-    gsap.to(patientListDrawerRef.current, {
-      y: '100%',
-      opacity: 0.9,
-      duration: 0.28,
-      ease: 'power3.in',
-      onComplete: () => {
-        setIsPatientListDrawerOpen(false);
-        isClosingPatientListRef.current = false;
-      },
-    });
-  }, []);
-
   // Single Patient Detail Modal State (Keluhan & Rekam Pasien)
   const [isPatientDetailModalOpen, setIsPatientDetailModalOpen] = React.useState(false);
   const [detailPatient, setDetailPatient] = React.useState<BookedPatient | null>(null);
@@ -771,10 +761,21 @@ export function ScheduleTabScreen(props: {
   const isDayCuti = currentDaySetting.isCuti;
   const currentSchedules = schedulesMap[selectedDateKey] ?? [];
   const targetDailyQuota = currentDaySetting.targetQuota;
-  const totalBookedPatientsToday = currentSchedules.reduce(
-    (acc, sch) => acc + (sch.bookedPatients?.length ?? 0),
-    0,
-  );
+  // View Mode: 'overview' (Showcase Pasien Booking) vs 'sessions' (Halaman Detail Jadwal Sesi Praktik) vs 'session-patients' (Halaman Daftar Pasien Booking Sesi)
+  const [viewMode, setViewMode] = React.useState<'overview' | 'sessions' | 'session-patients'>('overview');
+
+  // Aggregated Booked Patients for Current Selected Date
+  const allBookedPatientsForDay = React.useMemo(() => {
+    const list: { patient: BookedPatient; schedule: DoctorSchedule }[] = [];
+    currentSchedules.forEach((sch) => {
+      (sch.bookedPatients ?? []).forEach((p) => {
+        list.push({ patient: p, schedule: sch });
+      });
+    });
+    return list;
+  }, [currentSchedules]);
+
+  const totalBookedPatientsToday = allBookedPatientsForDay.length;
   const capacityPercentage = targetDailyQuota > 0
     ? Math.min(100, Math.round((totalBookedPatientsToday / targetDailyQuota) * 100))
     : 0;
@@ -844,16 +845,6 @@ export function ScheduleTabScreen(props: {
       );
     }
   }, [isDetailDrawerOpen]);
-
-  React.useEffect(() => {
-    if (isPatientListDrawerOpen && patientListDrawerRef.current) {
-      gsap.fromTo(
-        patientListDrawerRef.current,
-        { y: '100%', opacity: 0.95 },
-        { y: '0%', opacity: 1, duration: 0.35, ease: 'power3.out' },
-      );
-    }
-  }, [isPatientListDrawerOpen]);
 
   React.useEffect(() => {
     if (isPatientDetailModalOpen && patientDetailModalRef.current) {
@@ -1250,400 +1241,837 @@ export function ScheduleTabScreen(props: {
     <div
       className={cn('relative w-full h-full overflow-hidden', props.className)}
     >
-      {/* Dynamic Spring Transitions directly from POC */}
+      {/* Dynamic Smooth Transitions */}
       <style>{`
         .spring-card-transition {
-          transition: all 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+          transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         .spring-grid-transition {
-          transition: grid-template-rows 0.48s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.35s ease-out;
+          transition: grid-template-rows 0.38s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease-out;
         }
       `}</style>
 
       {/* 1. Master Overlay Glassmorphic Screen Header */}
       <ScreenHeader
-        title="Jadwal Praktik"
-        onBack={props.onBack}
+        title={viewMode === 'session-patients' ? 'Daftar Pasien Booking' : 'Jadwal Praktik'}
+        subtitle={viewMode === 'sessions' ? format(selectedDate, 'EEEE, d MMMM yyyy', { locale: idLocale }) : undefined}
+        onBack={
+          viewMode === 'session-patients'
+            ? () => setViewMode('sessions')
+            : viewMode === 'sessions'
+              ? () => setViewMode('overview')
+              : props.onBack
+        }
         theme={props.theme}
-        rightAction={(
-          <button
-            type="button"
-            aria-label="Tambah Jadwal Baru"
-            onClick={() => {
-              handleOpenAddDrawer();
-            }}
-            className={cn(
-              'p-1.5 -mr-1.5 rounded-full transition-all cursor-pointer active:scale-90 flex items-center justify-center',
-              isDark
-                ? 'text-cyan-400 hover:text-cyan-300 hover:bg-white/10'
-                : 'text-blue-600 hover:text-blue-700 hover:bg-slate-100',
-            )}
-          >
-            <Plus className="h-6 w-6 stroke-[2]" />
-          </button>
-        )}
+        rightAction={
+          viewMode !== 'session-patients' ? (
+            <button
+              type="button"
+              aria-label="Tambah Jadwal Baru"
+              onClick={() => {
+                handleOpenAddDrawer(selectedDate);
+              }}
+              className={cn(
+                'p-1.5 -mr-1.5 rounded-full transition-all cursor-pointer active:scale-90 flex items-center justify-center',
+                isDark
+                  ? 'text-cyan-400 hover:text-cyan-300 hover:bg-white/10'
+                  : 'text-blue-600 hover:text-blue-700 hover:bg-slate-100',
+              )}
+            >
+              <Plus className="h-6 w-6 stroke-[2]" />
+            </button>
+          ) : undefined
+        }
       />
 
       {/* 2. Full-Height Scrollable Content Viewport */}
       <div className="w-full h-full overflow-y-auto overflow-x-hidden no-scrollbar px-5 pt-20 pb-36 flex flex-col gap-3.5">
-        {/* 1. Top Row: Kapasitas Hari Ini Radial & Lihat Schedule Trigger */}
-        <div className="flex justify-between items-center px-1 shrink-0 mt-1 select-none">
-          {/* Left: Kapasitas Hari Ini Radial Component */}
-          <div className="flex items-center gap-2.5 min-w-0">
-            {/* Radial Circular Progress Gauge */}
-            <div className="relative w-11 h-11 shrink-0 flex items-center justify-center">
-              <svg className="w-11 h-11 -rotate-90 transform-gpu" viewBox="0 0 48 48">
-                <defs>
-                  <linearGradient id="capacityRadialGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stopColor={isDark ? '#22d3ee' : '#2563eb'} />
-                    <stop offset="100%" stopColor={isDark ? '#06b6d4' : '#4f46e5'} />
-                  </linearGradient>
-                </defs>
-                {/* Track Circle */}
-                <circle
-                  cx="24"
-                  cy="24"
-                  r="19"
-                  fill="transparent"
-                  stroke={isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)'}
-                  strokeWidth="4"
-                />
-                {/* Active Progress Arc */}
-                <circle
-                  cx="24"
-                  cy="24"
-                  r="19"
-                  fill="transparent"
-                  stroke={isDayCuti ? '#f59e0b' : 'url(#capacityRadialGradient)'}
-                  strokeWidth="4"
-                  strokeDasharray={119.38}
-                  strokeDashoffset={119.38 - (119.38 * (isDayCuti ? 0 : capacityPercentage)) / 100}
-                  strokeLinecap="round"
-                  className="transition-all duration-700 ease-out"
-                />
-              </svg>
-              {/* Radial Center Value */}
-              <span className={cn('absolute text-[9.5px] font-bold tracking-tight', isDark ? 'text-white' : 'text-slate-900')}>
-                {isDayCuti ? '0%' : `${capacityPercentage}%`}
-              </span>
-            </div>
-
-            {/* Capacity Label & Real Patient Count */}
-            <div className="flex flex-col justify-center min-w-0">
-              <div className="flex items-center gap-1.5">
-                <span className={cn('text-xs font-bold tracking-tight', isDark ? 'text-white' : 'text-slate-900')}>
-                  Kapasitas Hari Ini
-                </span>
-                <span
-                  className={cn(
-                    'px-1.5 py-0.2 rounded-full text-[9.5px] font-bold inline-flex items-center gap-1 shrink-0',
-                    isDayCuti
-                      ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30'
-                      : 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30',
-                  )}
-                >
-                  <span className={cn('h-1.5 w-1.5 rounded-full', isDayCuti ? 'bg-amber-400' : 'bg-emerald-400 animate-pulse')} />
-                  {isDayCuti ? 'Cuti' : 'Buka'}
-                </span>
-              </div>
-              <p className={cn('text-[11px] font-medium mt-0.5', isDark ? 'text-neutral-400' : 'text-slate-500')}>
-                <span className={cn('font-bold', isDark ? 'text-cyan-400' : 'text-blue-600')}>
-                  {totalBookedPatientsToday}
-                </span>
-                <span> / {targetDailyQuota} Pasien Terdaftar</span>
-              </p>
-            </div>
-          </div>
-
-          {/* Right: Lihat Schedule Trigger */}
-          <button
-            type="button"
-            onClick={() => {
-              setDocScheduleMonth(selectedDate);
-              setIsDocScheduleDrawerOpen(true);
-            }}
-            className={cn(
-              'text-xs font-bold transition-all cursor-pointer flex items-center gap-1 shrink-0 hover:underline',
-              isDark
-                ? 'text-cyan-400 hover:text-cyan-300'
-                : 'text-blue-600 hover:text-blue-700',
-            )}
-          >
-            <span>Lihat Schedule</span>
-            <ChevronRight className="h-3.5 w-3.5" />
-          </button>
-        </div>
-
-        {/* 2. GSAP 3D Coverflow Date Carousel with Swipe Gestures */}
-        <div className="w-full max-w-full shrink-0 my-0.5 overflow-hidden">
-          <DateCarouselStrip
-            selectedDate={selectedDate}
-            onSelectDate={(d) => {
-              setSelectedDate(d);
-            }}
-            schedulesMap={schedulesMap}
-            daySettingsMap={daySettingsMap}
-            baseToday={baseToday}
-            theme={props.theme}
-          />
-        </div>
-
-        {/* 4. Cuti Alert Banner if Day is on Cuti */}
-        {isDayCuti && (
-          <div
-            className={cn(
-              'p-3 rounded-2xl border text-xs font-semibold flex items-center justify-between gap-3 animate-in fade-in',
-              isDark
-                ? 'bg-amber-950/30 border-amber-500/30 text-amber-300'
-                : 'bg-amber-50 border-amber-200 text-amber-800',
-            )}
-          >
-            <div className="flex items-center gap-2">
-              <AlertCircle className="h-4 w-4 shrink-0 text-amber-500" />
-              <span>Dokter Cuti Praktik: Seluruh jadwal dinonaktifkan.</span>
-            </div>
-            <button
-              type="button"
-              onClick={() => {
-                setDaySettingsMap(prev => ({
-                  ...prev,
-                  [selectedDateKey]: { ...currentDaySetting, isCuti: false },
-                }));
-              }}
-              className="px-2.5 py-1 rounded-lg bg-amber-500 text-neutral-950 font-bold text-[11px] shrink-0 hover:bg-amber-400 transition-colors cursor-pointer"
-            >
-              Buka Jadwal
-            </button>
-          </div>
-        )}
-
-        {/* 5. Singular Schedule Cards (1 Card = 1 Patient) */}
-        <div className="flex flex-col gap-3 mt-1">
-          <div className="flex justify-between items-center px-1">
-            <h3
-              className={cn(
-                'text-xs font-semibold tracking-tight',
-                isDark ? 'text-slate-400' : 'text-slate-600',
-              )}
-            >
-              {format(selectedDate, 'EEEE, d MMMM yyyy', { locale: idLocale })}
-            </h3>
-            <span className={cn('text-[11px] font-medium', isDark ? 'text-neutral-500' : 'text-slate-400')}>
-              {currentSchedules.length} Sesi Praktik
-            </span>
-          </div>
-
-          {currentSchedules.length > 0 ? (
-            currentSchedules.map((sch, index) => {
-              const natureImage = NATURE_IMAGES_POOL[index % NATURE_IMAGES_POOL.length];
-              const sessionTitle = sch.title;
-              const displayStartTime = sch.startTime ?? (sch.time.split(' ')[0] ?? '08:00');
-              const displayEndTime = sch.endTime ?? (sch.time.split(' - ')[1]?.split(' ')[0] ?? '11:00');
-              const bookedCount = sch.bookedPatients?.length ?? 0;
-
-              return (
-                <div
-                  key={sch.id}
-                  data-schedule-card
-                  onClick={() => {
-                    handleOpenDetailDrawer(sch);
-                  }}
-                  className={cn(
-                    'relative w-full h-[360px] rounded-[32px] overflow-hidden shadow-2xl bg-slate-900 select-none border border-black/10 transition-all duration-300 active:scale-[0.99] cursor-pointer isolate [transform:translateZ(0)]',
-                    isDayCuti && 'opacity-85 grayscale-20',
-                  )}
-                  style={{
-                    clipPath: 'inset(0 round 32px)',
-                    WebkitClipPath: 'inset(0 round 32px)',
-                  }}
-                >
-                  {/* Layer 1: Single 100% Crisp Background Photo */}
-                  <img
-                    src={natureImage}
-                    alt={sessionTitle}
-                    className="absolute inset-0 w-full h-full object-cover object-center rounded-[32px]"
-                  />
-
-                  {/* Layer 2: Real-time GPU Liquid Glass */}
-                  <div
-                    className="absolute inset-0 pointer-events-none z-10 rounded-[32px]"
-                    style={{
-                      backdropFilter: 'blur(20px) saturate(160%)',
-                      WebkitBackdropFilter: 'blur(20px) saturate(160%)',
-                      maskImage: 'linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,0.95) 35%, rgba(0,0,0,0.3) 55%, rgba(0,0,0,0) 75%)',
-                      WebkitMaskImage: 'linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,0.95) 35%, rgba(0,0,0,0.3) 55%, rgba(0,0,0,0) 75%)',
-                    }}
-                  />
-
-                  {/* Layer 3: High-Contrast Ambient Gradient */}
-                  <div
-                    className="absolute inset-0 pointer-events-none z-15 rounded-[32px]"
-                    style={{
-                      background: 'linear-gradient(to top, rgba(12, 20, 15, 0.82) 0%, rgba(12, 20, 15, 0.4) 40%, rgba(12, 20, 15, 0) 70%)',
-                    }}
-                  />
-
-                  {/* Top Badge: Status Badge (Top-Left) */}
-                  <div className="absolute top-4 left-4 z-30">
-                    <div className="flex items-center gap-1.5 bg-white/95 backdrop-blur-md px-3 py-1.5 rounded-full shadow-md border border-white/90">
-                      <span
-                        className={cn(
-                          'h-2 w-2 rounded-full',
-                          isDayCuti
-                            ? 'bg-amber-500'
-                            : sch.badgeVariant === 'success'
-                              ? 'bg-emerald-500 animate-pulse'
-                              : sch.badgeVariant === 'warning'
-                                ? 'bg-amber-500'
-                                : 'bg-cyan-500',
-                        )}
-                      />
-                      <span className="text-xs font-semibold text-gray-900 tracking-tight">
-                        {isDayCuti ? 'Cuti' : sch.badge}
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Top Badge: Booked Patients Count (Top-Right) */}
-                  <div className="absolute top-4 right-4 z-30">
-                    <div className="flex items-center gap-1.5 bg-black/45 backdrop-blur-md px-3 py-1.5 rounded-full shadow-md border border-white/20 text-white">
-                      <Users className="w-3.5 h-3.5" />
-                      <span className="text-xs font-semibold tracking-tight">
-                        {bookedCount} Pasien Booking
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Card Content Overlay Layer */}
-                  <div className="absolute bottom-0 inset-x-0 z-20 p-5 pt-6 text-white">
-                    {/* Session Name Heading */}
-                    <h1 className="text-white text-[24px] font-semibold tracking-tight leading-none mb-3">
-                      {sessionTitle}
-                    </h1>
-
-                    {/* Details Row: Room & Poli on Left, Time Mulai & Selesai on Right */}
-                    <div className="flex items-end justify-between gap-2">
-                      {/* Room & Poli */}
-                      <div className="flex flex-col justify-end text-left space-y-0.5 max-w-[55%]">
-                        <p className="text-white/70 text-[13px] font-normal leading-snug tracking-tight truncate">
-                          {sch.poli} • {sch.room}
-                        </p>
-                        <p className="text-white/95 text-[13.5px] font-medium leading-snug tracking-tight">
-                          {sch.date}
-                        </p>
-                      </div>
-
-                      {/* Specifications: Jam Mulai & Jam Selesai (Pure uncolored white icons) */}
-                      <div className="flex items-center gap-3 shrink-0">
-                        {/* Jam Mulai */}
-                        <div className="flex flex-col items-center">
-                          <div className="flex items-center gap-1 text-white font-medium text-[13.5px]">
-                            <Clock className="w-3.5 h-3.5 text-white" />
-                            <span>{displayStartTime}</span>
-                          </div>
-                          <span className="text-[11px] text-white/70 font-normal mt-0.5">Mulai</span>
-                        </div>
-
-                        {/* Separator Line */}
-                        <div className="w-[1px] h-7 bg-white/20 self-center" />
-
-                        {/* Jam Selesai */}
-                        <div className="flex flex-col items-center">
-                          <div className="flex items-center gap-1 text-white font-medium text-[13.5px]">
-                            <Clock className="w-3.5 h-3.5 text-white" />
-                            <span>{displayEndTime}</span>
-                          </div>
-                          <span className="text-[11px] text-white/70 font-normal mt-0.5">Selesai</span>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Glass Line Separator */}
-                    <div className="w-full h-[1px] bg-white/20 my-3.5" />
-
-                    {/* Footer Actions: Detail + Edit + Delete */}
-                    <div className="flex items-center gap-2">
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleOpenDetailDrawer(sch);
-                        }}
-                        className="flex-1 py-2.5 rounded-2xl bg-white hover:bg-white/90 text-slate-950 font-bold text-xs shadow-lg transition-all text-center cursor-pointer active:scale-[0.98]"
-                      >
-                        Detail Sesi
-                      </button>
-
-                      {/* Icon-based Edit Action */}
-                      <button
-                        type="button"
-                        aria-label="Edit Jadwal"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleOpenEditDrawer(sch);
-                        }}
-                        className="h-10 w-10 rounded-2xl flex items-center justify-center transition-all cursor-pointer shrink-0 active:scale-95 bg-white/15 hover:bg-white/25 text-white border border-white/20 shadow-sm"
-                      >
-                        <Edit3 className="h-4 w-4" />
-                      </button>
-
-                      {/* Icon-based Delete Action */}
-                      <button
-                        type="button"
-                        aria-label="Hapus Jadwal"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleDeleteSchedule(sch.id);
-                        }}
-                        className="h-10 w-10 rounded-2xl flex items-center justify-center transition-all cursor-pointer shrink-0 active:scale-95 bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 border border-rose-500/30 shadow-sm"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </button>
-                    </div>
-                  </div>
+        {viewMode === 'overview' ? (
+          /* VIEW 1: OVERVIEW & SHOWCASE PASIEN BOOKING */
+          <>
+            {/* 1. Top Row: Kapasitas Hari Ini Radial & Lihat Schedule Trigger */}
+            <div className="flex justify-between items-center px-1 shrink-0 mt-1 select-none">
+              {/* Left: Kapasitas Hari Ini Radial Component */}
+              <div className="flex items-center gap-2.5 min-w-0">
+                {/* Radial Circular Progress Gauge */}
+                <div className="relative w-11 h-11 shrink-0 flex items-center justify-center">
+                  <svg className="w-11 h-11 -rotate-90 transform-gpu" viewBox="0 0 48 48">
+                    <defs>
+                      <linearGradient id="capacityRadialGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stopColor={isDark ? '#22d3ee' : '#2563eb'} />
+                        <stop offset="100%" stopColor={isDark ? '#06b6d4' : '#4f46e5'} />
+                      </linearGradient>
+                    </defs>
+                    {/* Track Circle */}
+                    <circle
+                      cx="24"
+                      cy="24"
+                      r="19"
+                      fill="transparent"
+                      stroke={isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)'}
+                      strokeWidth="4"
+                    />
+                    {/* Active Progress Arc */}
+                    <circle
+                      cx="24"
+                      cy="24"
+                      r="19"
+                      fill="transparent"
+                      stroke={isDayCuti ? '#f59e0b' : 'url(#capacityRadialGradient)'}
+                      strokeWidth="4"
+                      strokeDasharray={119.38}
+                      strokeDashoffset={119.38 - (119.38 * (isDayCuti ? 0 : capacityPercentage)) / 100}
+                      strokeLinecap="round"
+                      className="transition-all duration-700 ease-out"
+                    />
+                  </svg>
+                  {/* Radial Center Value */}
+                  <span className={cn('absolute text-[9.5px] font-bold tracking-tight', isDark ? 'text-white' : 'text-slate-900')}>
+                    {isDayCuti ? '0%' : `${capacityPercentage}%`}
+                  </span>
                 </div>
-              );
-            })
-          ) : (
-            // Empty State
-            <div
-              className={cn(
-                'flex flex-col items-center justify-center p-8 rounded-3xl border text-center my-2',
-                isDark
-                  ? 'bg-neutral-900/60 border-white/10 text-neutral-300'
-                  : 'bg-slate-50/80 border-slate-200 text-slate-600',
-              )}
-            >
-              <div
-                className={cn(
-                  'flex h-13 w-13 items-center justify-center rounded-2xl mb-3',
-                  isDark ? 'bg-white/10 text-neutral-400' : 'bg-slate-100 text-slate-400',
-                )}
-              >
-                <CalendarDays className="h-6 w-6" />
+
+                {/* Capacity Label & Real Patient Count */}
+                <div className="flex flex-col justify-center min-w-0">
+                  <div className="flex items-center gap-1.5">
+                    <span className={cn('text-xs font-bold tracking-tight', isDark ? 'text-white' : 'text-slate-900')}>
+                      Kapasitas Hari Ini
+                    </span>
+                    <span
+                      className={cn(
+                        'px-1.5 py-0.2 rounded-full text-[9.5px] font-bold inline-flex items-center gap-1 shrink-0',
+                        isDayCuti
+                          ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30'
+                          : 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30',
+                      )}
+                    >
+                      <span className={cn('h-1.5 w-1.5 rounded-full', isDayCuti ? 'bg-amber-400' : 'bg-emerald-400 animate-pulse')} />
+                      {isDayCuti ? 'Cuti' : 'Buka'}
+                    </span>
+                  </div>
+                  <p className={cn('text-[11px] font-medium mt-0.5', isDark ? 'text-neutral-400' : 'text-slate-500')}>
+                    <span className={cn('font-bold', isDark ? 'text-cyan-400' : 'text-blue-600')}>
+                      {totalBookedPatientsToday}
+                    </span>
+                    <span> / {targetDailyQuota} Pasien Terdaftar</span>
+                  </p>
+                </div>
               </div>
-              <h4 className={cn('text-sm font-bold mb-1', isDark ? 'text-white' : 'text-slate-900')}>
-                Tidak Ada Jadwal
-              </h4>
-              <p className="text-xs max-w-[220px] mb-4 text-neutral-400">
-                {isDayCuti
-                  ? 'Dokter sedang cuti pada tanggal ini.'
-                  : 'Belum ada sesi praktik dokter pada tanggal ini.'}
-              </p>
+
+              {/* Right: Lihat Schedule Trigger (Opens Monthly Calendar Drawer first) */}
               <button
                 type="button"
                 onClick={() => {
-                  handleOpenAddDrawer(selectedDate);
+                  setDocScheduleMonth(selectedDate);
+                  setIsDocScheduleDrawerOpen(true);
                 }}
-                className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold shadow-md shadow-blue-600/25 transition-all cursor-pointer active:scale-95"
+                className={cn(
+                  'text-xs font-bold transition-all cursor-pointer flex items-center gap-1 shrink-0 hover:underline',
+                  isDark
+                    ? 'text-cyan-400 hover:text-cyan-300'
+                    : 'text-blue-600 hover:text-blue-700',
+                )}
               >
-                <Plus className="h-4 w-4" />
-                <span>Tambah Jadwal Dokter</span>
+                <span>Lihat Schedule</span>
+                <ChevronRight className="h-3.5 w-3.5" />
               </button>
             </div>
-          )}
-        </div>
+
+            {/* 2. GSAP 3D Coverflow Date Carousel with Swipe Gestures */}
+            <div className="w-full max-w-full shrink-0 my-0.5 overflow-hidden">
+              <DateCarouselStrip
+                selectedDate={selectedDate}
+                onSelectDate={(d) => {
+                  setSelectedDate(d);
+                }}
+                schedulesMap={schedulesMap}
+                daySettingsMap={daySettingsMap}
+                baseToday={baseToday}
+                theme={props.theme}
+              />
+            </div>
+
+            {/* 3. Cuti Alert Banner if Day is on Cuti */}
+            {isDayCuti && (
+              <div
+                className={cn(
+                  'p-3 rounded-2xl border text-xs font-semibold flex items-center justify-between gap-3 animate-in fade-in',
+                  isDark
+                    ? 'bg-amber-950/30 border-amber-500/30 text-amber-300'
+                    : 'bg-amber-50 border-amber-200 text-amber-800',
+                )}
+              >
+                <div className="flex items-center gap-2">
+                  <AlertCircle className="h-4 w-4 shrink-0 text-amber-500" />
+                  <span>Dokter Cuti Praktik: Seluruh jadwal dinonaktifkan.</span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setDaySettingsMap(prev => ({
+                      ...prev,
+                      [selectedDateKey]: { ...currentDaySetting, isCuti: false },
+                    }));
+                  }}
+                  className="px-2.5 py-1 rounded-lg bg-amber-500 text-amber-950 font-bold text-[11px] shrink-0 hover:bg-amber-400 transition-colors cursor-pointer"
+                >
+                  Buka Jadwal
+                </button>
+              </div>
+            )}
+
+            {/* 4. Showcase Daftar Pasien Booking Hari Ini */}
+            <div className="flex flex-col gap-3 mt-1">
+              <div className="flex justify-between items-center px-1">
+                <h3
+                  className={cn(
+                    'text-xs font-semibold tracking-tight',
+                    isDark ? 'text-slate-400' : 'text-slate-600',
+                  )}
+                >
+                  {format(selectedDate, 'EEEE, d MMMM yyyy', { locale: idLocale })}
+                </h3>
+                <span className={cn('text-[11px] font-medium', isDark ? 'text-neutral-500' : 'text-slate-400')}>
+                  {allBookedPatientsForDay.length} Pasien Booking
+                </span>
+              </div>
+
+              {allBookedPatientsForDay.length > 0 ? (
+                allBookedPatientsForDay.map((item, pIndex) => {
+                  const patientNatureBg = NATURE_IMAGES_POOL[pIndex % NATURE_IMAGES_POOL.length];
+                  const patient = item.patient;
+                  const schedule = item.schedule;
+
+                  return (
+                    <div
+                      key={patient.id || pIndex}
+                      data-schedule-card
+                      onClick={() => {
+                        setDetailPatient(patient);
+                        setDetailSchedule(schedule);
+                        setIsPatientDetailModalOpen(true);
+                      }}
+                      className={cn(
+                        'relative w-full h-[320px] rounded-[32px] overflow-hidden shadow-2xl bg-slate-900 select-none border border-black/10 transition-all duration-300 active:scale-[0.99] cursor-pointer isolate [transform:translateZ(0)]',
+                        isDayCuti && 'opacity-85 grayscale-20',
+                      )}
+                      style={{
+                        clipPath: 'inset(0 round 32px)',
+                        WebkitClipPath: 'inset(0 round 32px)',
+                      }}
+                    >
+                      {/* Layer 1: Crisp Nature Background */}
+                      <img
+                        src={patientNatureBg}
+                        alt={patient.patientName}
+                        className="absolute inset-0 w-full h-full object-cover object-center rounded-[32px]"
+                      />
+
+                      {/* Layer 2: Real-time GPU Liquid Glass */}
+                      <div
+                        className="absolute inset-0 pointer-events-none z-10 rounded-[32px]"
+                        style={{
+                          backdropFilter: 'blur(20px) saturate(160%)',
+                          WebkitBackdropFilter: 'blur(20px) saturate(160%)',
+                          maskImage: 'linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,0.95) 35%, rgba(0,0,0,0.3) 55%, rgba(0,0,0,0.75) 75%)',
+                          WebkitMaskImage: 'linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,0.95) 35%, rgba(0,0,0,0.3) 55%, rgba(0,0,0,0.75) 75%)',
+                        }}
+                      />
+
+                      {/* Layer 3: High-Contrast Ambient Gradient */}
+                      <div
+                        className="absolute inset-0 pointer-events-none z-15 rounded-[32px]"
+                        style={{
+                          background: 'linear-gradient(to top, rgba(12, 20, 15, 0.85) 0%, rgba(12, 20, 15, 0.4) 40%, rgba(12, 20, 15, 0) 70%)',
+                        }}
+                      />
+
+                      {/* Top-Left: Status Badge */}
+                      <div className="absolute top-4 left-4 z-30">
+                        <div className="flex items-center gap-1.5 bg-white/95 backdrop-blur-md px-3 py-1.5 rounded-full shadow-md border border-white/90">
+                          <span
+                            className={cn(
+                              'h-2 w-2 rounded-full',
+                              patient.badgeVariant === 'success'
+                                ? 'bg-emerald-500 animate-pulse'
+                                : patient.badgeVariant === 'warning'
+                                  ? 'bg-amber-500'
+                                  : 'bg-cyan-500',
+                            )}
+                          />
+                          <span className="text-xs font-bold text-gray-900 tracking-tight">
+                            {patient.badge}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Top-Right: Queue Badge */}
+                      <div className="absolute top-4 right-4 z-30">
+                        <div className="flex items-center gap-1 bg-black/50 backdrop-blur-md px-3 py-1.5 rounded-full shadow-md border border-white/20 text-white">
+                          <span className="text-xs font-bold tracking-tight">
+                            Antrean {patient.queueNumber}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Card Content Overlay Layer */}
+                      <div className="absolute bottom-0 inset-x-0 z-20 p-5 pt-6 text-white">
+                        {/* Avatar, Name, Age Row */}
+                        <div className="flex items-center gap-3.5 mb-2.5">
+                          <img
+                            src={patient.avatarUrl || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=200&auto=format&fit=crop'}
+                            alt={patient.patientName}
+                            className="h-12 w-12 rounded-full object-cover border-2 border-white/95 shadow-md shrink-0"
+                          />
+                          <div className="flex-1 min-w-0">
+                            <h4 className="text-white text-[20px] font-bold tracking-tight leading-tight truncate">
+                              {patient.patientName}
+                            </h4>
+                            <p className="text-white/80 text-[12.5px] font-medium leading-snug">
+                              {patient.patientRm} • Usia {patient.patientAge}
+                            </p>
+                          </div>
+                        </div>
+
+                        {/* Session, Poli, Room Info */}
+                        <div className="flex items-center justify-between gap-2 text-white/80 text-[12px] font-medium mb-2.5">
+                          <span className="truncate">
+                            {schedule.title} • {schedule.poli}
+                          </span>
+                          <span className="shrink-0 text-white font-semibold">
+                            {schedule.room}
+                          </span>
+                        </div>
+
+                        {/* Time Slot Row */}
+                        <div className="flex items-center gap-1.5 text-white text-[12.5px] font-semibold mb-3">
+                          <Clock className="w-3.5 h-3.5 text-white" />
+                          <span>{patient.timeSlot}</span>
+                        </div>
+
+                        {/* Glass Line Separator */}
+                        <div className="w-full h-[1px] bg-white/20 mb-3" />
+
+                        {/* Detail Pasien Button */}
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setDetailPatient(patient);
+                            setDetailSchedule(schedule);
+                            setIsPatientDetailModalOpen(true);
+                          }}
+                          className="w-full py-2.5 rounded-2xl bg-white hover:bg-white/90 text-slate-950 font-bold text-xs shadow-lg transition-all text-center cursor-pointer active:scale-[0.98]"
+                        >
+                          Detail Pasien
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })
+              ) : (
+                <div
+                  className={cn(
+                    'p-8 rounded-[30px] border text-center flex flex-col items-center gap-3 transition-colors',
+                    isDark ? 'bg-white/5 border-white/10' : 'bg-slate-50 border-slate-200/80',
+                  )}
+                >
+                  <div className={cn('p-3 rounded-2xl', isDark ? 'bg-white/5 text-neutral-400' : 'bg-white text-slate-400')}>
+                    <Users className="h-6 w-6" />
+                  </div>
+                  <div className="space-y-1">
+                    <h4 className={cn('text-sm font-bold', isDark ? 'text-white' : 'text-slate-900')}>
+                      Belum Ada Pasien Booking
+                    </h4>
+                    <p className={cn('text-xs max-w-xs', isDark ? 'text-neutral-400' : 'text-slate-500')}>
+                      {isDayCuti
+                        ? 'Dokter sedang cuti pada tanggal ini.'
+                        : 'Belum ada pasien yang mendaftar pada sesi praktik di tanggal ini.'}
+                    </p>
+                  </div>
+                  <div className="flex flex-col w-full max-w-xs gap-2 pt-1">
+                    <button
+                      type="button"
+                      onClick={() => handleOpenAddDrawer(selectedDate)}
+                      className={cn(
+                        'w-full flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-xs font-bold shadow-md transition-all cursor-pointer active:scale-95',
+                        isDark
+                          ? 'bg-cyan-500 hover:bg-cyan-400 text-cyan-950 shadow-cyan-500/20'
+                          : 'bg-blue-600 hover:bg-blue-700 text-white shadow-blue-600/25',
+                      )}
+                    >
+                      <Plus className="h-4 w-4" />
+                      <span>Tambah Jadwal</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setViewMode('sessions')}
+                      className={cn(
+                        'w-full py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer border text-center',
+                        isDark
+                          ? 'border-white/15 text-neutral-200 hover:bg-white/10'
+                          : 'border-slate-200 text-slate-700 hover:bg-white',
+                      )}
+                    >
+                      Lihat Sesi Dokter
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          </>
+        ) : viewMode === 'sessions' ? (
+          /* VIEW 2: DEDICATED DOCTOR PRACTICE SESSIONS PAGE */
+          <>
+            {/* Header Summary Row */}
+            <div className="flex justify-between items-center px-1 shrink-0 mt-1">
+              <h3
+                className={cn(
+                  'text-xs font-semibold tracking-tight',
+                  isDark ? 'text-slate-400' : 'text-slate-600',
+                )}
+              >
+                Daftar Sesi Praktik Dokter
+              </h3>
+              <span className={cn('text-[11px] font-medium', isDark ? 'text-neutral-500' : 'text-slate-400')}>
+                {currentSchedules.length} Sesi Aktif
+              </span>
+            </div>
+
+            {/* Cuti Alert Banner if Day is on Cuti */}
+            {isDayCuti && (
+              <div
+                className={cn(
+                  'p-3 rounded-2xl border text-xs font-semibold flex items-center justify-between gap-3 animate-in fade-in',
+                  isDark
+                    ? 'bg-amber-950/30 border-amber-500/30 text-amber-300'
+                    : 'bg-amber-50 border-amber-200 text-amber-800',
+                )}
+              >
+                <div className="flex items-center gap-2">
+                  <AlertCircle className="h-4 w-4 shrink-0 text-amber-500" />
+                  <span>Dokter Cuti Praktik: Seluruh jadwal dinonaktifkan.</span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setDaySettingsMap(prev => ({
+                      ...prev,
+                      [selectedDateKey]: { ...currentDaySetting, isCuti: false },
+                    }));
+                  }}
+                  className="px-2.5 py-1 rounded-lg bg-amber-500 text-amber-950 font-bold text-[11px] shrink-0 hover:bg-amber-400 transition-colors cursor-pointer"
+                >
+                  Buka Jadwal
+                </button>
+              </div>
+            )}
+
+            {/* Doctor Practice Session Cards */}
+            <div className="flex flex-col gap-3">
+              {currentSchedules.length > 0 ? (
+                currentSchedules.map((sch, index) => {
+                  const natureImage = NATURE_IMAGES_POOL[index % NATURE_IMAGES_POOL.length];
+                  const sessionTitle = sch.title;
+                  const displayStartTime = sch.startTime ?? (sch.time.split(' ')[0] ?? '08:00');
+                  const displayEndTime = sch.endTime ?? (sch.time.split(' - ')[1]?.split(' ')[0] ?? '11:00');
+                  const bookedCount = sch.bookedPatients?.length ?? 0;
+
+                  return (
+                    <div
+                      key={sch.id}
+                      data-schedule-card
+                      onClick={() => {
+                        handleOpenDetailDrawer(sch);
+                      }}
+                      className={cn(
+                        'relative w-full h-[360px] rounded-[32px] overflow-hidden shadow-2xl bg-slate-900 select-none border border-black/10 transition-all duration-300 active:scale-[0.99] cursor-pointer isolate [transform:translateZ(0)]',
+                        isDayCuti && 'opacity-85 grayscale-20',
+                      )}
+                      style={{
+                        clipPath: 'inset(0 round 32px)',
+                        WebkitClipPath: 'inset(0 round 32px)',
+                      }}
+                    >
+                      {/* Layer 1: Single 100% Crisp Background Photo */}
+                      <img
+                        src={natureImage}
+                        alt={sessionTitle}
+                        className="absolute inset-0 w-full h-full object-cover object-center rounded-[32px]"
+                      />
+
+                      {/* Layer 2: Real-time GPU Liquid Glass */}
+                      <div
+                        className="absolute inset-0 pointer-events-none z-10 rounded-[32px]"
+                        style={{
+                          backdropFilter: 'blur(20px) saturate(160%)',
+                          WebkitBackdropFilter: 'blur(20px) saturate(160%)',
+                          maskImage: 'linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,0.95) 35%, rgba(0,0,0,0.3) 55%, rgba(0,0,0,0.75) 75%)',
+                          WebkitMaskImage: 'linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,0.95) 35%, rgba(0,0,0,0.3) 55%, rgba(0,0,0,0.75) 75%)',
+                        }}
+                      />
+
+                      {/* Layer 3: High-Contrast Ambient Gradient */}
+                      <div
+                        className="absolute inset-0 pointer-events-none z-15 rounded-[32px]"
+                        style={{
+                          background: 'linear-gradient(to top, rgba(12, 20, 15, 0.82) 0%, rgba(12, 20, 15, 0.4) 40%, rgba(12, 20, 15, 0) 70%)',
+                        }}
+                      />
+
+                      {/* Top Badge: Status Badge (Top-Left) */}
+                      <div className="absolute top-4 left-4 z-30">
+                        <div className="flex items-center gap-1.5 bg-white/95 backdrop-blur-md px-3 py-1.5 rounded-full shadow-md border border-white/90">
+                          <span
+                            className={cn(
+                              'h-2 w-2 rounded-full',
+                              isDayCuti
+                                ? 'bg-amber-500'
+                                : sch.badgeVariant === 'success'
+                                  ? 'bg-emerald-500 animate-pulse'
+                                  : sch.badgeVariant === 'warning'
+                                    ? 'bg-amber-500'
+                                    : 'bg-cyan-500',
+                            )}
+                          />
+                          <span className="text-xs font-semibold text-gray-900 tracking-tight">
+                            {isDayCuti ? 'Cuti' : sch.badge}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Top Badge: Booked Patients Count (Top-Right) */}
+                      <div className="absolute top-4 right-4 z-30">
+                        <div className="flex items-center gap-1.5 bg-black/45 backdrop-blur-md px-3 py-1.5 rounded-full shadow-md border border-white/20 text-white">
+                          <Users className="w-3.5 h-3.5" />
+                          <span className="text-xs font-semibold tracking-tight">
+                            {bookedCount} Pasien Booking
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Card Content Overlay Layer */}
+                      <div className="absolute bottom-0 inset-x-0 z-20 p-5 pt-6 text-white">
+                        {/* Session Name Heading */}
+                        <h1 className="text-white text-[24px] font-semibold tracking-tight leading-none mb-3">
+                          {sessionTitle}
+                        </h1>
+
+                        {/* Details Row: Room & Poli on Left, Time Mulai & Selesai on Right */}
+                        <div className="flex items-end justify-between gap-2">
+                          {/* Room & Poli */}
+                          <div className="flex flex-col justify-end text-left space-y-0.5 max-w-[55%]">
+                            <p className="text-white/70 text-[13px] font-normal leading-snug tracking-tight truncate">
+                              {sch.poli} • {sch.room}
+                            </p>
+                            <p className="text-white/95 text-[13.5px] font-medium leading-snug tracking-tight">
+                              {sch.date}
+                            </p>
+                          </div>
+
+                          {/* Specifications: Jam Mulai & Jam Selesai */}
+                          <div className="flex items-center gap-3 shrink-0">
+                            {/* Jam Mulai */}
+                            <div className="flex flex-col items-center">
+                              <div className="flex items-center gap-1 text-white font-medium text-[13.5px]">
+                                <Clock className="w-3.5 h-3.5 text-white" />
+                                <span>{displayStartTime}</span>
+                              </div>
+                              <span className="text-[11px] text-white/70 font-normal mt-0.5">Mulai</span>
+                            </div>
+
+                            {/* Separator Line */}
+                            <div className="w-[1px] h-7 bg-white/20 self-center" />
+
+                            {/* Jam Selesai */}
+                            <div className="flex flex-col items-center">
+                              <div className="flex items-center gap-1 text-white font-medium text-[13.5px]">
+                                <Clock className="w-3.5 h-3.5 text-white" />
+                                <span>{displayEndTime}</span>
+                              </div>
+                              <span className="text-[11px] text-white/70 font-normal mt-0.5">Selesai</span>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Glass Line Separator */}
+                        <div className="w-full h-[1px] bg-white/20 my-3.5" />
+
+                        {/* Footer Actions: Detail + Edit + Delete */}
+                        <div className="flex items-center gap-2">
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleOpenDetailDrawer(sch);
+                            }}
+                            className="flex-1 py-2.5 rounded-2xl bg-white hover:bg-white/90 text-slate-950 font-bold text-xs shadow-lg transition-all text-center cursor-pointer active:scale-[0.98]"
+                          >
+                            Detail Sesi
+                          </button>
+
+                          {/* Icon-based Edit Action */}
+                          <button
+                            type="button"
+                            aria-label="Edit Jadwal"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleOpenEditDrawer(sch);
+                            }}
+                            className="h-10 w-10 rounded-2xl flex items-center justify-center transition-all cursor-pointer shrink-0 active:scale-95 bg-white/15 hover:bg-white/25 text-white border border-white/20 shadow-sm"
+                          >
+                            <Edit3 className="h-4 w-4" />
+                          </button>
+
+                          {/* Icon-based Delete Action */}
+                          <button
+                            type="button"
+                            aria-label="Hapus Jadwal"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleDeleteSchedule(sch.id);
+                            }}
+                            className="h-10 w-10 rounded-2xl flex items-center justify-center transition-all cursor-pointer shrink-0 active:scale-95 bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 border border-rose-500/30 shadow-sm"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })
+              ) : (
+                <div
+                  className={cn(
+                    'p-8 rounded-[30px] border text-center flex flex-col items-center gap-3 transition-colors',
+                    isDark ? 'bg-white/5 border-white/10' : 'bg-slate-50 border-slate-200/80',
+                  )}
+                >
+                  <div className={cn('p-3 rounded-2xl', isDark ? 'bg-white/5 text-neutral-400' : 'bg-white text-slate-400')}>
+                    <CalendarDays className="h-6 w-6" />
+                  </div>
+                  <div className="space-y-1">
+                    <h4 className={cn('text-sm font-bold', isDark ? 'text-white' : 'text-slate-900')}>
+                      Belum Ada Sesi Praktik
+                    </h4>
+                    <p className={cn('text-xs max-w-xs', isDark ? 'text-neutral-400' : 'text-slate-500')}>
+                      {isDayCuti
+                        ? 'Dokter sedang cuti pada tanggal ini.'
+                        : 'Belum ada sesi praktik dokter yang ditambahkan pada tanggal ini.'}
+                    </p>
+                  </div>
+                  <div className="w-full max-w-xs pt-1">
+                    <button
+                      type="button"
+                      onClick={() => handleOpenAddDrawer(selectedDate)}
+                      className={cn(
+                        'w-full flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-xs font-bold shadow-md transition-all cursor-pointer active:scale-95',
+                        isDark
+                          ? 'bg-cyan-500 hover:bg-cyan-400 text-cyan-950 shadow-cyan-500/20'
+                          : 'bg-blue-600 hover:bg-blue-700 text-white shadow-blue-600/25',
+                      )}
+                    >
+                      <Plus className="h-4 w-4" />
+                      <span>Tambah Jadwal Dokter</span>
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          </>
+        ) : (
+          /* VIEW 3: DEDICATED FULL-SCREEN SESSION BOOKED PATIENTS INTENT */
+          <>
+            {/* Unwrapped Seamless Session Context & Stacked Avatars */}
+            <div className="flex items-center justify-between gap-3 px-1 py-1 shrink-0 select-none">
+              <div className="min-w-0">
+                <h4 className={cn('text-sm font-bold truncate', isDark ? 'text-white' : 'text-slate-950')}>
+                  {detailSchedule?.title} • {detailSchedule?.poli}
+                </h4>
+                <p className={cn('text-xs font-medium mt-0.5', isDark ? 'text-neutral-400' : 'text-slate-500')}>
+                  {detailSchedule?.room} • {detailSchedule?.startTime || detailSchedule?.time.split(' ')[0]} - {detailSchedule?.endTime || detailSchedule?.time.split(' - ')[1]?.split(' ')[0]} WIB
+                </p>
+              </div>
+
+              {/* Stacked Avatars Layer & Count */}
+              <div className="flex items-center gap-2 shrink-0">
+                <div className="flex items-center -space-x-2">
+                  {detailSchedule?.bookedPatients && detailSchedule.bookedPatients.length > 0 ? (
+                    detailSchedule.bookedPatients.slice(0, 3).map((p, idx) => (
+                      <img
+                        key={p.id || idx}
+                        src={p.avatarUrl || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=200&auto=format&fit=crop'}
+                        alt={p.patientName}
+                        className={cn(
+                          'h-7 w-7 rounded-full object-cover border-2 shadow-xs',
+                          isDark ? 'border-[#0a0e1a]' : 'border-white',
+                        )}
+                      />
+                    ))
+                  ) : null}
+                </div>
+                <span className={cn('text-xs font-bold', isDark ? 'text-cyan-400' : 'text-blue-600')}>
+                  {detailSchedule?.bookedPatients?.length ?? 0} Pasien
+                </span>
+              </div>
+            </div>
+
+            {/* List of Liquid Glass Patient Cards */}
+            <div className="flex flex-col gap-3">
+              {detailSchedule?.bookedPatients && detailSchedule.bookedPatients.length > 0 ? (
+                detailSchedule.bookedPatients.map((patient: BookedPatient, pIdx) => {
+                  const patientNatureBg = NATURE_IMAGES_POOL[pIdx % NATURE_IMAGES_POOL.length];
+                  return (
+                    <div
+                      key={patient.id || pIdx}
+                      data-schedule-card
+                      onClick={() => {
+                        setDetailPatient(patient);
+                        setIsPatientDetailModalOpen(true);
+                      }}
+                      className={cn(
+                        'relative w-full h-[320px] rounded-[32px] overflow-hidden shadow-2xl bg-slate-900 select-none border border-black/10 transition-all duration-300 active:scale-[0.99] cursor-pointer isolate [transform:translateZ(0)]',
+                        isDayCuti && 'opacity-85 grayscale-20',
+                      )}
+                      style={{
+                        clipPath: 'inset(0 round 32px)',
+                        WebkitClipPath: 'inset(0 round 32px)',
+                      }}
+                    >
+                      {/* Layer 1: Crisp Nature Background */}
+                      <img
+                        src={patientNatureBg}
+                        alt={patient.patientName}
+                        className="absolute inset-0 w-full h-full object-cover object-center rounded-[32px]"
+                      />
+
+                      {/* Layer 2: Real-time GPU Liquid Glass */}
+                      <div
+                        className="absolute inset-0 pointer-events-none z-10 rounded-[32px]"
+                        style={{
+                          backdropFilter: 'blur(20px) saturate(160%)',
+                          WebkitBackdropFilter: 'blur(20px) saturate(160%)',
+                          maskImage: 'linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,0.95) 35%, rgba(0,0,0,0.3) 55%, rgba(0,0,0,0.75) 75%)',
+                          WebkitMaskImage: 'linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,0.95) 35%, rgba(0,0,0,0.3) 55%, rgba(0,0,0,0.75) 75%)',
+                        }}
+                      />
+
+                      {/* Layer 3: High-Contrast Ambient Gradient */}
+                      <div
+                        className="absolute inset-0 pointer-events-none z-15 rounded-[32px]"
+                        style={{
+                          background: 'linear-gradient(to top, rgba(12, 20, 15, 0.85) 0%, rgba(12, 20, 15, 0.4) 40%, rgba(12, 20, 15, 0) 70%)',
+                        }}
+                      />
+
+                      {/* Top-Left: Status Badge */}
+                      <div className="absolute top-4 left-4 z-30">
+                        <div className="flex items-center gap-1.5 bg-white/95 backdrop-blur-md px-3 py-1.5 rounded-full shadow-md border border-white/90">
+                          <span
+                            className={cn(
+                              'h-2 w-2 rounded-full',
+                              patient.badgeVariant === 'success'
+                                ? 'bg-emerald-500 animate-pulse'
+                                : patient.badgeVariant === 'warning'
+                                  ? 'bg-amber-500'
+                                  : 'bg-cyan-500',
+                            )}
+                          />
+                          <span className="text-xs font-bold text-gray-900 tracking-tight">
+                            {patient.badge}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Top-Right: Queue Badge */}
+                      <div className="absolute top-4 right-4 z-30">
+                        <div className="flex items-center gap-1 bg-black/50 backdrop-blur-md px-3 py-1.5 rounded-full shadow-md border border-white/20 text-white">
+                          <span className="text-xs font-bold tracking-tight">
+                            Antrean {patient.queueNumber}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Card Content Overlay Layer */}
+                      <div className="absolute bottom-0 inset-x-0 z-20 p-5 pt-6 text-white">
+                        {/* Avatar, Name, Age Row */}
+                        <div className="flex items-center gap-3.5 mb-2.5">
+                          <img
+                            src={patient.avatarUrl || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=200&auto=format&fit=crop'}
+                            alt={patient.patientName}
+                            className="h-12 w-12 rounded-full object-cover border-2 border-white/95 shadow-md shrink-0"
+                          />
+                          <div className="flex-1 min-w-0">
+                            <h4 className="text-white text-[20px] font-bold tracking-tight leading-tight truncate">
+                              {patient.patientName}
+                            </h4>
+                            <p className="text-white/80 text-[12.5px] font-medium leading-snug">
+                              {patient.patientRm} • Usia {patient.patientAge}
+                            </p>
+                          </div>
+                        </div>
+
+                        {/* Time Slot Row */}
+                        <div className="flex items-center gap-1.5 text-white text-[12.5px] font-semibold mb-3">
+                          <Clock className="w-3.5 h-3.5 text-white" />
+                          <span>{patient.timeSlot}</span>
+                        </div>
+
+                        {/* Glass Line Separator */}
+                        <div className="w-full h-[1px] bg-white/20 mb-3" />
+
+                        {/* Detail Pasien Button */}
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setDetailPatient(patient);
+                            setIsPatientDetailModalOpen(true);
+                          }}
+                          className="w-full py-2.5 rounded-2xl bg-white hover:bg-white/90 text-slate-950 font-bold text-xs shadow-lg transition-all text-center cursor-pointer active:scale-[0.98]"
+                        >
+                          Detail Pasien
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })
+              ) : (
+                <div
+                  className={cn(
+                    'p-8 rounded-[30px] border text-center flex flex-col items-center gap-3 transition-colors',
+                    isDark ? 'bg-white/5 border-white/10' : 'bg-slate-50 border-slate-200/80',
+                  )}
+                >
+                  <div className={cn('p-3 rounded-2xl', isDark ? 'bg-white/5 text-neutral-400' : 'bg-white text-slate-400')}>
+                    <Users className="h-6 w-6" />
+                  </div>
+                  <h4 className={cn('text-sm font-bold', isDark ? 'text-white' : 'text-slate-900')}>
+                    Belum Ada Pasien Booking
+                  </h4>
+                  <p className={cn('text-xs max-w-xs', isDark ? 'text-neutral-400' : 'text-slate-500')}>
+                    Belum ada pasien yang mendaftar pada sesi praktik ini.
+                  </p>
+                  <div className="w-full max-w-xs pt-1">
+                    <button
+                      type="button"
+                      onClick={() => setViewMode('sessions')}
+                      className={cn(
+                        'w-full py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer border text-center',
+                        isDark
+                          ? 'border-white/15 text-neutral-200 hover:bg-white/10'
+                          : 'border-slate-200 text-slate-700 hover:bg-white',
+                      )}
+                    >
+                      Kembali ke Sesi Praktik
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          </>
+        )}
       </div>
 
       {/* 5. Master Drawer: Tambah / Edit Jadwal Pasien */}
@@ -1651,7 +2079,7 @@ export function ScheduleTabScreen(props: {
         <>
           {/* Flat Backdrop Overlay */}
           <div
-            className="absolute -inset-10 z-40 bg-black/60 backdrop-blur-xs transition-opacity duration-300"
+            className="absolute inset-0 z-40 bg-black/60 backdrop-blur-xs transition-opacity duration-300 animate-in fade-in"
             onClick={triggerCloseDrawer}
           />
 
@@ -1663,34 +2091,45 @@ export function ScheduleTabScreen(props: {
             onPointerUp={handleDrawerPointerUp}
             onPointerCancel={handleDrawerPointerUp}
             className={cn(
-              'absolute inset-x-0 bottom-0 z-50 h-auto max-h-[88%] rounded-t-[36px] border-t p-5 pb-28 sm:pb-32 shadow-2xl transition-colors duration-300 select-text touch-pan-y backdrop-blur-2xl will-change-transform flex flex-col justify-between',
+              'absolute inset-x-0 bottom-0 z-50 flex max-h-[92%] min-h-[75%] w-full flex-col overflow-hidden rounded-t-[32px] sm:rounded-t-[36px] shadow-[0_-12px_45px_rgba(0,0,0,0.25)] border-t will-change-transform select-text touch-pan-y backdrop-blur-2xl',
               isDark
-                ? 'bg-[#0a0e1a] border-white/15 text-white shadow-black/80'
-                : 'bg-white border-slate-200 text-slate-900 shadow-xl',
+                ? 'bg-[#0a0e1a] border-white/10 text-white shadow-black/80'
+                : 'bg-white border-neutral-100 text-slate-900 shadow-[0_-12px_45px_rgba(0,0,0,0.25)]',
             )}
           >
-            {/* GSAP Drag Handle Indicator */}
-            <div className={cn('w-12 h-1.5 rounded-full mx-auto mb-2 cursor-grab active:cursor-grabbing shrink-0', isDark ? 'bg-white/25' : 'bg-slate-300')} />
+            {/* Interactive Drag Handle */}
+            <div
+              role="button"
+              tabIndex={0}
+              aria-label="Tarik ke bawah untuk menutup"
+              onClick={(e) => {
+                e.stopPropagation();
+                triggerCloseDrawer();
+              }}
+              className="flex w-full cursor-grab active:cursor-grabbing flex-col items-center justify-center pt-3.5 pb-1 shrink-0 touch-none select-none hover:bg-neutral-50/50 dark:hover:bg-white/5 transition-colors"
+            >
+              <div className={cn('h-1.25 w-11 rounded-full transition-colors duration-150', isDark ? 'bg-white/25 hover:bg-white/40 active:bg-white/50' : 'bg-neutral-300 hover:bg-neutral-400 active:bg-neutral-500')} />
+            </div>
 
-            <div ref={drawerContentRef} className="overflow-y-auto no-scrollbar flex flex-col gap-3">
-              {/* Header Bar inside Drawer Base */}
-              <div className="flex items-center justify-between pb-2 border-b shrink-0" style={{ borderColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)' }}>
-                <h4 className={cn('text-base font-bold tracking-tight', isDark ? 'text-white' : 'text-slate-950')}>
-                  {editingSchedule ? 'Edit Jadwal' : 'Tambah Jadwal'}
-                </h4>
-                <button
-                  type="button"
-                  aria-label="Tutup drawer"
-                  onClick={triggerCloseDrawer}
-                  className={cn(
-                    'p-1.5 rounded-full transition-colors cursor-pointer',
-                    isDark ? 'text-neutral-400 hover:text-white hover:bg-white/10' : 'text-slate-400 hover:text-slate-900 hover:bg-slate-100',
-                  )}
-                >
-                  <ChevronDown className="h-5 w-5" />
-                </button>
-              </div>
+            {/* Master Header */}
+            <div className="relative z-20 flex items-center justify-between px-6 pt-0.5 pb-2.5 shrink-0 border-b border-inherit">
+              <h4 className={cn('text-base font-bold tracking-tight', isDark ? 'text-white' : 'text-slate-900')}>
+                {editingSchedule ? 'Edit Jadwal' : 'Tambah Jadwal'}
+              </h4>
+              <button
+                type="button"
+                aria-label="Tutup drawer"
+                onClick={triggerCloseDrawer}
+                className={cn(
+                  'p-1.5 -mr-2 rounded-full transition-colors cursor-pointer flex items-center justify-center shrink-0',
+                  isDark ? 'bg-white/10 text-neutral-300 hover:text-white hover:bg-white/20' : 'bg-neutral-100/80 text-neutral-600 hover:text-neutral-900 hover:bg-slate-200',
+                )}
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
 
+            <div ref={drawerContentRef} className="flex w-full flex-1 flex-col px-6 pt-3 pb-8 overflow-y-auto no-scrollbar select-text">
               {/* Form Fields for Doctor Practice Schedule (Doctor POV) */}
               <form onSubmit={handleSaveSchedule} className="space-y-3.5">
                 {/* 0. Status Jadwal Praktik: Menunggu | Buka | Cuti (Hanya ditampilkan saat Edit Jadwal) */}
@@ -1712,7 +2151,7 @@ export function ScheduleTabScreen(props: {
                           'flex-1 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-1.5',
                           formStatus === 'menunggu'
                             ? isDark
-                              ? 'bg-amber-500 text-neutral-950 shadow-md'
+                              ? 'bg-amber-500 text-amber-950 shadow-md'
                               : 'bg-amber-500 text-white shadow-sm'
                             : isDark
                               ? 'text-neutral-400 hover:text-white hover:bg-white/5'
@@ -1730,7 +2169,7 @@ export function ScheduleTabScreen(props: {
                           'flex-1 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-1.5',
                           formStatus === 'buka'
                             ? isDark
-                              ? 'bg-emerald-500 text-neutral-950 shadow-md'
+                              ? 'bg-emerald-500 text-emerald-950 shadow-md'
                               : 'bg-emerald-600 text-white shadow-sm'
                             : isDark
                               ? 'text-neutral-400 hover:text-white hover:bg-white/5'
@@ -1871,7 +2310,7 @@ export function ScheduleTabScreen(props: {
                                 'h-8 w-8 mx-auto rounded-xl text-xs font-semibold flex items-center justify-center transition-all cursor-pointer active:scale-95',
                                 isSelected
                                   ? isDark
-                                    ? 'bg-cyan-500 text-neutral-950 font-bold shadow-md shadow-cyan-500/25'
+                                    ? 'bg-cyan-500 text-cyan-950 font-bold shadow-md shadow-cyan-500/25'
                                     : 'bg-blue-600 text-white font-bold shadow-md shadow-blue-600/25'
                                   : isTodayDate
                                     ? isDark
@@ -2116,7 +2555,12 @@ export function ScheduleTabScreen(props: {
 
                   <button
                     type="submit"
-                    className="flex-1 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold shadow-lg shadow-blue-600/30 transition-all cursor-pointer active:scale-98"
+                    className={cn(
+                      'flex-1 py-3 rounded-xl text-xs font-bold shadow-lg transition-all cursor-pointer active:scale-98',
+                      isDark
+                        ? 'bg-cyan-500 hover:bg-cyan-400 text-cyan-950 shadow-cyan-500/20'
+                        : 'bg-blue-600 hover:bg-blue-700 text-white shadow-blue-600/30',
+                    )}
                   >
                     {editingSchedule ? 'Simpan Perubahan' : 'Tambah Jadwal'}
                   </button>
@@ -2132,26 +2576,35 @@ export function ScheduleTabScreen(props: {
         <>
           <div
             onClick={triggerCloseDetailDrawer}
-            className="absolute -inset-10 z-50 bg-black/60 backdrop-blur-xs transition-opacity duration-300 animate-in fade-in"
+            className="absolute inset-0 z-50 bg-black/60 backdrop-blur-xs transition-opacity duration-300 animate-in fade-in"
           />
 
           <div
             ref={detailDrawerRef}
             className={cn(
-              'absolute inset-x-0 bottom-0 z-50 h-auto max-h-[85%] rounded-t-[36px] border-t p-5 pb-28 sm:pb-32 shadow-2xl flex flex-col justify-between backdrop-blur-2xl will-change-transform',
+              'absolute inset-x-0 bottom-0 z-50 flex max-h-[88%] w-full flex-col overflow-hidden rounded-t-[32px] sm:rounded-t-[36px] shadow-[0_-12px_45px_rgba(0,0,0,0.25)] border-t will-change-transform select-text touch-pan-y backdrop-blur-2xl',
               isDark
-                ? 'bg-[#0a0e1a] border-white/15 text-white shadow-black/80'
-                : 'bg-white border-slate-200 text-slate-900 shadow-slate-400/40',
+                ? 'bg-[#0a0e1a] border-white/10 text-white shadow-black/80'
+                : 'bg-white border-neutral-100 text-slate-900 shadow-[0_-12px_45px_rgba(0,0,0,0.25)]',
             )}
           >
-            {/* Drag Handle Bar */}
-            <div className="pb-1 flex justify-center shrink-0">
-              <div className={cn('w-12 h-1.5 rounded-full', isDark ? 'bg-white/20' : 'bg-slate-300')} />
+            {/* Interactive Drag Handle */}
+            <div
+              role="button"
+              tabIndex={0}
+              aria-label="Tarik ke bawah untuk menutup"
+              onClick={(e) => {
+                e.stopPropagation();
+                triggerCloseDetailDrawer();
+              }}
+              className="flex w-full cursor-grab active:cursor-grabbing flex-col items-center justify-center pt-3.5 pb-1 shrink-0 touch-none select-none hover:bg-neutral-50/50 dark:hover:bg-white/5 transition-colors"
+            >
+              <div className={cn('h-1.25 w-11 rounded-full transition-colors duration-150', isDark ? 'bg-white/25 hover:bg-white/40 active:bg-white/50' : 'bg-neutral-300 hover:bg-neutral-400 active:bg-neutral-500')} />
             </div>
 
-            {/* Header with Title and Close Button */}
-            <div className={cn('flex justify-between items-center py-2 border-b shrink-0', isDark ? 'border-white/10' : 'border-slate-200')}>
-              <h3 className={cn('text-base font-bold tracking-tight', isDark ? 'text-white' : 'text-slate-950')}>
+            {/* Master Header */}
+            <div className="relative z-20 flex items-center justify-between px-6 pt-0.5 pb-2.5 shrink-0 border-b border-inherit">
+              <h3 className={cn('text-base font-bold tracking-tight', isDark ? 'text-white' : 'text-slate-900')}>
                 Detail Sesi Praktik
               </h3>
               <button
@@ -2159,8 +2612,8 @@ export function ScheduleTabScreen(props: {
                 aria-label="Tutup Detail"
                 onClick={triggerCloseDetailDrawer}
                 className={cn(
-                  'h-8 w-8 rounded-full flex items-center justify-center transition-all cursor-pointer',
-                  isDark ? 'bg-white/10 text-neutral-300 hover:bg-white/20' : 'bg-slate-100 text-slate-700 hover:bg-slate-200',
+                  'p-1.5 -mr-2 rounded-full transition-colors cursor-pointer flex items-center justify-center shrink-0',
+                  isDark ? 'bg-white/10 text-neutral-300 hover:text-white hover:bg-white/20' : 'bg-neutral-100/80 text-neutral-600 hover:text-neutral-900 hover:bg-slate-200',
                 )}
               >
                 <X className="h-4 w-4" />
@@ -2168,7 +2621,7 @@ export function ScheduleTabScreen(props: {
             </div>
 
             {/* Detail Content Body */}
-            <div className="overflow-y-auto py-3 flex flex-col gap-4 no-scrollbar">
+            <div className="flex w-full flex-1 flex-col px-6 pt-3 pb-8 overflow-y-auto no-scrollbar select-text gap-4">
               {/* Title & Date Heading + Status Badge */}
               <div className="flex justify-between items-start gap-2">
                 <div>
@@ -2270,7 +2723,8 @@ export function ScheduleTabScreen(props: {
                 <button
                   type="button"
                   onClick={() => {
-                    setIsPatientListDrawerOpen(true);
+                    triggerCloseDetailDrawer();
+                    setViewMode('session-patients');
                   }}
                   className={cn(
                     'w-full flex items-center justify-between py-1 text-xs font-bold transition-all cursor-pointer group',
@@ -2315,7 +2769,7 @@ export function ScheduleTabScreen(props: {
                   className={cn(
                     'w-full py-3 rounded-2xl text-xs font-bold shadow-lg transition-all cursor-pointer active:scale-98 flex items-center justify-center gap-2',
                     isDark
-                      ? 'bg-cyan-500 hover:bg-cyan-400 text-neutral-950 shadow-cyan-500/20'
+                      ? 'bg-cyan-500 hover:bg-cyan-400 text-cyan-950 shadow-cyan-500/20'
                       : 'bg-blue-600 hover:bg-blue-700 text-white shadow-blue-600/30',
                   )}
                 >
@@ -2328,228 +2782,40 @@ export function ScheduleTabScreen(props: {
         </>
       )}
 
-      {/* 7b. Patient List Sheet Drawer (Daftar Pasien Booking - Liquid Glass Cards) */}
-      {isPatientListDrawerOpen && detailSchedule && (
-        <>
-          <div
-            onClick={triggerClosePatientListDrawer}
-            className="absolute -inset-10 z-55 bg-black/60 backdrop-blur-xs transition-opacity duration-300 animate-in fade-in"
-          />
-
-          <div
-            ref={patientListDrawerRef}
-            className={cn(
-              'absolute inset-x-0 bottom-0 z-55 h-auto max-h-[88%] rounded-t-[36px] border-t p-5 pb-28 sm:pb-32 shadow-2xl flex flex-col justify-between backdrop-blur-2xl will-change-transform',
-              isDark
-                ? 'bg-[#0a0e1a] border-white/15 text-white shadow-black/80'
-                : 'bg-white border-slate-200 text-slate-900 shadow-slate-400/40',
-            )}
-          >
-            {/* Drag Handle Bar */}
-            <div className="pb-1 flex justify-center shrink-0">
-              <div className={cn('w-12 h-1.5 rounded-full', isDark ? 'bg-white/20' : 'bg-slate-300')} />
-            </div>
-
-            {/* Header with Back Button, Title, and Close Button */}
-            <div className={cn('flex justify-between items-center py-2 border-b shrink-0', isDark ? 'border-white/10' : 'border-slate-200')}>
-              <div className="flex items-center gap-2">
-                <button
-                  type="button"
-                  aria-label="Kembali ke Detail Sesi"
-                  onClick={triggerClosePatientListDrawer}
-                  className={cn(
-                    'p-1.5 rounded-full transition-all cursor-pointer',
-                    isDark ? 'text-neutral-400 hover:text-white hover:bg-white/10' : 'text-slate-400 hover:text-slate-900 hover:bg-slate-100',
-                  )}
-                >
-                  <ChevronLeft className="h-5 w-5" />
-                </button>
-                <div>
-                  <h3 className={cn('text-sm font-bold tracking-tight', isDark ? 'text-white' : 'text-slate-950')}>
-                    Daftar Pasien Booking
-                  </h3>
-                  <p className={cn('text-[11px]', isDark ? 'text-neutral-400' : 'text-slate-500')}>
-                    {detailSchedule.title} • {detailSchedule.date}
-                  </p>
-                </div>
-              </div>
-              <button
-                type="button"
-                aria-label="Tutup"
-                onClick={triggerClosePatientListDrawer}
-                className={cn(
-                  'h-8 w-8 rounded-full flex items-center justify-center transition-all cursor-pointer',
-                  isDark ? 'bg-white/10 text-neutral-300 hover:bg-white/20' : 'bg-slate-100 text-slate-700 hover:bg-slate-200',
-                )}
-              >
-                <X className="h-4 w-4" />
-              </button>
-            </div>
-
-            {/* Patient Liquid Glass Cards List (Exposing Name, Real Avatar, Age, and Time) */}
-            <div className="overflow-y-auto py-3.5 flex flex-col gap-3.5 no-scrollbar max-h-96">
-              {detailSchedule.bookedPatients && detailSchedule.bookedPatients.length > 0 ? (
-                detailSchedule.bookedPatients.map((patient: BookedPatient, pIdx) => {
-                  const patientNatureBg = NATURE_IMAGES_POOL[pIdx % NATURE_IMAGES_POOL.length];
-                  return (
-                    <div
-                      key={patient.id || pIdx}
-                      className="relative w-full h-[270px] rounded-[28px] overflow-hidden shadow-xl bg-slate-900 select-none border border-black/10 transition-all duration-300 active:scale-[0.99] isolate [transform:translateZ(0)] shrink-0"
-                      style={{
-                        clipPath: 'inset(0 round 28px)',
-                        WebkitClipPath: 'inset(0 round 28px)',
-                      }}
-                    >
-                      {/* Layer 1: Crisp Background Photo */}
-                      <img
-                        src={patientNatureBg}
-                        alt={patient.patientName}
-                        className="absolute inset-0 w-full h-full object-cover object-center rounded-[28px]"
-                      />
-
-                      {/* Layer 2: Real-time GPU Liquid Glass */}
-                      <div
-                        className="absolute inset-0 pointer-events-none z-10 rounded-[28px]"
-                        style={{
-                          backdropFilter: 'blur(20px) saturate(160%)',
-                          WebkitBackdropFilter: 'blur(20px) saturate(160%)',
-                          maskImage: 'linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,0.95) 35%, rgba(0,0,0,0.3) 55%, rgba(0,0,0,0) 75%)',
-                          WebkitMaskImage: 'linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,0.95) 35%, rgba(0,0,0,0.3) 55%, rgba(0,0,0,0) 75%)',
-                        }}
-                      />
-
-                      {/* Layer 3: High-Contrast Ambient Gradient */}
-                      <div
-                        className="absolute inset-0 pointer-events-none z-15 rounded-[28px]"
-                        style={{
-                          background: 'linear-gradient(to top, rgba(12, 20, 15, 0.85) 0%, rgba(12, 20, 15, 0.4) 40%, rgba(12, 20, 15, 0) 70%)',
-                        }}
-                      />
-
-                      {/* Top Badge: Status (Top-Left) */}
-                      <div className="absolute top-3.5 left-3.5 z-30">
-                        <div className="flex items-center gap-1.5 bg-white/95 backdrop-blur-md px-3 py-1 rounded-full shadow-md border border-white/90">
-                          <span
-                            className={cn(
-                              'h-2 w-2 rounded-full',
-                              patient.badgeVariant === 'success'
-                                ? 'bg-emerald-500 animate-pulse'
-                                : patient.badgeVariant === 'warning'
-                                  ? 'bg-amber-500'
-                                  : 'bg-cyan-500',
-                            )}
-                          />
-                          <span className="text-[11px] font-bold text-gray-900 tracking-tight">
-                            {patient.badge}
-                          </span>
-                        </div>
-                      </div>
-
-                      {/* Top Badge: Queue Number (Top-Right) */}
-                      <div className="absolute top-3.5 right-3.5 z-30">
-                        <div className="flex items-center gap-1 bg-black/50 backdrop-blur-md px-2.5 py-1 rounded-full shadow-md border border-white/20 text-white">
-                          <span className="text-[11px] font-bold tracking-tight">
-                            Antrean {patient.queueNumber}
-                          </span>
-                        </div>
-                      </div>
-
-                      {/* Overlay Content: Avatar, Name, Age, Time, Detail Button */}
-                      <div className="absolute bottom-0 inset-x-0 z-20 p-4 pt-5 text-white">
-                        {/* Avatar & Name & Age Row */}
-                        <div className="flex items-center gap-3 mb-2.5">
-                          <img
-                            src={patient.avatarUrl || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=200&auto=format&fit=crop'}
-                            alt={patient.patientName}
-                            className="h-11 w-11 rounded-full object-cover border-2 border-white/90 shadow-md shrink-0"
-                          />
-                          <div className="flex-1 min-w-0">
-                            <h4 className="text-white text-[19px] font-bold tracking-tight leading-tight truncate">
-                              {patient.patientName}
-                            </h4>
-                            <p className="text-white/80 text-[12px] font-medium leading-snug">
-                              Usia: {patient.patientAge}
-                            </p>
-                          </div>
-                        </div>
-
-                        {/* Time Slot Row */}
-                        <div className="flex items-center gap-1.5 text-white text-[12.5px] font-semibold mb-2.5">
-                          <Clock className="w-3.5 h-3.5 text-white" />
-                          <span>{patient.timeSlot}</span>
-                        </div>
-
-                        {/* Glass Line Separator */}
-                        <div className="w-full h-[1px] bg-white/20 mb-2.5" />
-
-                        {/* Detail Button */}
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setDetailPatient(patient);
-                            setIsPatientDetailModalOpen(true);
-                          }}
-                          className="w-full py-2.5 rounded-2xl bg-white hover:bg-white/90 text-slate-950 font-bold text-xs shadow-lg transition-all text-center cursor-pointer active:scale-[0.98]"
-                        >
-                          Detail Pasien
-                        </button>
-                      </div>
-                    </div>
-                  );
-                })
-              ) : (
-                <div className="py-8 text-center">
-                  <p className={cn('text-xs', isDark ? 'text-neutral-400' : 'text-slate-500')}>
-                    Belum ada pasien yang melakukan booking pada sesi ini.
-                  </p>
-                </div>
-              )}
-            </div>
-
-            {/* Back Button */}
-            <div className="pt-2">
-              <button
-                type="button"
-                onClick={triggerClosePatientListDrawer}
-                className={cn(
-                  'w-full py-3 rounded-2xl border text-xs font-bold transition-all cursor-pointer',
-                  isDark
-                    ? 'border-white/15 text-neutral-300 hover:bg-white/10'
-                    : 'border-slate-200 text-slate-700 hover:bg-slate-100',
-                )}
-              >
-                Kembali ke Detail Sesi
-              </button>
-            </div>
-          </div>
-        </>
-      )}
-
       {/* 7c. Single Patient Detail Modal Sheet (Keluhan & Rekam Pasien) */}
       {isPatientDetailModalOpen && detailPatient && (
         <>
           <div
             onClick={triggerClosePatientDetailModal}
-            className="absolute -inset-10 z-60 bg-black/60 backdrop-blur-xs transition-opacity duration-300 animate-in fade-in"
+            className="absolute inset-0 z-60 bg-black/60 backdrop-blur-xs transition-opacity duration-300 animate-in fade-in"
           />
 
           <div
             ref={patientDetailModalRef}
             className={cn(
-              'absolute inset-x-0 bottom-0 z-60 h-auto max-h-[88%] rounded-t-[36px] border-t p-5 pb-28 sm:pb-32 shadow-2xl flex flex-col justify-between backdrop-blur-2xl will-change-transform',
+              'absolute inset-x-0 bottom-0 z-60 flex max-h-[88%] w-full flex-col overflow-hidden rounded-t-[32px] sm:rounded-t-[36px] shadow-[0_-12px_45px_rgba(0,0,0,0.25)] border-t will-change-transform select-text touch-pan-y backdrop-blur-2xl',
               isDark
-                ? 'bg-[#0a0e1a] border-white/15 text-white shadow-black/80'
-                : 'bg-white border-slate-200 text-slate-900 shadow-slate-400/40',
+                ? 'bg-[#0a0e1a] border-white/10 text-white shadow-black/80'
+                : 'bg-white border-neutral-100 text-slate-900 shadow-[0_-12px_45px_rgba(0,0,0,0.25)]',
             )}
           >
-            {/* Drag Handle Bar */}
-            <div className="pb-1 flex justify-center shrink-0">
-              <div className={cn('w-12 h-1.5 rounded-full', isDark ? 'bg-white/20' : 'bg-slate-300')} />
+            {/* Interactive Drag Handle */}
+            <div
+              role="button"
+              tabIndex={0}
+              aria-label="Tarik ke bawah untuk menutup"
+              onClick={(e) => {
+                e.stopPropagation();
+                triggerClosePatientDetailModal();
+              }}
+              className="flex w-full cursor-grab active:cursor-grabbing flex-col items-center justify-center pt-3.5 pb-1 shrink-0 touch-none select-none hover:bg-neutral-50/50 dark:hover:bg-white/5 transition-colors"
+            >
+              <div className={cn('h-1.25 w-11 rounded-full transition-colors duration-150', isDark ? 'bg-white/25 hover:bg-white/40 active:bg-white/50' : 'bg-neutral-300 hover:bg-neutral-400 active:bg-neutral-500')} />
             </div>
 
-            {/* Header with Title and Close Button */}
-            <div className={cn('flex justify-between items-center py-2 border-b shrink-0', isDark ? 'border-white/10' : 'border-slate-200')}>
-              <h3 className={cn('text-base font-bold tracking-tight', isDark ? 'text-white' : 'text-slate-950')}>
+            {/* Master Header */}
+            <div className="relative z-20 flex items-center justify-between px-6 pt-0.5 pb-2.5 shrink-0 border-b border-inherit">
+              <h3 className={cn('text-base font-bold tracking-tight', isDark ? 'text-white' : 'text-slate-900')}>
                 Detail Rekam Pasien
               </h3>
               <button
@@ -2557,8 +2823,8 @@ export function ScheduleTabScreen(props: {
                 aria-label="Tutup Detail Pasien"
                 onClick={triggerClosePatientDetailModal}
                 className={cn(
-                  'h-8 w-8 rounded-full flex items-center justify-center transition-all cursor-pointer',
-                  isDark ? 'bg-white/10 text-neutral-300 hover:bg-white/20' : 'bg-slate-100 text-slate-700 hover:bg-slate-200',
+                  'p-1.5 -mr-2 rounded-full transition-colors cursor-pointer flex items-center justify-center shrink-0',
+                  isDark ? 'bg-white/10 text-neutral-300 hover:text-white hover:bg-white/20' : 'bg-neutral-100/80 text-neutral-600 hover:text-neutral-900 hover:bg-slate-200',
                 )}
               >
                 <X className="h-4 w-4" />
@@ -2566,7 +2832,7 @@ export function ScheduleTabScreen(props: {
             </div>
 
             {/* Detail Patient Body */}
-            <div className="overflow-y-auto py-3 flex flex-col gap-4 no-scrollbar">
+            <div className="flex w-full flex-1 flex-col px-6 pt-3 pb-8 overflow-y-auto no-scrollbar select-text gap-4">
               {/* Profile Card Header with Real Avatar */}
               <div className="flex flex-col items-center text-center gap-2 pt-1 pb-2">
                 <img
@@ -2694,26 +2960,35 @@ export function ScheduleTabScreen(props: {
           {/* Full-Bleed Flat Backdrop Overlay */}
           <div
             onClick={triggerCloseDocScheduleDrawer}
-            className="absolute -inset-10 z-50 bg-black/60 backdrop-blur-xs transition-opacity duration-300 animate-in fade-in"
+            className="absolute inset-0 z-50 bg-black/60 backdrop-blur-xs transition-opacity duration-300 animate-in fade-in"
           />
 
           {/* Super Big Calendar Drawer Container */}
           <div
             ref={docScheduleDrawerRef}
             className={cn(
-              'absolute inset-x-0 bottom-0 z-50 h-auto max-h-[90%] rounded-t-[36px] border-t p-5 pb-28 sm:pb-32 shadow-2xl flex flex-col justify-between backdrop-blur-2xl will-change-transform',
+              'absolute inset-x-0 bottom-0 z-50 flex max-h-[92%] w-full flex-col overflow-hidden rounded-t-[32px] sm:rounded-t-[36px] shadow-[0_-12px_45px_rgba(0,0,0,0.25)] border-t will-change-transform select-text touch-pan-y backdrop-blur-2xl',
               isDark
-                ? 'bg-[#0a0e1a] border-white/15 text-white shadow-black/80'
-                : 'bg-white border-slate-200 text-slate-900 shadow-xl',
+                ? 'bg-[#0a0e1a] border-white/10 text-white shadow-black/80'
+                : 'bg-white border-neutral-100 text-slate-900 shadow-[0_-12px_45px_rgba(0,0,0,0.25)]',
             )}
           >
-            {/* Drag Handle Bar */}
-            <div className="pb-1 flex justify-center shrink-0">
-              <div className={cn('w-12 h-1.5 rounded-full', isDark ? 'bg-white/20' : 'bg-slate-300')} />
+            {/* Interactive Drag Handle */}
+            <div
+              role="button"
+              tabIndex={0}
+              aria-label="Tarik ke bawah untuk menutup"
+              onClick={(e) => {
+                e.stopPropagation();
+                triggerCloseDocScheduleDrawer();
+              }}
+              className="flex w-full cursor-grab active:cursor-grabbing flex-col items-center justify-center pt-3.5 pb-1 shrink-0 touch-none select-none hover:bg-neutral-50/50 dark:hover:bg-white/5 transition-colors"
+            >
+              <div className={cn('h-1.25 w-11 rounded-full transition-colors duration-150', isDark ? 'bg-white/25 hover:bg-white/40 active:bg-white/50' : 'bg-neutral-300 hover:bg-neutral-400 active:bg-neutral-500')} />
             </div>
 
             {/* Fluid Header with Month Navigation & Close Button */}
-            <div className={cn('flex items-center justify-between py-2 border-b shrink-0 mb-3 gap-2', isDark ? 'border-white/10' : 'border-slate-200')}>
+            <div className="relative z-20 flex items-center justify-between px-6 pt-0.5 pb-2.5 shrink-0 border-b border-inherit gap-2">
               <div className="flex-1 flex items-center justify-between">
                 <button
                   type="button"
@@ -2753,8 +3028,8 @@ export function ScheduleTabScreen(props: {
                 aria-label="Tutup Kalender"
                 onClick={triggerCloseDocScheduleDrawer}
                 className={cn(
-                  'h-8 w-8 rounded-full flex items-center justify-center transition-all cursor-pointer shrink-0',
-                  isDark ? 'bg-white/10 text-neutral-300 hover:bg-white/20' : 'bg-slate-100 text-slate-700 hover:bg-slate-200',
+                  'p-1.5 -mr-2 rounded-full transition-colors cursor-pointer flex items-center justify-center shrink-0',
+                  isDark ? 'bg-white/10 text-neutral-300 hover:text-white hover:bg-white/20' : 'bg-neutral-100/80 text-neutral-600 hover:text-neutral-900 hover:bg-slate-200',
                 )}
               >
                 <X className="h-4 w-4" />
@@ -2762,7 +3037,7 @@ export function ScheduleTabScreen(props: {
             </div>
 
             {/* Big Month Calendar Grid */}
-            <div className="overflow-y-auto no-scrollbar flex flex-col gap-2">
+            <div className="flex w-full flex-1 flex-col px-6 pt-3 pb-8 overflow-y-auto no-scrollbar select-text gap-2">
               {/* Day of week labels */}
               <div className="grid grid-cols-7 gap-1 text-center mb-1">
                 {['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'].map((day, idx) => (
@@ -2797,6 +3072,7 @@ export function ScheduleTabScreen(props: {
                       onClick={() => {
                         setSelectedDate(day);
                         triggerCloseDocScheduleDrawer();
+                        setViewMode('sessions');
                       }}
                       className={cn(
                         'h-12 rounded-xl flex flex-col items-center justify-center gap-1 transition-all select-none',
