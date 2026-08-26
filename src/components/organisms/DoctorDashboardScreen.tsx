@@ -5,6 +5,7 @@ import { type BottomNavTab, BottomNavBar } from '@/components/molecules/BottomNa
 import { DoctorProfileHeader } from '@/components/molecules/DoctorProfileHeader';
 import { AccountTabScreen } from '@/components/organisms/AccountTabScreen';
 import { NotificationTabScreen } from '@/components/organisms/NotificationTabScreen';
+import { PresenceHistoryScreen } from '@/components/organisms/PresenceHistoryScreen';
 import { QrScannerTabScreen } from '@/components/organisms/QrScannerTabScreen';
 import { QuickAccessSection } from '@/components/organisms/QuickAccessSection';
 import { ScheduleCardStack } from '@/components/organisms/ScheduleCardStack';
@@ -30,6 +31,7 @@ export function DoctorDashboardScreen(props: {
   );
 
   const activeTab = props.activeTab ?? internalTab;
+  const [showPresenceHistory, setShowPresenceHistory] = React.useState(false);
 
   const [toastMessage, setToastMessage] = React.useState<string | null>(null);
 
@@ -41,13 +43,14 @@ export function DoctorDashboardScreen(props: {
   };
 
   const handleTabChange = (tab: BottomNavTab) => {
+    setShowPresenceHistory(false);
     setInternalTab(tab);
     props.onTabChange?.(tab);
   };
 
   const handleQuickAction = (id: string) => {
-    if (id === 'presensi') {
-      handleTabChange('qr');
+    if (id === 'history' || id === 'presensi') {
+      setShowPresenceHistory(true);
     } else if (id === 'jadwal-saya') {
       handleTabChange('schedule');
     } else if (id === 'cari-visit') {
@@ -101,66 +104,81 @@ export function DoctorDashboardScreen(props: {
       {/* Content Viewport Container */}
       <div
         className={cn(
-          'relative z-10 flex-1',
-          activeTab === 'qr'
-            ? 'h-full p-0 overflow-hidden select-none'
+          'relative z-10 flex-1 min-h-0 w-full overflow-hidden',
+          showPresenceHistory || activeTab === 'qr' || activeTab === 'schedule' || activeTab === 'notification'
+            ? 'p-0 select-none'
             : activeTab === 'home' || activeTab === 'account'
-              ? 'px-5 pt-2 h-full flex flex-col justify-start overflow-hidden pb-24 overscroll-none touch-pan-x select-none'
+              ? 'px-5 pt-2 flex flex-col justify-start overflow-hidden pb-24 overscroll-none touch-pan-x select-none'
               : 'px-5 pt-2 overflow-y-auto pb-32 no-scrollbar overscroll-contain',
         )}
       >
-        {activeTab === 'home' && (
-          <div className="flex flex-col h-full justify-between">
-            {/* 1. Doctor Profile Header */}
-            <DoctorProfileHeader
-              profile={data.profile}
-              onNotificationClick={() => handleTabChange('notification')}
-              onProfileClick={() => handleTabChange('account')}
-            />
-
-            {/* 2. 3D Stack of Schedule Cards with Wave Petal Texture */}
-            <ScheduleCardStack
-              schedules={data.schedules}
-              theme={props.theme}
-            />
-
-            {/* 3. Quick Access Menu Grid */}
-            <QuickAccessSection
-              actions={data.quickActions}
-              theme={props.theme}
-              onActionClick={handleQuickAction}
-            />
-
-            {/* 4. Today's Activity Stat Cards */}
-            <TodayActivitySection
-              activities={data.activities}
-              theme={props.theme}
-              onDetailClick={() => handleTabChange('schedule')}
-              onActivityClick={() => showToast('Membuka rincian aktivitas')}
-            />
-          </div>
-        )}
-
-        {activeTab === 'schedule' && (
-          <ScheduleTabScreen theme={props.theme} />
-        )}
-
-        {activeTab === 'qr' && (
-          <QrScannerTabScreen
+        {showPresenceHistory ? (
+          <PresenceHistoryScreen
             theme={props.theme}
-            onBack={() => handleTabChange('home')}
+            onBack={() => setShowPresenceHistory(false)}
           />
-        )}
+        ) : (
+          <>
+            {activeTab === 'home' && (
+              <div className="flex flex-col h-full justify-between">
+                {/* 1. Doctor Profile Header */}
+                <DoctorProfileHeader
+                  profile={data.profile}
+                  onNotificationClick={() => handleTabChange('notification')}
+                  onProfileClick={() => handleTabChange('account')}
+                />
 
-        {activeTab === 'notification' && (
-          <NotificationTabScreen theme={props.theme} />
-        )}
+                {/* 2. 3D Stack of Schedule Cards with Wave Petal Texture */}
+                <ScheduleCardStack
+                  schedules={data.schedules}
+                  theme={props.theme}
+                />
 
-        {activeTab === 'account' && (
-          <AccountTabScreen
-            theme={props.theme}
-            onLogout={props.onLogout}
-          />
+                {/* 3. Quick Access Menu Grid */}
+                <QuickAccessSection
+                  actions={data.quickActions}
+                  theme={props.theme}
+                  onActionClick={handleQuickAction}
+                />
+
+                {/* 4. Today's Activity Stat Cards */}
+                <TodayActivitySection
+                  activities={data.activities}
+                  theme={props.theme}
+                  onDetailClick={() => handleTabChange('schedule')}
+                  onActivityClick={() => showToast('Membuka rincian aktivitas')}
+                />
+              </div>
+            )}
+
+            {activeTab === 'schedule' && (
+              <ScheduleTabScreen
+                theme={props.theme}
+                onBack={() => handleTabChange('home')}
+              />
+            )}
+
+            {activeTab === 'qr' && (
+              <QrScannerTabScreen
+                theme={props.theme}
+                onBack={() => handleTabChange('home')}
+              />
+            )}
+
+            {activeTab === 'notification' && (
+              <NotificationTabScreen
+                theme={props.theme}
+                onBack={() => handleTabChange('home')}
+              />
+            )}
+
+            {activeTab === 'account' && (
+              <AccountTabScreen
+                theme={props.theme}
+                onLogout={props.onLogout}
+              />
+            )}
+          </>
         )}
       </div>
 

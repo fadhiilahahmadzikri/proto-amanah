@@ -64,11 +64,11 @@ export function BottomNavBar(props: {
           aria-label="Pindai QR Presensi"
           onClick={() => props.onTabChange?.('qr')}
           className={cn(
-            'absolute bottom-1 w-14 h-14 rounded-[20px] flex items-center justify-center text-white text-2xl shadow-lg transform hover:scale-105 active:scale-95 transition-all cursor-pointer focus:outline-none',
-            activeTab === 'qr' && 'ring-2 ring-cyan-400',
+            'absolute bottom-1 w-14 h-14 rounded-[20px] flex items-center justify-center text-2xl shadow-lg transform hover:scale-105 active:scale-95 transition-all cursor-pointer focus:outline-none',
+            activeTab === 'qr' && (isDark ? 'ring-2 ring-cyan-300' : 'ring-2 ring-blue-400'),
             isDark
-              ? 'bg-blue-600 shadow-blue-600/30 ring-4 ring-neutral-900'
-              : 'bg-[#14103B] shadow-[#14103B]/30 ring-4 ring-white',
+              ? 'bg-cyan-500 text-neutral-950 shadow-cyan-500/30 ring-4 ring-neutral-950 hover:bg-cyan-400'
+              : 'bg-[#14103B] text-white shadow-[#14103B]/30 ring-4 ring-white hover:bg-[#1C1645]',
           )}
         >
           <QrCode className="h-7 w-7 stroke-[2]" />

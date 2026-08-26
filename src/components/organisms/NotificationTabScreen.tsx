@@ -1,10 +1,12 @@
 'use client';
 
 import { Activity, Bell, CheckCheck, FileText } from 'lucide-react';
+import { ScreenHeader } from '@/components/molecules/ScreenHeader';
 import { cn } from '@/lib/utils';
 
 export function NotificationTabScreen(props: {
   theme?: 'dark' | 'light';
+  onBack?: () => void;
   className?: string;
 }) {
   const isDark = props.theme === 'dark';
@@ -37,43 +39,30 @@ export function NotificationTabScreen(props: {
   ];
 
   return (
-    <div className={cn('flex flex-col gap-4 pt-2 pb-28 select-text', props.className)}>
-      {/* Title Header */}
-      <div className="flex justify-between items-center px-1 mb-1">
-        <div>
-          <h2
+    <div className={cn('relative w-full h-full overflow-hidden select-text', props.className)}>
+      {/* Master Overlay Glassmorphic Screen Header (No borders) */}
+      <ScreenHeader
+        title="Pusat Notifikasi"
+        onBack={props.onBack}
+        theme={props.theme}
+        rightAction={(
+          <button
+            type="button"
             className={cn(
-              'text-xl font-bold tracking-tight',
-              isDark ? 'text-white' : 'text-slate-900',
+              'flex items-center gap-1 text-[11px] font-bold py-1.5 px-3 rounded-full backdrop-blur-md transition-colors cursor-pointer border',
+              isDark
+                ? 'text-white/90 bg-white/10 hover:bg-white/20 border-white/20'
+                : 'text-blue-600 bg-blue-50 hover:bg-blue-100 border-blue-100',
             )}
           >
-            Pusat Notifikasi
-          </h2>
-          <p
-            className={cn(
-              'text-xs mt-0.5',
-              isDark ? 'text-neutral-400' : 'text-slate-500',
-            )}
-          >
-            2 notifikasi baru belum dibaca
-          </p>
-        </div>
-        <button
-          type="button"
-          className={cn(
-            'flex items-center gap-1 text-[11px] font-bold py-1.5 px-3 rounded-full backdrop-blur-md transition-colors cursor-pointer border',
-            isDark
-              ? 'text-white/90 bg-white/10 hover:bg-white/20 border-white/20'
-              : 'text-blue-600 bg-blue-50 hover:bg-blue-100 border-blue-100',
-          )}
-        >
-          <CheckCheck className="h-3.5 w-3.5" />
-          <span>Tandai Baca</span>
-        </button>
-      </div>
+            <CheckCheck className="h-3.5 w-3.5" />
+            <span>Tandai Baca</span>
+          </button>
+        )}
+      />
 
-      {/* Notifications List */}
-      <div className="flex flex-col gap-3">
+      {/* Scrollable Notifications List (Slides under glass header) */}
+      <div className="w-full h-full overflow-y-auto no-scrollbar px-5 pt-20 pb-28 flex flex-col gap-3">
         {notifications.map((item) => {
           return (
             <div

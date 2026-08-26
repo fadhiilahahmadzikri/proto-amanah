@@ -1,4 +1,4 @@
-import { Calendar, CheckSquare, Contact, Search } from 'lucide-react';
+import { Calendar, CheckSquare, Contact, History, Search } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { QuickActionItem } from '@/types/portal.types';
 
@@ -12,6 +12,8 @@ export function QuickActionButton(props: {
 
   const renderIcon = () => {
     switch (props.item.icon) {
+      case 'history':
+        return <History className="h-6 w-6 stroke-[2.2]" />;
       case 'presence':
         return <CheckSquare className="h-6 w-6" />;
       case 'schedule':

@@ -47,9 +47,9 @@
   ],
   "quickActions": [
     {
-      "id": "presensi",
-      "label": "Presensi",
-      "icon": "presence"
+      "id": "history",
+      "label": "History",
+      "icon": "history"
     },
     {
       "id": "jadwal-saya",

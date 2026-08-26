@@ -46,7 +46,7 @@ describe('Auth Prototype Configuration and Data', () => {
     it('contains 4 quick access actions', () => {
       expect(portalData.quickActions.length).toBe(4);
       expect(portalData.quickActions.map(a => a.label)).toEqual([
-        'Presensi',
+        'History',
         'Jadwal Saya',
         'Cari Visit',
         'Kartu ID',
