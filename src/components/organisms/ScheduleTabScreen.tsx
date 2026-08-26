@@ -33,6 +33,7 @@ import {
   X,
 } from 'lucide-react';
 import React from 'react';
+import { QueueBadge } from '@/components/atoms/QueueBadge';
 import { DateCarouselStrip } from '@/components/molecules/DateCarouselStrip';
 import { ScreenHeader } from '@/components/molecules/ScreenHeader';
 import { cn } from '@/lib/utils';
@@ -762,7 +763,29 @@ export function ScheduleTabScreen(props: {
   const currentSchedules = schedulesMap[selectedDateKey] ?? [];
   const targetDailyQuota = currentDaySetting.targetQuota;
   // View Mode: 'overview' (Showcase Pasien Booking) vs 'sessions' (Halaman Detail Jadwal Sesi Praktik) vs 'session-patients' (Halaman Daftar Pasien Booking Sesi)
-  const [viewMode, setViewMode] = React.useState<'overview' | 'sessions' | 'session-patients'>('overview');
+  const VIEW_MODE_ORDER: ('overview' | 'sessions' | 'session-patients')[] = ['overview', 'sessions', 'session-patients'];
+  const [viewMode, setViewModeState] = React.useState<'overview' | 'sessions' | 'session-patients'>('overview');
+  const [viewModeDirection, setViewModeDirection] = React.useState<'forward' | 'backward'>('forward');
+  const contentViewportRef = React.useRef<HTMLDivElement>(null);
+
+  const setViewMode = (newMode: 'overview' | 'sessions' | 'session-patients') => {
+    const currentIndex = VIEW_MODE_ORDER.indexOf(viewMode);
+    const nextIndex = VIEW_MODE_ORDER.indexOf(newMode);
+    setViewModeDirection(nextIndex >= currentIndex ? 'forward' : 'backward');
+    setViewModeState(newMode);
+  };
+
+  // Android Native Context Switcher animation
+  React.useEffect(() => {
+    if (contentViewportRef.current) {
+      const fromX = viewModeDirection === 'forward' ? '25%' : '-25%';
+      gsap.fromTo(
+        contentViewportRef.current,
+        { x: fromX, opacity: 0.8 },
+        { x: '0%', opacity: 1, duration: 0.28, ease: 'power3.out', clearProps: 'transform,opacity' },
+      );
+    }
+  }, [viewMode, viewModeDirection]);
 
   // Aggregated Booked Patients for Current Selected Date
   const allBookedPatientsForDay = React.useMemo(() => {
@@ -1285,8 +1308,12 @@ export function ScheduleTabScreen(props: {
         }
       />
 
-      {/* 2. Full-Height Scrollable Content Viewport */}
-      <div className="w-full h-full overflow-y-auto overflow-x-hidden no-scrollbar px-5 pt-20 pb-36 flex flex-col gap-3.5">
+      {/* 2. Full-Height Scrollable Content Viewport with Android Slide Motion */}
+      <div
+        ref={contentViewportRef}
+        key={`view-${viewMode}`}
+        className="w-full h-full overflow-y-auto overflow-x-hidden no-scrollbar px-5 pt-20 pb-36 flex flex-col gap-3.5 will-change-transform"
+      >
         {viewMode === 'overview' ? (
           /* VIEW 1: OVERVIEW & SHOWCASE PASIEN BOOKING */
           <>
@@ -1338,17 +1365,12 @@ export function ScheduleTabScreen(props: {
                     <span className={cn('text-xs font-bold tracking-tight', isDark ? 'text-white' : 'text-slate-900')}>
                       Kapasitas Hari Ini
                     </span>
-                    <span
-                      className={cn(
-                        'px-1.5 py-0.2 rounded-full text-[9.5px] font-bold inline-flex items-center gap-1 shrink-0',
-                        isDayCuti
-                          ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30'
-                          : 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30',
-                      )}
-                    >
-                      <span className={cn('h-1.5 w-1.5 rounded-full', isDayCuti ? 'bg-amber-400' : 'bg-emerald-400 animate-pulse')} />
-                      {isDayCuti ? 'Cuti' : 'Buka'}
-                    </span>
+                    {isDayCuti && (
+                      <span className="px-1.5 py-0.2 rounded-full text-[9.5px] font-bold inline-flex items-center gap-1 shrink-0 bg-amber-500/20 text-amber-400">
+                        <span className="h-1.5 w-1.5 rounded-full bg-amber-400" />
+                        Cuti
+                      </span>
+                    )}
                   </div>
                   <p className={cn('text-[11px] font-medium mt-0.5', isDark ? 'text-neutral-400' : 'text-slate-500')}>
                     <span className={cn('font-bold', isDark ? 'text-cyan-400' : 'text-blue-600')}>
@@ -1468,28 +1490,35 @@ export function ScheduleTabScreen(props: {
                         className="absolute inset-0 w-full h-full object-cover object-center rounded-[32px]"
                       />
 
-                      {/* Layer 2: Real-time GPU Liquid Glass */}
+                      {/* Layer 2: Real-time GPU Liquid Glass (Progressive Backdrop Blur + Vibrance Boost) */}
                       <div
                         className="absolute inset-0 pointer-events-none z-10 rounded-[32px]"
                         style={{
                           backdropFilter: 'blur(20px) saturate(160%)',
                           WebkitBackdropFilter: 'blur(20px) saturate(160%)',
-                          maskImage: 'linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,0.95) 35%, rgba(0,0,0,0.3) 55%, rgba(0,0,0,0.75) 75%)',
-                          WebkitMaskImage: 'linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,0.95) 35%, rgba(0,0,0,0.3) 55%, rgba(0,0,0,0.75) 75%)',
+                          maskImage: 'linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,0.95) 35%, rgba(0,0,0,0.3) 55%, rgba(0,0,0,0) 75%)',
+                          WebkitMaskImage: 'linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,0.95) 35%, rgba(0,0,0,0.3) 55%, rgba(0,0,0,0) 75%)',
                         }}
                       />
 
-                      {/* Layer 3: High-Contrast Ambient Gradient */}
+                      {/* Layer 3: High-Contrast Ambient Gradient (Crystal clear text contrast without milky haze) */}
                       <div
                         className="absolute inset-0 pointer-events-none z-15 rounded-[32px]"
                         style={{
-                          background: 'linear-gradient(to top, rgba(12, 20, 15, 0.85) 0%, rgba(12, 20, 15, 0.4) 40%, rgba(12, 20, 15, 0) 70%)',
+                          background: 'linear-gradient(to top, rgba(12, 20, 15, 0.82) 0%, rgba(12, 20, 15, 0.4) 40%, rgba(12, 20, 15, 0) 70%)',
                         }}
                       />
 
-                      {/* Top-Left: Status Badge */}
+                      {/* Top-Left: Status Badge (Theme-Responsive Liquid Glass without stroke) */}
                       <div className="absolute top-4 left-4 z-30">
-                        <div className="flex items-center gap-1.5 bg-white/95 backdrop-blur-md px-3 py-1.5 rounded-full shadow-md border border-white/90">
+                        <div
+                          className={cn(
+                            'flex items-center gap-1.5 backdrop-blur-md px-3 py-1.5 rounded-full shadow-md transition-colors',
+                            isDark
+                              ? 'bg-[#0a0e1a]/65 text-white shadow-black/40'
+                              : 'bg-white/85 text-slate-900 shadow-slate-900/10',
+                          )}
+                        >
                           <span
                             className={cn(
                               'h-2 w-2 rounded-full',
@@ -1500,15 +1529,22 @@ export function ScheduleTabScreen(props: {
                                   : 'bg-cyan-500',
                             )}
                           />
-                          <span className="text-xs font-bold text-gray-900 tracking-tight">
+                          <span className="text-xs font-bold tracking-tight">
                             {patient.badge}
                           </span>
                         </div>
                       </div>
 
-                      {/* Top-Right: Queue Badge */}
+                      {/* Top-Right: Queue Badge (Theme-Responsive Liquid Glass without stroke) */}
                       <div className="absolute top-4 right-4 z-30">
-                        <div className="flex items-center gap-1 bg-black/50 backdrop-blur-md px-3 py-1.5 rounded-full shadow-md border border-white/20 text-white">
+                        <div
+                          className={cn(
+                            'flex items-center gap-1 backdrop-blur-md px-3 py-1.5 rounded-full shadow-md transition-colors',
+                            isDark
+                              ? 'bg-[#0a0e1a]/65 text-white shadow-black/40'
+                              : 'bg-white/85 text-slate-900 shadow-slate-900/10',
+                          )}
+                        >
                           <span className="text-xs font-bold tracking-tight">
                             Antrean {patient.queueNumber}
                           </span>
@@ -1701,18 +1737,18 @@ export function ScheduleTabScreen(props: {
                         className="absolute inset-0 w-full h-full object-cover object-center rounded-[32px]"
                       />
 
-                      {/* Layer 2: Real-time GPU Liquid Glass */}
+                      {/* Layer 2: Real-time GPU Liquid Glass (Progressive Backdrop Blur + Vibrance Boost) */}
                       <div
                         className="absolute inset-0 pointer-events-none z-10 rounded-[32px]"
                         style={{
                           backdropFilter: 'blur(20px) saturate(160%)',
                           WebkitBackdropFilter: 'blur(20px) saturate(160%)',
-                          maskImage: 'linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,0.95) 35%, rgba(0,0,0,0.3) 55%, rgba(0,0,0,0.75) 75%)',
-                          WebkitMaskImage: 'linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,0.95) 35%, rgba(0,0,0,0.3) 55%, rgba(0,0,0,0.75) 75%)',
+                          maskImage: 'linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,0.95) 35%, rgba(0,0,0,0.3) 55%, rgba(0,0,0,0) 75%)',
+                          WebkitMaskImage: 'linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,0.95) 35%, rgba(0,0,0,0.3) 55%, rgba(0,0,0,0) 75%)',
                         }}
                       />
 
-                      {/* Layer 3: High-Contrast Ambient Gradient */}
+                      {/* Layer 3: High-Contrast Ambient Gradient (Crystal clear text contrast without milky haze) */}
                       <div
                         className="absolute inset-0 pointer-events-none z-15 rounded-[32px]"
                         style={{
@@ -1720,9 +1756,16 @@ export function ScheduleTabScreen(props: {
                         }}
                       />
 
-                      {/* Top Badge: Status Badge (Top-Left) */}
+                      {/* Top Badge: Status Badge (Theme-Responsive Liquid Glass without stroke) */}
                       <div className="absolute top-4 left-4 z-30">
-                        <div className="flex items-center gap-1.5 bg-white/95 backdrop-blur-md px-3 py-1.5 rounded-full shadow-md border border-white/90">
+                        <div
+                          className={cn(
+                            'flex items-center gap-1.5 backdrop-blur-md px-3 py-1.5 rounded-full shadow-md transition-colors',
+                            isDark
+                              ? 'bg-[#0a0e1a]/65 text-white shadow-black/40'
+                              : 'bg-white/85 text-slate-900 shadow-slate-900/10',
+                          )}
+                        >
                           <span
                             className={cn(
                               'h-2 w-2 rounded-full',
@@ -1735,16 +1778,23 @@ export function ScheduleTabScreen(props: {
                                     : 'bg-cyan-500',
                             )}
                           />
-                          <span className="text-xs font-semibold text-gray-900 tracking-tight">
+                          <span className="text-xs font-semibold tracking-tight">
                             {isDayCuti ? 'Cuti' : sch.badge}
                           </span>
                         </div>
                       </div>
 
-                      {/* Top Badge: Booked Patients Count (Top-Right) */}
+                      {/* Top Badge: Booked Patients Count (Theme-Responsive Liquid Glass without stroke) */}
                       <div className="absolute top-4 right-4 z-30">
-                        <div className="flex items-center gap-1.5 bg-black/45 backdrop-blur-md px-3 py-1.5 rounded-full shadow-md border border-white/20 text-white">
-                          <Users className="w-3.5 h-3.5" />
+                        <div
+                          className={cn(
+                            'flex items-center gap-1.5 backdrop-blur-md px-3 py-1.5 rounded-full shadow-md transition-colors',
+                            isDark
+                              ? 'bg-[#0a0e1a]/65 text-white shadow-black/40'
+                              : 'bg-white/85 text-slate-900 shadow-slate-900/10',
+                          )}
+                        >
+                          <Users className="w-3.5 h-3.5 opacity-80" />
                           <span className="text-xs font-semibold tracking-tight">
                             {bookedCount} Pasien Booking
                           </span>
@@ -1946,28 +1996,35 @@ export function ScheduleTabScreen(props: {
                         className="absolute inset-0 w-full h-full object-cover object-center rounded-[32px]"
                       />
 
-                      {/* Layer 2: Real-time GPU Liquid Glass */}
+                      {/* Layer 2: Real-time GPU Liquid Glass (Progressive Backdrop Blur + Vibrance Boost) */}
                       <div
                         className="absolute inset-0 pointer-events-none z-10 rounded-[32px]"
                         style={{
                           backdropFilter: 'blur(20px) saturate(160%)',
                           WebkitBackdropFilter: 'blur(20px) saturate(160%)',
-                          maskImage: 'linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,0.95) 35%, rgba(0,0,0,0.3) 55%, rgba(0,0,0,0.75) 75%)',
-                          WebkitMaskImage: 'linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,0.95) 35%, rgba(0,0,0,0.3) 55%, rgba(0,0,0,0.75) 75%)',
+                          maskImage: 'linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,0.95) 35%, rgba(0,0,0,0.3) 55%, rgba(0,0,0,0) 75%)',
+                          WebkitMaskImage: 'linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,0.95) 35%, rgba(0,0,0,0.3) 55%, rgba(0,0,0,0) 75%)',
                         }}
                       />
 
-                      {/* Layer 3: High-Contrast Ambient Gradient */}
+                      {/* Layer 3: High-Contrast Ambient Gradient (Crystal clear text contrast without milky haze) */}
                       <div
                         className="absolute inset-0 pointer-events-none z-15 rounded-[32px]"
                         style={{
-                          background: 'linear-gradient(to top, rgba(12, 20, 15, 0.85) 0%, rgba(12, 20, 15, 0.4) 40%, rgba(12, 20, 15, 0) 70%)',
+                          background: 'linear-gradient(to top, rgba(12, 20, 15, 0.82) 0%, rgba(12, 20, 15, 0.4) 40%, rgba(12, 20, 15, 0) 70%)',
                         }}
                       />
 
-                      {/* Top-Left: Status Badge */}
+                      {/* Top-Left: Status Badge (Theme-Responsive Liquid Glass without stroke) */}
                       <div className="absolute top-4 left-4 z-30">
-                        <div className="flex items-center gap-1.5 bg-white/95 backdrop-blur-md px-3 py-1.5 rounded-full shadow-md border border-white/90">
+                        <div
+                          className={cn(
+                            'flex items-center gap-1.5 backdrop-blur-md px-3 py-1.5 rounded-full shadow-md transition-colors',
+                            isDark
+                              ? 'bg-[#0a0e1a]/65 text-white shadow-black/40'
+                              : 'bg-white/85 text-slate-900 shadow-slate-900/10',
+                          )}
+                        >
                           <span
                             className={cn(
                               'h-2 w-2 rounded-full',
@@ -1978,15 +2035,22 @@ export function ScheduleTabScreen(props: {
                                   : 'bg-cyan-500',
                             )}
                           />
-                          <span className="text-xs font-bold text-gray-900 tracking-tight">
+                          <span className="text-xs font-bold tracking-tight">
                             {patient.badge}
                           </span>
                         </div>
                       </div>
 
-                      {/* Top-Right: Queue Badge */}
+                      {/* Top-Right: Queue Badge (Theme-Responsive Liquid Glass without stroke) */}
                       <div className="absolute top-4 right-4 z-30">
-                        <div className="flex items-center gap-1 bg-black/50 backdrop-blur-md px-3 py-1.5 rounded-full shadow-md border border-white/20 text-white">
+                        <div
+                          className={cn(
+                            'flex items-center gap-1 backdrop-blur-md px-3 py-1.5 rounded-full shadow-md transition-colors',
+                            isDark
+                              ? 'bg-[#0a0e1a]/65 text-white shadow-black/40'
+                              : 'bg-white/85 text-slate-900 shadow-slate-900/10',
+                          )}
+                        >
                           <span className="text-xs font-bold tracking-tight">
                             Antrean {patient.queueNumber}
                           </span>
@@ -2636,12 +2700,12 @@ export function ScheduleTabScreen(props: {
                   className={cn(
                     'px-2.5 py-1 rounded-full text-[11px] font-bold shrink-0 flex items-center gap-1.5',
                     isDayCuti
-                      ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30'
+                      ? 'bg-amber-500/20 text-amber-400'
                       : detailSchedule.badgeVariant === 'success'
-                        ? isDark ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                        ? isDark ? 'bg-emerald-500/20 text-emerald-400' : 'bg-emerald-50 text-emerald-700'
                         : detailSchedule.badgeVariant === 'warning'
-                          ? isDark ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30' : 'bg-amber-50 text-amber-700 border border-amber-200'
-                          : isDark ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30' : 'bg-blue-50 text-blue-700 border border-blue-200',
+                          ? isDark ? 'bg-amber-500/20 text-amber-400' : 'bg-amber-50 text-amber-700'
+                          : isDark ? 'bg-blue-500/20 text-blue-400' : 'bg-blue-50 text-blue-700',
                   )}
                 >
                   <span
@@ -2793,7 +2857,7 @@ export function ScheduleTabScreen(props: {
           <div
             ref={patientDetailModalRef}
             className={cn(
-              'absolute inset-x-0 bottom-0 z-60 flex max-h-[88%] w-full flex-col overflow-hidden rounded-t-[32px] sm:rounded-t-[36px] shadow-[0_-12px_45px_rgba(0,0,0,0.25)] border-t will-change-transform select-text touch-pan-y backdrop-blur-2xl',
+              'absolute inset-x-0 bottom-0 z-60 flex max-h-[92%] min-h-[540px] w-full flex-col overflow-hidden rounded-t-[32px] sm:rounded-t-[36px] shadow-[0_-12px_45px_rgba(0,0,0,0.25)] border-t will-change-transform select-text touch-pan-y backdrop-blur-2xl',
               isDark
                 ? 'bg-[#0a0e1a] border-white/10 text-white shadow-black/80'
                 : 'bg-white border-neutral-100 text-slate-900 shadow-[0_-12px_45px_rgba(0,0,0,0.25)]',
@@ -2832,41 +2896,47 @@ export function ScheduleTabScreen(props: {
             </div>
 
             {/* Detail Patient Body */}
-            <div className="flex w-full flex-1 flex-col px-6 pt-3 pb-8 overflow-y-auto no-scrollbar select-text gap-4">
-              {/* Profile Card Header with Real Avatar */}
-              <div className="flex flex-col items-center text-center gap-2 pt-1 pb-2">
-                <img
-                  src={detailPatient.avatarUrl || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=300&auto=format&fit=crop'}
-                  alt={detailPatient.patientName}
-                  className="h-16 w-16 rounded-full object-cover border-2 border-blue-500 shadow-lg"
-                />
-                <div>
+            <div className="flex w-full flex-1 flex-col px-6 pt-3 pb-4 overflow-y-auto no-scrollbar select-text gap-4">
+              {/* Profile Card Header with Trailing Queue Badge on Avatar */}
+              <div className="flex flex-col items-center text-center gap-2 pt-1 pb-1">
+                {/* Avatar with Trailing Rosette Queue Badge on Bottom-Right Corner */}
+                <div className="relative inline-flex">
+                  <img
+                    src={detailPatient.avatarUrl || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=300&auto=format&fit=crop'}
+                    alt={detailPatient.patientName}
+                    className="h-20 w-20 rounded-full object-cover shadow-lg ring-3 ring-blue-500/20"
+                  />
+                  {/* Floating Rosette Ribbon Medal Queue Badge */}
+                  <QueueBadge
+                    queueNumber={detailPatient.queueNumber}
+                    size={38}
+                    className="absolute -bottom-2 -right-2.5 z-10"
+                  />
+                </div>
+
+                {/* Name & Subtitle with Status Pill */}
+                <div className="flex flex-col items-center gap-1">
                   <h4 className={cn('text-lg font-black tracking-tight leading-tight', isDark ? 'text-white' : 'text-slate-950')}>
                     {detailPatient.patientName}
                   </h4>
-                  <p className={cn('text-xs font-semibold mt-0.5', isDark ? 'text-cyan-400' : 'text-blue-600')}>
-                    {detailPatient.patientRm} • Usia {detailPatient.patientAge}
-                  </p>
-                </div>
-                <div className="flex items-center gap-2 mt-1">
-                  <span
-                    className={cn(
-                      'px-2.5 py-0.5 rounded-full text-[11px] font-bold',
-                      isDark ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/30' : 'bg-blue-100 text-blue-800',
-                    )}
-                  >
-                    Antrean {detailPatient.queueNumber}
-                  </span>
-                  <span
-                    className={cn(
-                      'px-2.5 py-0.5 rounded-full text-[11px] font-bold',
-                      detailPatient.badgeVariant === 'success'
-                        ? isDark ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                        : isDark ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30' : 'bg-blue-50 text-blue-700 border border-blue-200',
-                    )}
-                  >
-                    {detailPatient.badge}
-                  </span>
+
+                  {/* Subtitle with Status Pill aligned on the same row */}
+                  <div className={cn('flex items-center justify-center gap-2 text-xs font-medium whitespace-nowrap mt-0.5', isDark ? 'text-neutral-400' : 'text-slate-500')}>
+                    <span className="shrink-0">{detailPatient.patientRm}</span>
+                    <span className={cn('w-px h-3 shrink-0', isDark ? 'bg-white/20' : 'bg-slate-300')} />
+                    <span className="shrink-0">Usia {detailPatient.patientAge}</span>
+                    <span className={cn('w-px h-3 shrink-0', isDark ? 'bg-white/20' : 'bg-slate-300')} />
+                    <span
+                      className={cn(
+                        'px-2 py-0.5 rounded-full text-[10px] font-bold shrink-0',
+                        detailPatient.badgeVariant === 'success'
+                          ? isDark ? 'bg-emerald-500/20 text-emerald-400' : 'bg-emerald-50 text-emerald-700'
+                          : isDark ? 'bg-blue-500/20 text-blue-400' : 'bg-blue-50 text-blue-700',
+                      )}
+                    >
+                      {detailPatient.badge}
+                    </span>
+                  </div>
                 </div>
               </div>
 
@@ -2933,22 +3003,22 @@ export function ScheduleTabScreen(props: {
                   </p>
                 </div>
               </div>
+            </div>
 
-              {/* Action Button: Tutup */}
-              <div className="pt-1">
-                <button
-                  type="button"
-                  onClick={triggerClosePatientDetailModal}
-                  className={cn(
-                    'w-full py-3 rounded-2xl border text-xs font-bold transition-all cursor-pointer',
-                    isDark
-                      ? 'border-white/15 text-neutral-300 hover:bg-white/10'
-                      : 'border-slate-200 text-slate-700 hover:bg-slate-100',
-                  )}
-                >
-                  Tutup Detail Pasien
-                </button>
-              </div>
+            {/* Action Button: Tutup */}
+            <div className="px-6 pb-28 sm:pb-32 pt-2 shrink-0">
+              <button
+                type="button"
+                onClick={triggerClosePatientDetailModal}
+                className={cn(
+                  'w-full py-3 rounded-2xl border text-xs font-bold transition-all cursor-pointer shadow-xs active:scale-98',
+                  isDark
+                    ? 'border-white/15 text-neutral-300 hover:bg-white/10 bg-white/5'
+                    : 'border-slate-200 text-slate-700 hover:bg-slate-50 shadow-2xs',
+                )}
+              >
+                Tutup Detail Pasien
+              </button>
             </div>
           </div>
         </>

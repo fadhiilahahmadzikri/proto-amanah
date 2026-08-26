@@ -5,6 +5,7 @@ import {
   Bell,
   Calendar,
   Check,
+  ChevronLeft,
   ChevronRight,
   Database,
   FileText,
@@ -111,6 +112,7 @@ const SETTINGS_ITEMS: SettingsItem[] = [
 
 export function AccountTabScreen(props: {
   theme?: 'dark' | 'light';
+  onBack?: () => void;
   onLogout?: () => void;
   className?: string;
 }) {
@@ -266,6 +268,23 @@ export function AccountTabScreen(props: {
             WebkitMaskImage: 'linear-gradient(to bottom, black 35%, transparent 100%)',
           }}
         />
+
+        {/* Floating Liquid Glassmorphism Back Button */}
+        {props.onBack && (
+          <button
+            type="button"
+            aria-label="Kembali ke Beranda"
+            onClick={props.onBack}
+            className={cn(
+              'absolute top-4 left-4 z-30 flex h-8 w-8 items-center justify-center rounded-full backdrop-blur-md transition-all active:scale-90 cursor-pointer shadow-md',
+              isDark
+                ? 'bg-black/40 text-white border border-white/20 hover:bg-black/60 shadow-black/40'
+                : 'bg-white/75 text-slate-800 border border-white/80 hover:bg-white/90 shadow-slate-900/10',
+            )}
+          >
+            <ChevronLeft className="h-4.5 w-4.5 -ml-0.5" />
+          </button>
+        )}
 
         {/* Seamless Theme Gradient Fade */}
         <div

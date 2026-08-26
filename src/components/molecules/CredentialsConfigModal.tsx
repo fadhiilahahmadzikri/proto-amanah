@@ -91,7 +91,7 @@ export function CredentialsConfigModal(props: {
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <span className="font-bold text-sm">{user.name}</span>
-                  <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-600 dark:bg-blue-500/20 dark:text-blue-400 border border-blue-500/20">
+                  <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-600 dark:bg-blue-500/20 dark:text-blue-400">
                     {user.id}
                   </span>
                 </div>

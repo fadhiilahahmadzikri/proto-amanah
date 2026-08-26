@@ -1098,7 +1098,7 @@ export function PresenceHistoryScreen(props: {
                   <span
                     className={cn(
                       'px-2.5 py-0.5 rounded-full text-[10px] font-bold shrink-0 flex items-center gap-1.5',
-                      isDark ? 'bg-indigo-500/20 text-indigo-300 border border-indigo-500/30' : 'bg-indigo-50 text-indigo-700 border border-indigo-200',
+                      isDark ? 'bg-indigo-500/20 text-indigo-300' : 'bg-indigo-50 text-indigo-700',
                     )}
                   >
                     <span className="h-1.5 w-1.5 rounded-full bg-indigo-500" />

@@ -49,10 +49,10 @@ export function NotificationTabScreen(props: {
           <button
             type="button"
             className={cn(
-              'flex items-center gap-1 text-[11px] font-bold py-1.5 px-3 rounded-full backdrop-blur-md transition-colors cursor-pointer border',
+              'flex items-center gap-1 text-[11px] font-bold py-1.5 px-3 rounded-full backdrop-blur-md transition-colors cursor-pointer',
               isDark
-                ? 'text-white/90 bg-white/10 hover:bg-white/20 border-white/20'
-                : 'text-blue-600 bg-blue-50 hover:bg-blue-100 border-blue-100',
+                ? 'text-white/90 bg-white/10 hover:bg-white/20'
+                : 'text-blue-600 bg-blue-50 hover:bg-blue-100',
             )}
           >
             <CheckCheck className="h-3.5 w-3.5" />
