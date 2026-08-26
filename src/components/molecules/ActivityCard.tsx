@@ -16,10 +16,10 @@ export function ActivityCard(props: {
     <div
       onClick={props.onClick}
       className={cn(
-        'flex-1 relative overflow-hidden rounded-[24px] p-4 border group cursor-pointer active:scale-[0.98] transition-all duration-300 select-none',
+        'flex-1 relative overflow-hidden rounded-[24px] p-4 group cursor-pointer active:scale-[0.98] transition-all duration-300 select-none',
         isDark
-          ? 'bg-neutral-900/90 border-white/15 text-white shadow-2xl shadow-black/50 backdrop-blur-xl hover:border-white/25'
-          : 'bg-white border-slate-100 text-slate-900 shadow-[0_8px_20px_-6px_rgba(0,0,0,0.04)] hover:shadow-[0_8px_25px_-5px_rgba(0,0,0,0.08)]',
+          ? 'bg-neutral-900/90 text-white shadow-2xl shadow-black/50 backdrop-blur-xl'
+          : 'bg-white text-slate-900 shadow-[0_8px_20px_-6px_rgba(0,0,0,0.04)] hover:shadow-[0_8px_25px_-5px_rgba(0,0,0,0.08)]',
         props.className,
       )}
     >
@@ -41,8 +41,8 @@ export function ActivityCard(props: {
               'w-9 h-9 rounded-full flex items-center justify-center shrink-0 transition-colors',
               isDark
                 ? isBlue
-                  ? 'bg-blue-950/70 text-cyan-400 border border-blue-500/25'
-                  : 'bg-emerald-950/70 text-emerald-400 border border-emerald-500/25'
+                  ? 'bg-blue-950/70 text-cyan-400'
+                  : 'bg-emerald-950/70 text-emerald-400'
                 : isBlue
                   ? 'bg-blue-50 text-[#0A44FF]'
                   : 'bg-emerald-50 text-[#38c474]',

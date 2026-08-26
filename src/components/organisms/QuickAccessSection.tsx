@@ -11,7 +11,7 @@ export function QuickAccessSection(props: {
   return (
     <div
       className={cn(
-        'flex justify-between items-start px-1 mb-9',
+        'flex justify-between items-start px-1 mb-5',
         props.className,
       )}
     >

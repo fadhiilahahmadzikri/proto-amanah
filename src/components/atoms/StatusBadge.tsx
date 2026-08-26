@@ -14,10 +14,10 @@ export function StatusBadge(props: {
     return (
       <div
         className={cn(
-          'px-2 py-1 rounded-md flex items-center gap-1.5 shrink-0 select-none border transition-colors',
+          'px-2.5 py-1 rounded-md flex items-center gap-1.5 shrink-0 select-none transition-colors',
           isDark
-            ? 'bg-red-950/70 text-red-400 border-red-500/30'
-            : 'bg-red-50 text-red-500 border-red-100',
+            ? 'bg-red-950/70 text-red-400'
+            : 'bg-red-50 text-red-500',
           props.className,
         )}
       >
@@ -31,10 +31,10 @@ export function StatusBadge(props: {
     return (
       <div
         className={cn(
-          'px-2 py-1 rounded-md flex items-center gap-1 shrink-0 select-none border transition-colors',
+          'px-2.5 py-1 rounded-md flex items-center gap-1 shrink-0 select-none transition-colors',
           isDark
-            ? 'bg-emerald-950/70 text-emerald-400 border-emerald-500/30'
-            : 'bg-emerald-50 text-emerald-600 border-emerald-100',
+            ? 'bg-emerald-950/70 text-emerald-400'
+            : 'bg-emerald-50 text-emerald-600',
           props.className,
         )}
       >

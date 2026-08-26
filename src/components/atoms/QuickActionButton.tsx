@@ -38,10 +38,10 @@ export function QuickActionButton(props: {
     >
       <div
         className={cn(
-          'w-[60px] h-[60px] rounded-[20px] flex items-center justify-center border transition-all duration-300',
+          'w-[60px] h-[60px] rounded-[20px] flex items-center justify-center transition-all duration-300',
           isDark
-            ? 'bg-neutral-900/90 border-white/15 text-cyan-400 shadow-xl shadow-black/40 backdrop-blur-xl'
-            : 'bg-white border-slate-50 text-[#0A44FF] shadow-[0_8px_20px_-6px_rgba(0,0,0,0.06)]',
+            ? 'bg-neutral-900/90 text-cyan-400 shadow-xl shadow-black/40 backdrop-blur-xl'
+            : 'bg-white text-[#0A44FF] shadow-[0_8px_20px_-6px_rgba(0,0,0,0.06)]',
         )}
       >
         {renderIcon()}

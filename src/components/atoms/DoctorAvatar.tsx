@@ -17,7 +17,7 @@ export function DoctorAvatar(props: {
   return (
     <div
       className={cn(
-        'relative rounded-full overflow-hidden bg-white/20 border-2 border-white/40 shadow-sm shrink-0 backdrop-blur-md',
+        'relative rounded-full overflow-hidden bg-white/20 shadow-sm shrink-0 backdrop-blur-md',
         props.className,
       )}
       style={{

@@ -15,6 +15,7 @@ import { ScheduleTabScreen } from '@/components/organisms/ScheduleTabScreen';
 import { TodayActivitySection } from '@/components/organisms/TodayActivitySection';
 import { prototypeConfig } from '@/config/prototype.config';
 import portalData from '@/data/portal/portal-data.json';
+import { useScheduleStore } from '@/features/schedule/hooks/use-schedule-store';
 import { cn } from '@/lib/utils';
 import type { PortalData } from '@/types/portal.types';
 
@@ -30,6 +31,7 @@ export function DoctorDashboardScreen(props: {
 }) {
   const data = (props.data ?? portalData) as PortalData;
   const isDark = props.theme === 'dark';
+  const { todaySchedules } = useScheduleStore();
   const [internalTab, setInternalTab] = React.useState<BottomNavTab>(
     props.activeTab ?? prototypeConfig.initialDashboardTab ?? 'home',
   );
@@ -165,7 +167,7 @@ export function DoctorDashboardScreen(props: {
           )}
         >
           {activeTab === 'home' && (
-            <div className="flex flex-col h-full justify-between">
+            <div className="flex flex-col">
               {/* 1. Doctor Profile Header */}
               <DoctorProfileHeader
                 profile={data.profile}
@@ -173,10 +175,11 @@ export function DoctorDashboardScreen(props: {
                 onProfileClick={() => handleTabChange('account')}
               />
 
-              {/* 2. 3D Stack of Schedule Cards with Wave Petal Texture */}
+              {/* 2. 3D Stack of Schedule Cards with Wave Petal Texture (Synced with Schedule Screen) */}
               <ScheduleCardStack
-                schedules={data.schedules}
+                schedules={todaySchedules.length > 0 ? todaySchedules : data.schedules}
                 theme={props.theme}
+                onCardClick={() => handleTabChange('schedule')}
               />
 
               {/* 3. Quick Access Menu Grid */}
@@ -186,9 +189,30 @@ export function DoctorDashboardScreen(props: {
                 onActionClick={handleQuickAction}
               />
 
-              {/* 4. Today's Activity Stat Cards */}
+              {/* 4. Today's Activity Stat Cards (Synced with Schedule Bookings) */}
               <TodayActivitySection
-                activities={data.activities}
+                activities={[
+                  {
+                    id: 'act-1',
+                    title: 'Antrean Pasien',
+                    count: todaySchedules.reduce((acc, s) => acc + (s.bookedPatients?.length ?? (Number.parseInt(s.slotCount, 10) || 0)), 0) || 4,
+                    unit: 'Pasien',
+                    badgeText: 'Live',
+                    badgeType: 'live',
+                    icon: 'users',
+                    glowVariant: 'blue',
+                  },
+                  {
+                    id: 'act-2',
+                    title: 'Selesai Praktik',
+                    count: 45,
+                    unit: 'Tindakan',
+                    badgeText: '+12%',
+                    badgeType: 'trend',
+                    icon: 'stethoscope',
+                    glowVariant: 'emerald',
+                  },
+                ]}
                 theme={props.theme}
                 onDetailClick={() => handleTabChange('schedule')}
                 onActivityClick={() => showToast('Membuka rincian aktivitas')}

@@ -8,6 +8,7 @@ import type { DoctorSchedule } from '@/types/portal.types';
 export function ScheduleCardStack(props: {
   schedules: DoctorSchedule[];
   theme?: 'dark' | 'light';
+  onCardClick?: (schedule: DoctorSchedule) => void;
   className?: string;
 }) {
   const [currentIndex, setCurrentIndex] = React.useState(0);
@@ -58,7 +59,17 @@ export function ScheduleCardStack(props: {
       // ignore
     }
 
-    const diff = dragOffset;
+    const diff = e.clientX - startXRef.current;
+
+    // Detect simple tap to trigger onCardClick
+    if (Math.abs(diff) < 6) {
+      const frontSchedule = schedules[currentIndex % schedules.length];
+      if (frontSchedule) {
+        props.onCardClick?.(frontSchedule);
+      }
+      setDragOffset(0);
+      return;
+    }
 
     if (Math.abs(diff) > 65) {
       const direction = diff > 0 ? 'right' : 'left';
@@ -167,7 +178,7 @@ export function ScheduleCardStack(props: {
       onPointerUp={handlePointerEnd}
       onPointerCancel={handlePointerEnd}
       className={cn(
-        'relative w-full h-[175px] mb-12 select-none touch-none',
+        'relative w-full h-[175px] mb-5 select-none touch-none',
         props.className,
       )}
       style={{ perspective: 1000 }}

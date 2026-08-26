@@ -12,7 +12,7 @@ export function DoctorProfileHeader(props: {
   return (
     <div
       className={cn(
-        'flex justify-between items-center mt-2 mb-6',
+        'flex justify-between items-center mt-1.5 mb-3.5',
         props.className,
       )}
     >
@@ -43,11 +43,11 @@ export function DoctorProfileHeader(props: {
         type="button"
         aria-label="Notifikasi"
         onClick={props.onNotificationClick}
-        className="relative w-11 h-11 rounded-full border border-white/30 bg-white/10 flex items-center justify-center text-white hover:bg-white/20 active:scale-95 shrink-0 transition-all shadow-sm backdrop-blur-md cursor-pointer focus:outline-none"
+        className="relative w-11 h-11 rounded-full bg-white/10 flex items-center justify-center text-white hover:bg-white/20 active:scale-95 shrink-0 transition-all shadow-sm backdrop-blur-md cursor-pointer focus:outline-none"
       >
         <Bell className="h-5 w-5 stroke-[2.2]" />
         {props.profile.unreadNotifications > 0 && (
-          <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-red-500 ring-2 ring-white/60" />
+          <span className="absolute top-2.5 right-2.5 w-2 h-2 rounded-full bg-red-500" />
         )}
       </button>
     </div>

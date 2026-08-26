@@ -13,7 +13,7 @@ export function TodayActivitySection(props: {
   const isDark = props.theme === 'dark';
 
   return (
-    <div className={cn('flex flex-col gap-3.5 mb-6', props.className)}>
+    <div className={cn('flex flex-col gap-2.5 mb-2', props.className)}>
       {/* Section Header */}
       <div className="flex justify-between items-center px-1">
         <h3
@@ -28,10 +28,10 @@ export function TodayActivitySection(props: {
           type="button"
           onClick={props.onDetailClick}
           className={cn(
-            'px-3 py-1.5 rounded-full text-[11px] font-bold shadow-xs active:scale-95 transition-all flex items-center gap-1 cursor-pointer focus:outline-none select-none border',
+            'px-3 py-1.5 rounded-full text-[11px] font-bold shadow-xs active:scale-95 transition-all flex items-center gap-1 cursor-pointer focus:outline-none select-none',
             isDark
-              ? 'bg-white/10 border-white/20 text-cyan-400 hover:bg-white/15 backdrop-blur-md'
-              : 'bg-white border-gray-200 text-[#0A44FF] hover:bg-gray-50',
+              ? 'bg-white/10 text-cyan-400 hover:bg-white/15 backdrop-blur-md'
+              : 'bg-white text-[#0A44FF] hover:bg-gray-50 shadow-sm',
           )}
         >
           <span>Detail</span>

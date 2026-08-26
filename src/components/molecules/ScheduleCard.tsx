@@ -39,40 +39,33 @@ export function ScheduleCard(props: {
             <path d={ticketPath} />
           </clipPath>
 
-          {/* Light Theme Pure White-on-White Wave Gradients */}
+          {/* Light Theme Elegant Ice-Blue Wave Gradients */}
           <linearGradient id={`${clipId}-wave-1-light`} x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#ffffff" stopOpacity="0.95" />
-            <stop offset="50%" stopColor="#f8faff" stopOpacity="0.5" />
-            <stop offset="100%" stopColor="#f1f5f9" stopOpacity="0.2" />
+            <stop offset="0%" stopColor="#dbeafe" stopOpacity="0.75" />
+            <stop offset="50%" stopColor="#eff6ff" stopOpacity="0.5" />
+            <stop offset="100%" stopColor="#f8fafc" stopOpacity="0.15" />
           </linearGradient>
           <linearGradient id={`${clipId}-wave-2-light`} x1="100%" y1="0%" x2="0%" y2="100%">
-            <stop offset="0%" stopColor="#ffffff" stopOpacity="0.95" />
-            <stop offset="60%" stopColor="#f8faff" stopOpacity="0.6" />
-            <stop offset="100%" stopColor="#f1f5f9" stopOpacity="0.2" />
-          </linearGradient>
-          <linearGradient id={`${clipId}-stroke-light`} x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#ffffff" stopOpacity="0.95" />
-            <stop offset="50%" stopColor="#f1f5f9" stopOpacity="0.6" />
-            <stop offset="100%" stopColor="#cbd5e1" stopOpacity="0.3" />
+            <stop offset="0%" stopColor="#e0f2fe" stopOpacity="0.75" />
+            <stop offset="60%" stopColor="#f0f9ff" stopOpacity="0.45" />
+            <stop offset="100%" stopColor="#ffffff" stopOpacity="0.1" />
           </linearGradient>
 
           {/* Dark Theme Obsidian Gradients */}
           <linearGradient id={`${clipId}-wave-1-dark`} x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#1e293b" stopOpacity="0.5" />
-            <stop offset="100%" stopColor="#0f172a" stopOpacity="0.2" />
+            <stop offset="0%" stopColor="#1e293b" stopOpacity="0.6" />
+            <stop offset="100%" stopColor="#0f172a" stopOpacity="0.25" />
           </linearGradient>
           <linearGradient id={`${clipId}-wave-2-dark`} x1="100%" y1="0%" x2="0%" y2="100%">
-            <stop offset="0%" stopColor="#38bdf8" stopOpacity="0.14" />
-            <stop offset="100%" stopColor="#0284c7" stopOpacity="0.04" />
+            <stop offset="0%" stopColor="#38bdf8" stopOpacity="0.18" />
+            <stop offset="100%" stopColor="#0284c7" stopOpacity="0.06" />
           </linearGradient>
         </defs>
 
-        {/* Card Background Fill & Crisp Border Contour */}
+        {/* Card Background Fill */}
         <path
           d={ticketPath}
           fill={isDark ? 'rgba(23, 23, 23, 0.95)' : '#ffffff'}
-          stroke={isDark ? 'rgba(255, 255, 255, 0.16)' : 'rgba(203, 213, 225, 0.9)'}
-          strokeWidth="1.2"
         />
 
         {/* Clipped Wave Petal Textures & Perforated Connector Line */}
@@ -81,16 +74,12 @@ export function ScheduleCard(props: {
           <path
             d="M-30,190 C60,110 130,50 350,15 L350,190 Z"
             fill={isDark ? `url(#${clipId}-wave-1-dark)` : `url(#${clipId}-wave-1-light)`}
-            stroke={isDark ? 'rgba(255, 255, 255, 0.1)' : `url(#${clipId}-stroke-light)`}
-            strokeWidth="1.2"
           />
 
           {/* Intersecting Secondary Translucent Wave */}
           <path
             d="M40,-20 C140,40 210,120 370,95 L370,-20 Z"
             fill={isDark ? `url(#${clipId}-wave-2-dark)` : `url(#${clipId}-wave-2-light)`}
-            stroke={isDark ? 'rgba(255, 255, 255, 0.1)' : `url(#${clipId}-stroke-light)`}
-            strokeWidth="1.2"
           />
 
           {/* Wall-to-Wall Perforated Connector Line between the "C" Notches */}
