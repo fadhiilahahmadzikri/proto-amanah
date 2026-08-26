@@ -33,6 +33,7 @@ import {
   X,
 } from 'lucide-react';
 import React from 'react';
+import { AuroraBackground } from '@/components/atoms/AuroraBackground';
 import { QueueBadge } from '@/components/atoms/QueueBadge';
 import { DateCarouselStrip } from '@/components/molecules/DateCarouselStrip';
 import { ScreenHeader } from '@/components/molecules/ScreenHeader';
@@ -2193,7 +2194,7 @@ export function ScheduleTabScreen(props: {
               </button>
             </div>
 
-            <div ref={drawerContentRef} className="flex w-full flex-1 flex-col px-6 pt-3 pb-8 overflow-y-auto no-scrollbar select-text">
+            <div ref={drawerContentRef} className="flex w-full flex-1 flex-col px-6 pt-3 pb-28 sm:pb-32 overflow-y-auto no-scrollbar select-text">
               {/* Form Fields for Doctor Practice Schedule (Doctor POV) */}
               <form onSubmit={handleSaveSchedule} className="space-y-3.5">
                 {/* 0. Status Jadwal Praktik: Menunggu | Buka | Cuti (Hanya ditampilkan saat Edit Jadwal) */}
@@ -2685,7 +2686,7 @@ export function ScheduleTabScreen(props: {
             </div>
 
             {/* Detail Content Body */}
-            <div className="flex w-full flex-1 flex-col px-6 pt-3 pb-8 overflow-y-auto no-scrollbar select-text gap-4">
+            <div className="flex w-full flex-1 flex-col px-6 pt-3 pb-28 sm:pb-32 overflow-y-auto no-scrollbar select-text gap-4">
               {/* Title & Date Heading + Status Badge */}
               <div className="flex justify-between items-start gap-2">
                 <div>
@@ -2863,6 +2864,13 @@ export function ScheduleTabScreen(props: {
                 : 'bg-white border-neutral-100 text-slate-900 shadow-[0_-12px_45px_rgba(0,0,0,0.25)]',
             )}
           >
+            {/* Dynamic Aurora Ambient Glow (Soft theme-responsive ambience) */}
+            <AuroraBackground
+              theme={props.theme}
+              intensity="soft"
+              className="h-[320px]"
+            />
+
             {/* Interactive Drag Handle */}
             <div
               role="button"

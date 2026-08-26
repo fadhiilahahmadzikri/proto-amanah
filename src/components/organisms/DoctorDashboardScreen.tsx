@@ -2,6 +2,7 @@
 
 import { gsap } from 'gsap';
 import React from 'react';
+import { AuroraBackground } from '@/components/atoms/AuroraBackground';
 import { type BottomNavTab, BottomNavBar } from '@/components/molecules/BottomNavBar';
 import { DoctorProfileHeader } from '@/components/molecules/DoctorProfileHeader';
 import { AccountTabScreen } from '@/components/organisms/AccountTabScreen';
@@ -147,29 +148,7 @@ export function DoctorDashboardScreen(props: {
     >
       {/* Dynamic Aurora Ambient Glow (Rendered EXCLUSIVELY on Home) */}
       {activeTab === 'home' && !showPresenceHistory && (
-        <div
-          className="absolute top-0 left-0 w-full h-[550px] z-0 pointer-events-none"
-          style={{
-            maskImage: 'linear-gradient(to bottom, black 40%, transparent 100%)',
-            WebkitMaskImage: 'linear-gradient(to bottom, black 40%, transparent 100%)',
-          }}
-        >
-          {isDark ? (
-            <>
-              {/* Deep Cosmic Sapphire Glow */}
-              <div className="absolute -top-[15%] -left-[20%] w-[140%] h-[380px] bg-[#07247a] rounded-full filter blur-[100px] opacity-90 transition-all duration-700" />
-              {/* Electric Cyan/Teal Glow */}
-              <div className="absolute top-[5%] -right-[20%] w-[100%] h-[260px] bg-[#0088cc] rounded-full filter blur-[90px] opacity-70 transition-all duration-700" />
-            </>
-          ) : (
-            <>
-              {/* Vibrant Apple/Amanah Blue Base */}
-              <div className="absolute -top-[10%] -left-[20%] w-[140%] h-[350px] bg-[#0A44FF] rounded-full filter blur-[100px] opacity-90 transition-all duration-700" />
-              {/* Radiant Cyan Glow */}
-              <div className="absolute top-[5%] -right-[20%] w-[100%] h-[250px] bg-[#00D4FF] rounded-full filter blur-[90px] opacity-80 transition-all duration-700" />
-            </>
-          )}
-        </div>
+        <AuroraBackground theme={props.theme} />
       )}
 
       {/* Content Viewport Container with Android Activity Slide Motion */}
