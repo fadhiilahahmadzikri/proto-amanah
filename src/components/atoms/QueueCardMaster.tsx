@@ -13,16 +13,20 @@ const adjust = (value: number, fromMin: number, fromMax: number, toMin: number, 
 export function QueueCardMaster(props: {
   card: QueueDockCardData;
   isRevealed?: boolean;
+  isSpinReady?: boolean;
   badgeText?: string;
   className?: string;
   onPointerDown?: (e: React.PointerEvent<HTMLDivElement>) => void;
+  onRevealApex?: () => void;
   children?: React.ReactNode;
 }) {
-  const { card, isRevealed = false, className, onPointerDown, children } = props;
+  const { card, isRevealed = false, isSpinReady = false, className, onPointerDown, onRevealApex, children } = props;
   const [imgSrc, setImgSrc] = React.useState<string | undefined>(card.imageUrl);
   const [isInteracting, setIsInteracting] = React.useState(false);
+  const [motionBlur, setMotionBlur] = React.useState(0);
   const cardRef = React.useRef<HTMLDivElement>(null);
   const rafRef = React.useRef<number | null>(null);
+  const springDecayRafRef = React.useRef<number | null>(null);
 
   // Holographic shader spring / pointer state
   const [pointer, setPointer] = React.useState({
@@ -35,46 +39,109 @@ export function QueueCardMaster(props: {
     opacity: 0,
   });
 
+  const pointerRef = React.useRef(pointer);
+  pointerRef.current = pointer;
+
   React.useEffect(() => {
     setImgSrc(card.imageUrl);
   }, [card.imageUrl]);
 
-  // Initial showcase sparkle when revealed
+  // Initial 3D Flip & Spin Reveal Animation (starts with backface 180deg, spins to front 0deg ONLY when isSpinReady is true)
   React.useEffect(() => {
     if (!isRevealed) return;
 
-    let step = 0;
-    const interval = setInterval(() => {
-      step += 0.08;
-      const rx = Math.sin(step) * 14;
-      const ry = Math.cos(step) * 14;
-      const px = 50 + Math.sin(step) * 35;
-      const py = 50 + Math.cos(step) * 35;
-
+    if (!isSpinReady) {
+      // While emerging from Genie, stay firmly in pristine Card Back mode
+      setMotionBlur(0);
       setPointer({
-        x: round(px),
-        y: round(py),
-        rx: round(rx),
-        ry: round(ry),
-        bgX: adjust(px, 0, 100, 37, 63),
-        bgY: adjust(py, 0, 100, 33, 67),
-        opacity: 0.85,
+        x: 50,
+        y: 50,
+        rx: 180,
+        ry: 0,
+        bgX: 50,
+        bgY: 50,
+        opacity: 0,
+      });
+      return;
+    }
+
+    let startTime: number | null = null;
+    const duration = 900;
+    let apexTriggered = false;
+
+    setMotionBlur(8);
+    setPointer({
+      x: 50,
+      y: 50,
+      rx: 180,
+      ry: 0,
+      bgX: 50,
+      bgY: 50,
+      opacity: 0.2,
+    });
+
+    const animateReveal = (now: number) => {
+      if (!startTime) startTime = now;
+      const elapsed = now - startTime;
+      const progress = Math.min(1, elapsed / duration);
+
+      // Smooth custom ease-out cubic
+      const ease = 1 - Math.pow(1 - progress, 3);
+      const currentRotation = 180 * (1 - ease);
+      const currentBlur = Math.max(0, 8 * (1 - ease * 1.3));
+
+      setMotionBlur(round(currentBlur, 1));
+      setPointer({
+        x: 50 + Math.sin(progress * Math.PI) * 20,
+        y: 50,
+        rx: round(currentRotation),
+        ry: round(Math.sin(progress * Math.PI) * 12),
+        bgX: adjust(50 + Math.sin(progress * Math.PI) * 20, 0, 100, 37, 63),
+        bgY: 50,
+        opacity: round(Math.min(1, ease * 1.2)),
       });
 
-      if (step >= Math.PI * 2.2) {
-        clearInterval(interval);
-        // Smooth return to neutral rest
-        setTimeout(() => {
-          setPointer({ x: 50, y: 50, rx: 0, ry: 0, bgX: 50, bgY: 50, opacity: 0 });
-        }, 300);
+      // Trigger apex confetti when front face crosses view (halfway through spin)
+      if (progress >= 0.45 && !apexTriggered) {
+        apexTriggered = true;
+        onRevealApex?.();
       }
-    }, 25);
 
-    return () => clearInterval(interval);
-  }, [isRevealed]);
+      if (progress < 1) {
+        requestAnimationFrame(animateReveal);
+      } else {
+        setMotionBlur(0);
+        // Smooth transition to neutral rest
+        let restFrame = 0;
+        const settleRest = () => {
+          restFrame++;
+          const settleProgress = Math.min(1, restFrame / 16);
+          const settleEase = 1 - Math.pow(1 - settleProgress, 2);
+          setPointer((prev) => ({
+            ...prev,
+            rx: round(prev.rx * (1 - settleEase)),
+            ry: round(prev.ry * (1 - settleEase)),
+            opacity: round(1 - settleEase * 0.4),
+          }));
+          if (settleProgress < 1) {
+            requestAnimationFrame(settleRest);
+          }
+        };
+        requestAnimationFrame(settleRest);
+      }
+    };
+
+    const animId = requestAnimationFrame(animateReveal);
+
+    return () => cancelAnimationFrame(animId);
+  }, [isRevealed, isSpinReady, onRevealApex]);
 
   const handlePointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
     if (!cardRef.current) return;
+    if (springDecayRafRef.current) {
+      cancelAnimationFrame(springDecayRafRef.current);
+      springDecayRafRef.current = null;
+    }
     setIsInteracting(true);
 
     const rect = cardRef.current.getBoundingClientRect();
@@ -104,15 +171,46 @@ export function QueueCardMaster(props: {
   const handlePointerLeave = () => {
     if (rafRef.current) cancelAnimationFrame(rafRef.current);
     setIsInteracting(false);
-    setPointer({
-      x: 50,
-      y: 50,
-      rx: 0,
-      ry: 0,
-      bgX: 50,
-      bgY: 50,
-      opacity: 0,
-    });
+
+    // Smooth physical spring decay back to resting equilibrium (no freezing/abrupt snapping)
+    let frame = 0;
+    const totalFrames = 22;
+    const startRx = pointerRef.current.rx;
+    const startRy = pointerRef.current.ry;
+    const startX = pointerRef.current.x;
+    const startY = pointerRef.current.y;
+    const startOpacity = pointerRef.current.opacity;
+
+    const animateSpringDecay = () => {
+      frame++;
+      const progress = Math.min(1, frame / totalFrames);
+      // Damped harmonic easeOutCubic curve
+      const ease = 1 - Math.pow(1 - progress, 3);
+
+      const curRx = round(startRx * (1 - ease));
+      const curRy = round(startRy * (1 - ease));
+      const curX = round(startX + (50 - startX) * ease);
+      const curY = round(startY + (50 - startY) * ease);
+      const curOpacity = round(startOpacity * (1 - ease));
+
+      setPointer({
+        x: curX,
+        y: curY,
+        rx: curRx,
+        ry: curRy,
+        bgX: adjust(curX, 0, 100, 37, 63),
+        bgY: adjust(curY, 0, 100, 33, 67),
+        opacity: curOpacity,
+      });
+
+      if (progress < 1) {
+        springDecayRafRef.current = requestAnimationFrame(animateSpringDecay);
+      } else {
+        springDecayRafRef.current = null;
+      }
+    };
+
+    springDecayRafRef.current = requestAnimationFrame(animateSpringDecay);
   };
 
   // Unrevealed state (default on 3D rail): Displays authentic Pokémon card back
@@ -173,6 +271,8 @@ export function QueueCardMaster(props: {
     '--card-scale': '1',
     '--translate-x': '0px',
     '--translate-y': '0px',
+    filter: motionBlur > 0 ? `blur(${motionBlur}px)` : undefined,
+    willChange: 'transform, filter',
   } as React.CSSProperties;
 
   // Revealed state (on Page 2): 100% Fidelity 3D Holographic Foil & Glitter Shader

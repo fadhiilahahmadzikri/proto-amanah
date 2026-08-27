@@ -42,8 +42,8 @@ export function QueueDockScreen(props: {
   const heroCardRef = React.useRef<HTMLDivElement>(null);
   const screenContainerRef = React.useRef<HTMLDivElement>(null);
 
-  const [displayedHeadline, setDisplayedHeadline] = React.useState('Pilih kartu misteri Pokémon');
-  const prevHeadlineRef = React.useRef('Pilih kartu misteri Pokémon');
+  const [displayedHeadline, setDisplayedHeadline] = React.useState('Choose your Pokémon');
+  const prevHeadlineRef = React.useRef('Choose your Pokémon');
 
   const isPlungingOrActive = activationStage === 'plunging' || activationStage === 'activating';
   const isMorphingActive = activationStage === 'activating';
@@ -51,11 +51,11 @@ export function QueueDockScreen(props: {
   const currentCard = cards[currentIndex];
   const isNearSlot = dragProgress >= 0.75 && !isPlungingOrActive;
 
-  let headlineText = 'Pilih kartu misteri Pokémon';
+  let headlineText = 'Choose your Pokémon';
   if (isMorphingActive) {
-    headlineText = 'Membuka misteri Pokémon...';
+    headlineText = 'Opening mystery Pokémon...';
   } else if (isNearSlot) {
-    headlineText = 'Lepas untuk reveal Pokémon!';
+    headlineText = 'Release to reveal Pokémon!';
   }
 
   // Native GSAP Text Blurry Morph Transformation
@@ -92,6 +92,46 @@ export function QueueDockScreen(props: {
     });
   }, [headlineText]);
 
+  // Automated Genie Open Emergence Sequence: Genie Emergence -> Settle -> Blur -> 3D Flip Rotation
+  React.useEffect(() => {
+    if (!showSuccess) return;
+
+    let isMounted = true;
+    const runOpenSequence = async () => {
+      // Ensure DOM has mounted and laid out heroCardRef
+      await new Promise((r) => requestAnimationFrame(r));
+
+      if (!isMounted) return;
+
+      const getTargetRect = (): DOMRect => {
+        const screenRect = screenContainerRef.current?.getBoundingClientRect();
+        const defaultX = screenRect ? screenRect.left + screenRect.width / 2 : window.innerWidth / 2;
+        const defaultY = screenRect ? screenRect.top + screenRect.height - 50 : window.innerHeight - 50;
+        return new DOMRect(defaultX - 20, defaultY - 10, 40, 20);
+      };
+
+      if (heroCardRef.current) {
+        try {
+          // 1. Genie effect emerges with card in 100% card-back mode
+          await runGenieAnimation('open', heroCardRef.current, getTargetRect, 'bottom');
+        } catch (err) {
+          console.warn('Genie open error:', err);
+        }
+      }
+
+      if (isMounted) {
+        // 2. Genie settles -> triggers blur -> 3D flip rotation -> confetti apex!
+        setIsGenieSettled(true);
+      }
+    };
+
+    runOpenSequence();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [showSuccess]);
+
   const handleActivate = React.useCallback(() => {
     // Stage 1 (t = 0ms): Card plunges completely down into the slot mouth off-screen
     setActivationStage('plunging');
@@ -108,26 +148,10 @@ export function QueueDockScreen(props: {
       setActivationStage('activating');
     }, 600);
 
-    // Stage 3 (t = 2800ms): Eject the SAME card from the bottom slot mouth using the macOS Genie wave!
-    setTimeout(async () => {
-      setShowSuccess(true);
+    // Stage 3 (t = 2800ms): Trigger showSuccess -> mounts overlay and starts Genie emergence
+    setTimeout(() => {
       setIsGenieSettled(false);
-
-      const getTargetRect = (): DOMRect => {
-        const screenRect = screenContainerRef.current?.getBoundingClientRect();
-        const defaultX = screenRect ? screenRect.left + screenRect.width / 2 : window.innerWidth / 2;
-        const defaultY = screenRect ? screenRect.top + screenRect.height - 50 : window.innerHeight - 50;
-        return new DOMRect(defaultX - 20, defaultY - 10, 40, 20);
-      };
-
-      if (heroCardRef.current) {
-        try {
-          await runGenieAnimation('open', heroCardRef.current, getTargetRect, 'bottom');
-        } catch {}
-      }
-
-      setIsGenieSettled(true);
-      confettiRef.current?.fire();
+      setShowSuccess(true);
     }, 2800);
   }, []);
 
@@ -197,13 +221,13 @@ export function QueueDockScreen(props: {
       <header className="absolute top-0 inset-x-0 z-30 flex items-center justify-between p-5 sm:p-6 pointer-events-none">
         <button
           type="button"
-          aria-label="Kembali"
+          aria-label="Back"
           className="p-1.5 -ml-1 text-white hover:opacity-80 active:scale-90 transition-all cursor-pointer pointer-events-auto"
           onClick={props.onBack}
         >
           <X size={22} strokeWidth={2.5} />
         </button>
-        <span className="text-xs font-semibold tracking-wide text-gray-300 pointer-events-auto">S&K Antrean</span>
+        <span className="text-xs font-semibold tracking-wide text-gray-300 pointer-events-auto">Queue Rules</span>
       </header>
 
       {/* 2. Title & Greeting with 100% Pure Morphing to Center (Starts ONLY after card is swallowed) */}
@@ -277,7 +301,7 @@ export function QueueDockScreen(props: {
         isActivating={isMorphingActive}
         dragProgress={dragProgress}
         isLongPressing={isLongPressing}
-        label="Tarik kartu ke bawah untuk reveal"
+        label="Pull card down to reveal"
       />
 
       {/* 5. Activation & Success Overlay */}
@@ -288,6 +312,7 @@ export function QueueDockScreen(props: {
         activeCard={currentCard}
         cardRef={heroCardRef}
         onClose={handleCloseOverlay}
+        onRevealApex={() => confettiRef.current?.fire()}
         onActionClick={() => {
           if (currentCard) {
             props.onSelectCard?.(currentCard);

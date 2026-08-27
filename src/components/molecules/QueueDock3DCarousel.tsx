@@ -55,21 +55,123 @@ export function QueueDock3DCarousel(props: {
   const longPressTimerRef = React.useRef<NodeJS.Timeout | null>(null);
   const containerRef = React.useRef<HTMLDivElement>(null);
 
+  const [spinOffset, setSpinOffset] = React.useState(0);
+  const spinOffsetRef = React.useRef(0);
+
+  const spinStateRef = React.useRef<{
+    isSpinning: boolean;
+    isDecelerating: boolean;
+    velocity: number;
+    lastTime: number;
+    rafId: number | null;
+  }>({
+    isSpinning: false,
+    isDecelerating: false,
+    velocity: 0,
+    lastTime: 0,
+    rafId: null,
+  });
+
+  // Rapid Roulette Card Spin-Off on Long Press + Smooth Deceleration on Release
   React.useEffect(() => {
-    if (typeof window !== 'undefined' && 'vibrate' in navigator) {
-      try {
-        navigator.vibrate(10);
-      } catch {
-        // Ignore if vibration is not permitted
-      }
+    if (isLongPressing) {
+      // 1. Immediately spin cards rapidly in real-time during hold
+      spinStateRef.current.isSpinning = true;
+      spinStateRef.current.isDecelerating = false;
+      spinStateRef.current.velocity = 18 * DOCK_SPACING; // ~18 cards per second
+      spinStateRef.current.lastTime = performance.now();
+
+      let lastCardStep = 0;
+
+      const spinLoop = (now: number) => {
+        const dt = Math.min(0.1, (now - spinStateRef.current.lastTime) / 1000);
+        spinStateRef.current.lastTime = now;
+
+        spinOffsetRef.current += spinStateRef.current.velocity * dt;
+        setSpinOffset(spinOffsetRef.current);
+
+        const currentCardStep = Math.floor(spinOffsetRef.current / DOCK_SPACING);
+        if (currentCardStep !== lastCardStep) {
+          lastCardStep = currentCardStep;
+          if (typeof window !== 'undefined' && 'vibrate' in navigator) {
+            try {
+              navigator.vibrate(6);
+            } catch {}
+          }
+        }
+
+        if (spinStateRef.current.isSpinning) {
+          spinStateRef.current.rafId = requestAnimationFrame(spinLoop);
+        }
+      };
+
+      spinStateRef.current.rafId = requestAnimationFrame(spinLoop);
+
+      return () => {
+        if (spinStateRef.current.rafId) {
+          cancelAnimationFrame(spinStateRef.current.rafId);
+        }
+      };
+    } else if (spinStateRef.current.isSpinning) {
+      // 2. Release -> Smooth exponential deceleration to land on selected card
+      spinStateRef.current.isSpinning = false;
+      spinStateRef.current.isDecelerating = true;
+      spinStateRef.current.lastTime = performance.now();
+
+      let lastCardStep = Math.floor(spinOffsetRef.current / DOCK_SPACING);
+
+      const decelerateLoop = (now: number) => {
+        const dt = Math.min(0.1, (now - spinStateRef.current.lastTime) / 1000);
+        spinStateRef.current.lastTime = now;
+
+        // Exponential deceleration friction
+        spinStateRef.current.velocity *= Math.pow(0.04, dt);
+        spinOffsetRef.current += spinStateRef.current.velocity * dt;
+        setSpinOffset(spinOffsetRef.current);
+
+        const currentCardStep = Math.floor(spinOffsetRef.current / DOCK_SPACING);
+        if (currentCardStep !== lastCardStep) {
+          lastCardStep = currentCardStep;
+          if (typeof window !== 'undefined' && 'vibrate' in navigator) {
+            try {
+              navigator.vibrate(8);
+            } catch {}
+          }
+        }
+
+        if (spinStateRef.current.velocity > 40) {
+          spinStateRef.current.rafId = requestAnimationFrame(decelerateLoop);
+        } else {
+          // Final snap to selected card
+          spinStateRef.current.isDecelerating = false;
+          const shiftCards = Math.round(spinOffsetRef.current / DOCK_SPACING);
+          const rawTarget = currentIndex + shiftCards;
+          const targetIndex = ((rawTarget % cards.length) + cards.length) % cards.length;
+          onIndexChange(targetIndex);
+          spinOffsetRef.current = 0;
+          setSpinOffset(0);
+          if (typeof window !== 'undefined' && 'vibrate' in navigator) {
+            try {
+              navigator.vibrate([20, 30]);
+            } catch {}
+          }
+        }
+      };
+
+      spinStateRef.current.rafId = requestAnimationFrame(decelerateLoop);
+
+      return () => {
+        if (spinStateRef.current.rafId) {
+          cancelAnimationFrame(spinStateRef.current.rafId);
+        }
+      };
     }
-  }, [currentIndex]);
+
+    return undefined;
+  }, [isLongPressing, currentIndex, cards.length, onIndexChange]);
 
   const handlePointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
     if (stateRef.current.isActivating) return;
-
-    const targetEl = e.target as HTMLElement;
-    console.log('[3D CAROUSEL] PointerDown at', e.clientX, e.clientY, '| Target:', targetEl?.tagName, targetEl?.className);
 
     stateRef.current.isDragging = true;
     stateRef.current.dragAxis = null;
@@ -90,7 +192,7 @@ export function QueueDock3DCarousel(props: {
           navigator.vibrate([25, 30, 45]);
         } catch {}
       }
-    }, 320);
+    }, 220);
   };
 
   const handlePointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
@@ -99,7 +201,7 @@ export function QueueDock3DCarousel(props: {
     const deltaX = e.clientX - stateRef.current.startX;
     const deltaY = e.clientY - stateRef.current.startY;
 
-    if (Math.abs(deltaX) > 4 || Math.abs(deltaY) > 4) {
+    if (!isLongPressing && (Math.abs(deltaX) > 12 || Math.abs(deltaY) > 12)) {
       if (longPressTimerRef.current) {
         clearTimeout(longPressTimerRef.current);
         longPressTimerRef.current = null;
@@ -151,29 +253,33 @@ export function QueueDock3DCarousel(props: {
 
     const { dragAxis: activeAxis, dragOffset: activeOffset, currentIndex: curIdx, totalCards: total } = stateRef.current;
 
-    if (activeAxis === 'x') {
-      const floatShift = -activeOffset.x / DOCK_SPACING;
-      let roundedShift = Math.round(floatShift);
+    const wasRouletteActive = spinStateRef.current.isSpinning || spinStateRef.current.isDecelerating;
 
-      // Flick assistance: if user flicked (>= 30px) but didn't cross 0.5 card threshold
-      if (roundedShift === 0 && Math.abs(activeOffset.x) >= 30) {
-        roundedShift = activeOffset.x < 0 ? 1 : -1;
-      }
+    if (!wasRouletteActive) {
+      if (activeAxis === 'x') {
+        const floatShift = -activeOffset.x / DOCK_SPACING;
+        let roundedShift = Math.round(floatShift);
 
-      const targetIndex = Math.max(0, Math.min(total - 1, curIdx + roundedShift));
-      onIndexChange(targetIndex);
-      onDragProgress?.(0);
-    } else if (activeAxis === 'y') {
-      if (activeOffset.y > 45) {
-        onDragProgress?.(1);
-        setDragOffset({ x: 0, y: 0 });
-        stateRef.current.dragOffset = { x: 0, y: 0 };
-        stateRef.current.dragAxis = null;
-        setDragAxis(null);
-        onActivate();
-        return;
+        // Flick assistance: if user flicked (>= 30px) but didn't cross 0.5 card threshold
+        if (roundedShift === 0 && Math.abs(activeOffset.x) >= 30) {
+          roundedShift = activeOffset.x < 0 ? 1 : -1;
+        }
+
+        const targetIndex = Math.max(0, Math.min(total - 1, curIdx + roundedShift));
+        onIndexChange(targetIndex);
+        onDragProgress?.(0);
+      } else if (activeAxis === 'y') {
+        if (activeOffset.y > 45) {
+          onDragProgress?.(1);
+          setDragOffset({ x: 0, y: 0 });
+          stateRef.current.dragOffset = { x: 0, y: 0 };
+          stateRef.current.dragAxis = null;
+          setDragAxis(null);
+          onActivate();
+          return;
+        }
+        onDragProgress?.(0);
       }
-      onDragProgress?.(0);
     }
 
     setDragOffset({ x: 0, y: 0 });
@@ -235,40 +341,43 @@ export function QueueDock3DCarousel(props: {
       setIsDragging(false);
 
       const { dragAxis: activeAxis, dragOffset: activeOffset, currentIndex: curIdx, totalCards: total } = stateRef.current;
+      const wasWindowRouletteActive = spinStateRef.current.isSpinning || spinStateRef.current.isDecelerating;
 
-      if (activeAxis === 'x') {
-        const floatShift = -activeOffset.x / DOCK_SPACING;
-        let roundedShift = Math.round(floatShift);
+      if (!wasWindowRouletteActive) {
+        if (activeAxis === 'x') {
+          const floatShift = -activeOffset.x / DOCK_SPACING;
+          let roundedShift = Math.round(floatShift);
 
-        // Flick assistance or edge tap
-        if (roundedShift === 0 && Math.abs(activeOffset.x) >= 30) {
-          roundedShift = activeOffset.x < 0 ? 1 : -1;
-        } else if (Math.abs(activeOffset.x) < 8 && Math.abs(activeOffset.y) < 8 && containerRef.current) {
-          // Tap on left/right side of the upper deck surface
-          const rect = containerRef.current.getBoundingClientRect();
-          const clickX = stateRef.current.startX - rect.left;
-          if (clickX < rect.width * 0.3) {
-            roundedShift = -1;
-          } else if (clickX > rect.width * 0.7) {
-            roundedShift = 1;
+          // Flick assistance or edge tap
+          if (roundedShift === 0 && Math.abs(activeOffset.x) >= 30) {
+            roundedShift = activeOffset.x < 0 ? 1 : -1;
+          } else if (Math.abs(activeOffset.x) < 8 && Math.abs(activeOffset.y) < 8 && containerRef.current) {
+            // Tap on left/right side of the upper deck surface
+            const rect = containerRef.current.getBoundingClientRect();
+            const clickX = stateRef.current.startX - rect.left;
+            if (clickX < rect.width * 0.3) {
+              roundedShift = -1;
+            } else if (clickX > rect.width * 0.7) {
+              roundedShift = 1;
+            }
           }
-        }
 
-        const targetIndex = Math.max(0, Math.min(total - 1, curIdx + roundedShift));
-        console.log('[3D CAROUSEL] Snapped precisely to targetIndex:', targetIndex);
-        onIndexChange(targetIndex);
-        onDragProgress?.(0);
-      } else if (activeAxis === 'y') {
-        if (activeOffset.y > 45) {
-          onDragProgress?.(1);
-          setDragOffset({ x: 0, y: 0 });
-          stateRef.current.dragOffset = { x: 0, y: 0 };
-          stateRef.current.dragAxis = null;
-          setDragAxis(null);
-          onActivate();
-          return;
+          const targetIndex = Math.max(0, Math.min(total - 1, curIdx + roundedShift));
+          console.log('[3D CAROUSEL] Snapped precisely to targetIndex:', targetIndex);
+          onIndexChange(targetIndex);
+          onDragProgress?.(0);
+        } else if (activeAxis === 'y') {
+          if (activeOffset.y > 45) {
+            onDragProgress?.(1);
+            setDragOffset({ x: 0, y: 0 });
+            stateRef.current.dragOffset = { x: 0, y: 0 };
+            stateRef.current.dragAxis = null;
+            setDragAxis(null);
+            onActivate();
+            return;
+          }
+          onDragProgress?.(0);
         }
-        onDragProgress?.(0);
       }
 
       setDragOffset({ x: 0, y: 0 });
@@ -355,11 +464,17 @@ export function QueueDock3DCarousel(props: {
 
       {/* 3. Render 3D Cards (Virtualized window of +/- 6 cards around active position for ultra-smooth 60fps with 1400+ cards) */}
       {cards.map((card, index) => {
-        const offsetCards = dragAxis === 'x' && isDragging ? -dragOffset.x / DOCK_SPACING : 0;
+        const totalXOffset = (dragAxis === 'x' && isDragging ? dragOffset.x : 0) - spinOffset;
+        const offsetCards = -totalXOffset / DOCK_SPACING;
         const effectiveCenter = currentIndex + offsetCards;
         if (Math.abs(index - effectiveCenter) > 6.5) {
           return null;
         }
+
+        const effectiveDragOffset = {
+          x: totalXOffset,
+          y: dragOffset.y,
+        };
 
         return (
           <QueueDockCardItem
@@ -367,9 +482,9 @@ export function QueueDock3DCarousel(props: {
             card={card}
             index={index}
             currentIndex={currentIndex}
-            dragOffset={dragOffset}
-            dragAxis={dragAxis}
-            isDragging={isDragging}
+            dragOffset={effectiveDragOffset}
+            dragAxis={spinOffset !== 0 ? 'x' : dragAxis}
+            isDragging={isDragging || spinOffset !== 0}
             isActivating={isActivating}
             ejectionStage={ejectionStage}
             isLongPressing={isLongPressing}
