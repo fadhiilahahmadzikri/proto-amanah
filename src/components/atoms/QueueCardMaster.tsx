@@ -95,6 +95,7 @@ export function QueueCardMaster(props: {
   className?: string;
   onPointerDown?: (e: React.PointerEvent<HTMLDivElement>) => void;
   onRevealApex?: () => void;
+  onCardClick?: (card: QueueDockCardData) => void;
   children?: React.ReactNode;
 }) {
   const isRevealed = props.isRevealed ?? false;
@@ -409,21 +410,30 @@ export function QueueCardMaster(props: {
               />
             </div>
 
-            {/* Section 1: Patient Name & Complaint (Highest Foreground Content) */}
+            {/* Section 1: Patient Name & Complaint (Highest Foreground Content with Clickable Area) */}
             <div
               style={{ transform: 'translateZ(24px)' }}
-              className="absolute bottom-14 sm:bottom-16 inset-x-5 z-20 flex flex-col select-none pointer-events-none"
+              onClick={(e) => {
+                if (props.onCardClick) {
+                  e.stopPropagation();
+                  props.onCardClick(props.card);
+                }
+              }}
+              className={cn(
+                'absolute bottom-14 sm:bottom-16 inset-x-5 z-20 flex flex-col select-none',
+                props.onCardClick ? 'pointer-events-auto cursor-pointer active:scale-98 transition-transform' : 'pointer-events-none',
+              )}
             >
               {/* Patient Name with Clickable Arrow ↗ */}
               <h4
                 className={cn(
-                  'flex items-center text-[17px] sm:text-[18px] font-extrabold truncate leading-tight tracking-tight drop-shadow-xs',
+                  'flex items-center text-[17px] sm:text-[18px] font-extrabold truncate leading-tight tracking-tight drop-shadow-xs group',
                   isDarkCard ? 'text-white' : 'text-slate-900',
                 )}
               >
                 <ArrowUpRight
                   className={cn(
-                    'h-5 w-5 mr-0.5 stroke-[3] shrink-0 inline-block',
+                    'h-5 w-5 mr-0.5 stroke-[3] shrink-0 inline-block transition-transform duration-150 group-hover:translate-x-0.5 group-hover:-translate-y-0.5',
                     isDarkCard ? 'text-cyan-400' : 'text-[#0a44ff]',
                   )}
                 />

@@ -122,8 +122,9 @@ export function QueueDockScreen(props: {
     }
   };
 
-  const [displayedHeadline, setDisplayedHeadline] = React.useState('Pilih Antrean Pasien');
-  const prevHeadlineRef = React.useRef('Pilih Antrean Pasien');
+  const [selectedActiveCard, setSelectedActiveCard] = React.useState<QueueDockCardData | null>(null);
+  const [displayedHeadline, setDisplayedHeadline] = React.useState('Pilih antrean pasien');
+  const prevHeadlineRef = React.useRef('Pilih antrean pasien');
   const isDark = props.theme !== 'light';
 
   const isPlungingOrActive = activationStage === 'plunging' || activationStage === 'activating';
@@ -132,7 +133,7 @@ export function QueueDockScreen(props: {
   const currentCard = cards[currentIndex];
   const isNearSlot = dragProgress >= 0.75 && !isPlungingOrActive;
 
-  let headlineText = 'Pilih Antrean Pasien';
+  let headlineText = 'Pilih antrean pasien';
   if (isMorphingActive) {
     headlineText = 'Memproses antrean';
   } else if (isNearSlot) {
@@ -231,6 +232,11 @@ export function QueueDockScreen(props: {
   const handleActivate = () => {
     if (isPlungingOrActive) return;
 
+    const chosen = cards[currentIndex] ?? cards[0];
+    if (chosen) {
+      setSelectedActiveCard(chosen);
+    }
+
     // 1. Trigger ATM Card Plunge
     setActivationStage('plunging');
     setEjectionStage('atm_plunge');
@@ -245,14 +251,17 @@ export function QueueDockScreen(props: {
     window.setTimeout(() => {
       setShowSuccess(true);
       setActivationStage('idle');
-      if (currentCard) {
-        props.onSelectCard?.(currentCard);
+      if (chosen) {
+        props.onSelectCard?.(chosen);
       }
     }, 1800);
   };
 
   const handleCollectCard = (card: QueueDockCardData) => {
-    setCollectedCards((prev) => [card, ...prev]);
+    setCollectedCards((prev) => {
+      const filtered = prev.filter((c) => c.id !== card.id);
+      return [card, ...filtered];
+    });
     setShowSuccess(false);
     setIsGenieSettled(false);
     resetToFreshDock();
@@ -412,7 +421,7 @@ export function QueueDockScreen(props: {
         isActivating={isMorphingActive}
         showSuccess={showSuccess}
         isGenieSettled={isGenieSettled}
-        activeCard={currentCard}
+        activeCard={selectedActiveCard ?? currentCard}
         cardRef={heroCardRef}
         theme={props.theme}
         onClose={handleCloseOverlay}
@@ -421,8 +430,9 @@ export function QueueDockScreen(props: {
         }}
         onRevealApex={() => confettiRef.current?.fire()}
         onActionClick={() => {
-          if (currentCard) {
-            handleCollectCard(currentCard);
+          const cardToCollect = selectedActiveCard ?? currentCard;
+          if (cardToCollect) {
+            handleCollectCard(cardToCollect);
           }
         }}
       />
@@ -466,14 +476,14 @@ export function QueueDockScreen(props: {
                 <div className={cn('h-1 w-9 rounded-full transition-colors duration-150', isDark ? 'bg-white/20' : 'bg-slate-300')} />
               </div>
 
-              {/* Master Header with thin hairline border */}
+              {/* Master Header with thin hairline border - Sentence case: Panduan alur sistem antrean */}
               <div className={cn('relative z-20 flex items-center justify-between px-6 pt-1 pb-2.5 shrink-0 border-b', isDark ? 'border-white/5' : 'border-slate-100')}>
                 <h3 className={cn('text-sm font-semibold tracking-tight', isDark ? 'text-white' : 'text-slate-900')}>
-                  Panduan Alur Sistem Antrean
+                  Panduan alur sistem antrean
                 </h3>
                 <button
                   type="button"
-                  aria-label="Tutup Panduan"
+                  aria-label="Tutup panduan"
                   onClick={triggerCloseInfoDrawer}
                   className={cn(
                     'p-1.5 -mr-2 rounded-full transition-colors cursor-pointer flex items-center justify-center shrink-0',

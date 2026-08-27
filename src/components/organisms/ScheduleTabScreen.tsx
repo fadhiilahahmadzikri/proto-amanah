@@ -33,10 +33,9 @@ import {
   X,
 } from 'lucide-react';
 import React from 'react';
-import { AuroraBackground } from '@/components/atoms/AuroraBackground';
-import { QueueBadge } from '@/components/atoms/QueueBadge';
 import { DateCarouselStrip } from '@/components/molecules/DateCarouselStrip';
 import { M3Banner } from '@/components/molecules/M3Banner';
+import { PatientDetailDrawer } from '@/components/molecules/PatientDetailDrawer';
 import { ScreenHeader } from '@/components/molecules/ScreenHeader';
 import { useModalStore } from '@/features/portal/hooks/use-modal-store';
 import { useScheduleStore } from '@/features/schedule/hooks/use-schedule-store';
@@ -458,26 +457,9 @@ export function ScheduleTabScreen(props: {
   // Single Patient Detail Modal State (Keluhan & Rekam Pasien)
   const [isPatientDetailModalOpen, setIsPatientDetailModalOpen] = React.useState(false);
   const [detailPatient, setDetailPatient] = React.useState<BookedPatient | null>(null);
-  const patientDetailModalRef = React.useRef<HTMLDivElement>(null);
-  const isClosingPatientDetailRef = React.useRef(false);
 
   const triggerClosePatientDetailModal = React.useCallback(() => {
-    if (isClosingPatientDetailRef.current || !patientDetailModalRef.current) {
-      setIsPatientDetailModalOpen(false);
-      return;
-    }
-    isClosingPatientDetailRef.current = true;
-
-    gsap.to(patientDetailModalRef.current, {
-      y: '100%',
-      opacity: 0.9,
-      duration: 0.28,
-      ease: 'power3.in',
-      onComplete: () => {
-        setIsPatientDetailModalOpen(false);
-        isClosingPatientDetailRef.current = false;
-      },
-    });
+    setIsPatientDetailModalOpen(false);
   }, []);
 
   // 3-way Form Status Switcher State (Menunggu | Buka | Cuti)
@@ -634,16 +616,6 @@ export function ScheduleTabScreen(props: {
       );
     }
   }, [isDetailDrawerOpen]);
-
-  React.useEffect(() => {
-    if (isPatientDetailModalOpen && patientDetailModalRef.current) {
-      gsap.fromTo(
-        patientDetailModalRef.current,
-        { y: '100%', opacity: 0.95 },
-        { y: '0%', opacity: 1, duration: 0.35, ease: 'power3.out' },
-      );
-    }
-  }, [isPatientDetailModalOpen]);
 
   React.useEffect(() => {
     if (isDocScheduleDrawerOpen && docScheduleDrawerRef.current) {
@@ -1061,7 +1033,7 @@ export function ScheduleTabScreen(props: {
 
   return (
     <div
-      className={cn('relative w-full h-full overflow-hidden', props.className)}
+      className={cn('relative flex flex-col w-full h-full overflow-hidden', props.className)}
     >
       {/* Dynamic Smooth Transitions */}
       <style>{`
@@ -1074,9 +1046,9 @@ export function ScheduleTabScreen(props: {
         }
       `}</style>
 
-      {/* 1. Master Overlay Glassmorphic Screen Header */}
+      {/* 1. Master Overlay Glassmorphic Screen Header - Sentence case */}
       <ScreenHeader
-        title={viewMode === 'session-patients' ? 'Daftar Pasien Booking' : 'Jadwal Praktik'}
+        title={viewMode === 'session-patients' ? 'Daftar pasien booking' : 'Jadwal praktik'}
         subtitle={viewMode === 'sessions' ? format(selectedDate, 'EEEE, d MMMM yyyy', { locale: idLocale }) : undefined}
         onBack={
           viewMode === 'session-patients'
@@ -1135,7 +1107,7 @@ export function ScheduleTabScreen(props: {
       <div
         ref={contentViewportRef}
         key={`view-${viewMode}`}
-        className="flex-1 min-h-0 w-full overflow-y-auto overflow-x-hidden no-scrollbar px-5 pt-2.5 pb-36 sm:pb-40 flex flex-col gap-3.5 will-change-transform"
+        className="flex-1 min-h-0 w-full overflow-y-auto overflow-x-hidden no-scrollbar px-5 pt-2.5 pb-36 sm:pb-40 flex flex-col gap-3.5 will-change-transform touch-pan-y"
       >
         {viewMode === 'overview' ? (
           /* VIEW 1: OVERVIEW & SHOWCASE PASIEN BOOKING */
@@ -1966,7 +1938,7 @@ export function ScheduleTabScreen(props: {
             {/* Master Header */}
             <div className="relative z-20 flex items-center justify-between px-6 pt-0.5 pb-2.5 shrink-0 border-b border-inherit">
               <h4 className={cn('text-base font-bold tracking-tight', isDark ? 'text-white' : 'text-slate-900')}>
-                {editingSchedule ? 'Edit Jadwal' : 'Tambah Jadwal'}
+                {editingSchedule ? 'Edit jadwal' : 'Tambah jadwal'}
               </h4>
               <button
                 type="button"
@@ -2457,7 +2429,7 @@ export function ScheduleTabScreen(props: {
             {/* Master Header */}
             <div className="relative z-20 flex items-center justify-between px-6 pt-0.5 pb-2.5 shrink-0 border-b border-inherit">
               <h3 className={cn('text-base font-bold tracking-tight', isDark ? 'text-white' : 'text-slate-900')}>
-                Detail Sesi Praktik
+                Detail sesi praktik
               </h3>
               <button
                 type="button"
@@ -2635,189 +2607,13 @@ export function ScheduleTabScreen(props: {
       )}
 
       {/* 7c. Single Patient Detail Modal Sheet (Keluhan & Rekam Pasien) */}
-      {isPatientDetailModalOpen && detailPatient && (
-        <>
-          <div
-            onClick={triggerClosePatientDetailModal}
-            className="absolute inset-0 z-60 bg-black/60 backdrop-blur-xs transition-opacity duration-300 animate-in fade-in"
-          />
-
-          <div
-            ref={patientDetailModalRef}
-            className={cn(
-              'absolute inset-x-0 bottom-0 z-60 flex max-h-[92%] min-h-[540px] w-full flex-col overflow-hidden rounded-t-[32px] sm:rounded-t-[36px] shadow-[0_-12px_45px_rgba(0,0,0,0.25)] border-t will-change-transform select-text touch-pan-y backdrop-blur-2xl',
-              isDark
-                ? 'bg-[#0a0e1a] border-white/10 text-white shadow-black/80'
-                : 'bg-white border-neutral-100 text-slate-900 shadow-[0_-12px_45px_rgba(0,0,0,0.25)]',
-            )}
-          >
-            {/* Dynamic Aurora Ambient Glow (Soft theme-responsive ambience) */}
-            <AuroraBackground
-              theme={props.theme}
-              intensity="soft"
-              className="h-[320px]"
-            />
-
-            {/* Interactive Drag Handle */}
-            <div
-              role="button"
-              tabIndex={0}
-              aria-label="Tarik ke bawah untuk menutup"
-              onClick={(e) => {
-                e.stopPropagation();
-                triggerClosePatientDetailModal();
-              }}
-              className="flex w-full cursor-grab active:cursor-grabbing flex-col items-center justify-center pt-3.5 pb-1 shrink-0 touch-none select-none hover:bg-neutral-50/50 dark:hover:bg-white/5 transition-colors"
-            >
-              <div className={cn('h-1.25 w-11 rounded-full transition-colors duration-150', isDark ? 'bg-white/25 hover:bg-white/40 active:bg-white/50' : 'bg-neutral-300 hover:bg-neutral-400 active:bg-neutral-500')} />
-            </div>
-
-            {/* Master Header */}
-            <div className="relative z-20 flex items-center justify-between px-6 pt-0.5 pb-2.5 shrink-0 border-b border-inherit">
-              <h3 className={cn('text-base font-bold tracking-tight', isDark ? 'text-white' : 'text-slate-900')}>
-                Detail Rekam Pasien
-              </h3>
-              <button
-                type="button"
-                aria-label="Tutup Detail Pasien"
-                onClick={triggerClosePatientDetailModal}
-                className={cn(
-                  'p-1.5 -mr-2 rounded-full transition-colors cursor-pointer flex items-center justify-center shrink-0',
-                  isDark ? 'bg-white/10 text-neutral-300 hover:text-white hover:bg-white/20' : 'bg-neutral-100/80 text-neutral-600 hover:text-neutral-900 hover:bg-slate-200',
-                )}
-              >
-                <X className="h-4 w-4" />
-              </button>
-            </div>
-
-            {/* Detail Patient Body */}
-            <div className="flex w-full flex-1 flex-col px-6 pt-3 pb-4 overflow-y-auto no-scrollbar select-text gap-4">
-              {/* Profile Card Header with Trailing Queue Badge on Avatar */}
-              <div className="flex flex-col items-center text-center gap-2 pt-1 pb-1">
-                {/* Avatar with Trailing Rosette Queue Badge on Bottom-Right Corner */}
-                <div className="relative inline-flex">
-                  <img
-                    src={detailPatient.avatarUrl || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=300&auto=format&fit=crop'}
-                    alt={detailPatient.patientName}
-                    className="h-20 w-20 rounded-full object-cover shadow-lg ring-3 ring-blue-500/20"
-                  />
-                  {/* Floating Rosette Ribbon Medal Queue Badge */}
-                  <QueueBadge
-                    queueNumber={detailPatient.queueNumber}
-                    size={38}
-                    className="absolute -bottom-2 -right-2.5 z-10"
-                  />
-                </div>
-
-                {/* Name & Subtitle with Status Pill */}
-                <div className="flex flex-col items-center gap-1">
-                  <h4 className={cn('text-lg font-black tracking-tight leading-tight', isDark ? 'text-white' : 'text-slate-950')}>
-                    {detailPatient.patientName}
-                  </h4>
-
-                  {/* Subtitle with Status Pill aligned on the same row */}
-                  <div className={cn('flex items-center justify-center gap-2 text-xs font-medium whitespace-nowrap mt-0.5', isDark ? 'text-neutral-400' : 'text-slate-500')}>
-                    <span className="shrink-0">{detailPatient.patientRm}</span>
-                    <span className={cn('w-px h-3 shrink-0', isDark ? 'bg-white/20' : 'bg-slate-300')} />
-                    <span className="shrink-0">Usia {detailPatient.patientAge}</span>
-                    <span className={cn('w-px h-3 shrink-0', isDark ? 'bg-white/20' : 'bg-slate-300')} />
-                    <span
-                      className={cn(
-                        'px-2 py-0.5 rounded-full text-[10px] font-bold shrink-0',
-                        detailPatient.badgeVariant === 'success'
-                          ? isDark ? 'bg-emerald-500/20 text-emerald-400' : 'bg-emerald-50 text-emerald-700'
-                          : isDark ? 'bg-blue-500/20 text-blue-400' : 'bg-blue-50 text-blue-700',
-                      )}
-                    >
-                      {detailPatient.badge}
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Patient Specification Table */}
-              <div
-                className={cn(
-                  'divide-y text-xs',
-                  isDark ? 'divide-white/10 text-neutral-200' : 'divide-slate-100 text-slate-900',
-                )}
-              >
-                {/* Jam Booking */}
-                <div className="flex items-center justify-between py-3">
-                  <span className={cn('font-medium', isDark ? 'text-neutral-400' : 'text-slate-500')}>
-                    Waktu / Jam Booking
-                  </span>
-                  <span className={cn('font-bold', isDark ? 'text-white' : 'text-slate-950')}>
-                    {detailPatient.timeSlot}
-                  </span>
-                </div>
-
-                {/* Sesi Praktik */}
-                {detailSchedule && (
-                  <div className="flex items-center justify-between py-3">
-                    <span className={cn('font-medium', isDark ? 'text-neutral-400' : 'text-slate-500')}>
-                      Sesi Praktik
-                    </span>
-                    <span className={cn('font-bold', isDark ? 'text-white' : 'text-slate-950')}>
-                      {detailSchedule.title} ({detailSchedule.poli})
-                    </span>
-                  </div>
-                )}
-
-                {/* Ruang Praktik */}
-                {detailSchedule && (
-                  <div className="flex items-center justify-between py-3">
-                    <span className={cn('font-medium', isDark ? 'text-neutral-400' : 'text-slate-500')}>
-                      Ruang Praktik
-                    </span>
-                    <span className={cn('font-bold', isDark ? 'text-white' : 'text-slate-950')}>
-                      {detailSchedule.room}
-                    </span>
-                  </div>
-                )}
-
-                {/* Pendamping */}
-                {detailPatient.patientGuardian && (
-                  <div className="flex items-center justify-between py-3">
-                    <span className={cn('font-medium', isDark ? 'text-neutral-400' : 'text-slate-500')}>
-                      Nama Pendamping
-                    </span>
-                    <span className={cn('font-bold', isDark ? 'text-white' : 'text-slate-950')}>
-                      {detailPatient.patientGuardian}
-                    </span>
-                  </div>
-                )}
-
-                {/* Keluhan Medis (Full detailed complaint inside modal) */}
-                <div className="flex flex-col gap-1.5 py-3">
-                  <span className={cn('font-medium', isDark ? 'text-neutral-400' : 'text-slate-500')}>
-                    Keluhan & Catatan Medis Pasien
-                  </span>
-                  <p className={cn('font-semibold text-xs leading-relaxed p-3 rounded-xl border', isDark ? 'bg-white/5 border-white/10 text-neutral-200' : 'bg-slate-50 border-slate-200 text-slate-800')}>
-                    {detailPatient.patientComplaint || 'Tidak ada catatan keluhan khusus.'}
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {/* Action Button: Tutup */}
-            <div className="px-6 pb-28 sm:pb-32 pt-2 shrink-0">
-              <button
-                type="button"
-                onClick={triggerClosePatientDetailModal}
-                className={cn(
-                  'w-full py-3 rounded-2xl border text-xs font-bold transition-all cursor-pointer shadow-xs active:scale-98',
-                  isDark
-                    ? 'border-white/15 text-neutral-300 hover:bg-white/10 bg-white/5'
-                    : 'border-slate-200 text-slate-700 hover:bg-slate-50 shadow-2xs',
-                )}
-              >
-                Tutup Detail Pasien
-              </button>
-            </div>
-          </div>
-        </>
-      )}
+      <PatientDetailDrawer
+        isOpen={isPatientDetailModalOpen && !!detailPatient}
+        patient={detailPatient}
+        schedule={detailSchedule}
+        onClose={triggerClosePatientDetailModal}
+        theme={props.theme}
+      />
 
       {/* 8. Doc Schedule Super Big Monthly Calendar Drawer */}
       {isDocScheduleDrawerOpen && (

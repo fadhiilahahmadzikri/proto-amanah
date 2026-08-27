@@ -1,6 +1,7 @@
 import { gsap } from 'gsap';
 import { X } from 'lucide-react';
 import React from 'react';
+import { PatientDetailDrawer } from '@/components/molecules/PatientDetailDrawer';
 import { QueueCardMaster } from '@/components/atoms/QueueCardMaster';
 import { cn } from '@/lib/utils';
 import type { QueueDockCardData } from '@/types/queue-dock.types';
@@ -19,6 +20,7 @@ export function QueueActivationOverlay(props: {
   className?: string;
 }) {
   const { showSuccess, isGenieSettled, activeCard, cardRef, onClose, onRedraw, onActionClick, onRevealApex, theme = 'dark' } = props;
+  const [showDetail, setShowDetail] = React.useState(false);
   const isDark = theme === 'dark';
 
   if (!showSuccess) {
@@ -68,7 +70,7 @@ export function QueueActivationOverlay(props: {
         props.className,
       )}
     >
-      {/* Top Header */}
+      {/* Top Header - Sentence case: Antrean terpilih */}
       <header
         className={cn(
           'flex w-full items-center justify-between transition-all duration-500 shrink-0',
@@ -86,8 +88,8 @@ export function QueueActivationOverlay(props: {
         >
           <X size={20} strokeWidth={2.5} />
         </button>
-        <span className={cn('text-sm font-semibold tracking-wide', isDark ? 'text-slate-300' : 'text-slate-600')}>
-          Antrean Terpilih
+        <span className={cn('text-sm font-semibold tracking-tight', isDark ? 'text-slate-300' : 'text-slate-600')}>
+          Antrean terpilih
         </span>
       </header>
 
@@ -108,6 +110,7 @@ export function QueueActivationOverlay(props: {
               badgeText="ANTREAN AKTIF"
               theme={theme}
               onRevealApex={onRevealApex}
+              onCardClick={() => setShowDetail(true)}
             />
           )}
         </div>
@@ -148,6 +151,14 @@ export function QueueActivationOverlay(props: {
           </button>
         </div>
       </div>
+
+      {/* Patient Detail Master Drawer */}
+      <PatientDetailDrawer
+        isOpen={showDetail}
+        patient={activeCard ?? null}
+        onClose={() => setShowDetail(false)}
+        theme={theme}
+      />
     </div>
   );
 }

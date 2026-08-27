@@ -231,7 +231,7 @@ export function DoctorDashboardScreen(props: {
   return (
     <div
       className={cn(
-        'relative flex h-full w-full flex-col overflow-hidden select-text transition-colors duration-500 overscroll-none touch-pan-x',
+        'relative flex h-full w-full flex-col overflow-hidden select-text transition-colors duration-500 overscroll-none touch-auto',
         isDark
           ? 'bg-[#0a0e1a] text-white'
           : activeTab === 'home'
@@ -255,7 +255,7 @@ export function DoctorDashboardScreen(props: {
           'w-full h-full will-change-transform overflow-hidden',
           activeTab === 'qr' || activeTab === 'schedule' || activeTab === 'notification' || activeTab === 'account'
             ? 'p-0 select-none'
-            : 'px-5 pt-2 flex flex-col justify-start overflow-y-auto no-scrollbar pb-24 overscroll-none touch-pan-x select-none',
+            : 'px-5 pt-2 flex flex-col justify-start overflow-y-auto no-scrollbar pb-24 overscroll-none touch-auto select-none',
         )}
       >
         {activeTab === 'home' && (
