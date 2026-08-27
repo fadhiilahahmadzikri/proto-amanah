@@ -1,3 +1,4 @@
+import { gsap } from 'gsap';
 import { X } from 'lucide-react';
 import { QueueCardMaster } from '@/components/atoms/QueueCardMaster';
 import { cn } from '@/lib/utils';
@@ -20,10 +21,44 @@ export function QueueActivationOverlay(props: {
     return null;
   }
 
+  const handleCollectClick = () => {
+    const cardEl = (cardRef && typeof cardRef !== 'function' ? cardRef.current : null) as HTMLElement | null;
+    if (!cardEl) {
+      onActionClick?.();
+      return;
+    }
+
+    // Ultra-graceful & elegant 3D Card Retreat choreography (slow & cinematic)
+    const tl = gsap.timeline({
+      onComplete: () => {
+        onActionClick?.();
+      },
+    });
+
+    // 1. Initial gentle floating lift with subtle scale
+    tl.to(cardEl, {
+      y: -22,
+      scale: 1.04,
+      rotateX: -4,
+      duration: 0.35,
+      ease: 'power2.out',
+    })
+    // 2. Slow, graceful 3D Y-rotation and smooth descent into the binder
+    .to(cardEl, {
+      rotateY: 360,
+      rotateX: 0,
+      scale: 0.42,
+      y: 190,
+      opacity: 0,
+      duration: 1.05,
+      ease: 'power2.inOut',
+    });
+  };
+
   return (
     <div
       className={cn(
-        'absolute inset-0 z-40 flex flex-col bg-black/85 px-6 pt-6 backdrop-blur-md transition-opacity duration-500 select-none',
+        'absolute inset-0 z-40 flex flex-col bg-[#0f0f0f]/95 px-6 pt-6 backdrop-blur-md transition-opacity duration-500 select-none',
         showSuccess ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none',
         props.className,
       )}
@@ -51,7 +86,7 @@ export function QueueActivationOverlay(props: {
         <div
           ref={cardRef}
           className={cn(
-            'w-full max-w-[320px] flex justify-center shrink-0',
+            'w-full max-w-[320px] flex justify-center shrink-0 will-change-transform',
             isGenieSettled ? 'opacity-100' : 'opacity-0',
           )}
         >
@@ -98,7 +133,7 @@ export function QueueActivationOverlay(props: {
         >
           <button
             type="button"
-            onClick={onActionClick ?? onClose}
+            onClick={handleCollectClick}
             className="w-full rounded-full bg-gradient-to-r from-amber-500 to-yellow-400 hover:from-amber-400 hover:to-yellow-300 py-3.5 text-base font-bold text-black shadow-[0_0_25px_rgba(251,191,36,0.45)] active:scale-98 transition-all cursor-pointer text-center"
           >
             Collect Card

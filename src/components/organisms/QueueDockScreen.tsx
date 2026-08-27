@@ -9,6 +9,8 @@ import {
   ConfettiCanvas,
   type ConfettiCanvasHandle,
 } from '@/components/atoms/ConfettiCanvas';
+import { GiftBox3DSvg } from '@/components/atoms/GiftBox3DSvg';
+import { PokemonCollectionGridScreen } from '@/components/organisms/PokemonCollectionGridScreen';
 import { QueueActivationOverlay } from '@/components/molecules/QueueActivationOverlay';
 import { QueueDock3DCarousel } from '@/components/molecules/QueueDock3DCarousel';
 import { cn } from '@/lib/utils';
@@ -29,6 +31,8 @@ export function QueueDockScreen(props: {
 }) {
   const pokemonData = usePokemonCards();
   const cards = props.cards ?? (pokemonData.cards.length > 0 ? pokemonData.cards : DEFAULT_DOCK_CARDS);
+  const [viewMode, setViewMode] = React.useState<'dock' | 'collection'>('dock');
+  const [collectedCards, setCollectedCards] = React.useState<QueueDockCardData[]>([]);
   const [currentIndex, setCurrentIndex] = React.useState(1);
   const [activationStage, setActivationStage] = React.useState<'idle' | 'plunging' | 'activating'>('idle');
   const [ejectionStage, setEjectionStage] = React.useState<EjectionStage>('idle');
@@ -55,7 +59,7 @@ export function QueueDockScreen(props: {
   if (isMorphingActive) {
     headlineText = 'Opening mystery Pokémon...';
   } else if (isNearSlot) {
-    headlineText = 'Release to reveal Pokémon!';
+    headlineText = 'Release to reveal';
   }
 
   // Native GSAP Text Blurry Morph Transformation
@@ -205,6 +209,37 @@ export function QueueDockScreen(props: {
     }, 1900);
   }, []);
 
+  const handleCollectCard = (card: QueueDockCardData) => {
+    setCollectedCards((prev) => {
+      if (prev.some((c) => c.id === card.id)) return prev;
+      return [card, ...prev];
+    });
+    setShowSuccess(false);
+    setIsGenieSettled(false);
+    setActivationStage('idle');
+    setViewMode('collection');
+    props.onSelectCard?.(card);
+  };
+
+  if (viewMode === 'collection') {
+    return (
+      <PokemonCollectionGridScreen
+        collectedCards={collectedCards}
+        onRedraw={() => {
+          setViewMode('dock');
+          setActivationStage('idle');
+          setShowSuccess(false);
+          setIsGenieSettled(false);
+        }}
+        onBack={() => {
+          props.onBack?.();
+        }}
+        theme={props.theme}
+        className={props.className}
+      />
+    );
+  }
+
   return (
     <div
       ref={screenContainerRef}
@@ -233,23 +268,21 @@ export function QueueDockScreen(props: {
       {/* 2. Title & Greeting with 100% Pure Morphing to Center (Starts ONLY after card is swallowed) */}
       <div
         className={cn(
-          'absolute top-12 sm:top-14 inset-x-0 z-20 flex flex-col items-center px-4 transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] pointer-events-none',
+          'absolute top-9 sm:top-11 inset-x-0 z-20 flex flex-col items-center px-4 transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] pointer-events-none',
           isMorphingActive
             ? 'translate-y-48 sm:translate-y-56 scale-105'
             : 'translate-y-0 scale-100',
           showSuccess ? 'opacity-0' : 'opacity-100',
         )}
       >
-        {/* Morphing Gift Icon (Solid Yellow on activating or near slot, no glow) */}
+        {/* 3D Gift Box Vector Component */}
         <div
           className={cn(
-            'mb-3 transition-all duration-300',
-            isMorphingActive || isNearSlot ? 'text-yellow-400 scale-105' : 'text-red-500 scale-100',
+            'mb-1 transition-all duration-300',
+            isMorphingActive || isNearSlot ? 'scale-110 drop-shadow-[0_0_20px_rgba(252,224,104,0.5)]' : 'scale-100 drop-shadow-[0_8px_16px_rgba(0,0,0,0.5)]',
           )}
         >
-          <svg width="34" height="34" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-            <path d="M20 12v9a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-9H3a1 1 0 0 1-.7-1.7l1.38-1.55A3.981 3.981 0 0 1 6.64 6H9.5a3.5 3.5 0 1 1 5 0h2.86c1.13 0 2.19.48 2.96 1.3l1.38 1.55A1 1 0 0 1 21 12h-1zm-9 8v-8H6v8h5zm2 0h5v-8h-5v8zm0-10h4.4l-1.07-1.2a2 2 0 0 0-1.49-.65H13v1.85zm-2 0V8.15H8.16c-.55 0-1.08.23-1.49.65L5.6 10H11zM9.5 4a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zm5 0a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3z" />
-          </svg>
+          <GiftBox3DSvg size={88} isOpen={isMorphingActive} />
         </div>
 
         {/* Morphing Headline Text with GSAP Blurry Morph (Solid yellow, max 2 words per line wrap) */}
@@ -315,9 +348,8 @@ export function QueueDockScreen(props: {
         onRevealApex={() => confettiRef.current?.fire()}
         onActionClick={() => {
           if (currentCard) {
-            props.onSelectCard?.(currentCard);
+            handleCollectCard(currentCard);
           }
-          props.onBack?.();
         }}
       />
 
