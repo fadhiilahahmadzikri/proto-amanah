@@ -1,7 +1,4 @@
-'use client';
-
 import { cn } from '@/lib/utils';
-import { ShaderGradient, ShaderGradientCanvas } from '@shadergradient/react';
 
 /**
  * AuroraShaderGradient - 3D Fluid "waterPlane" ShaderGradient master component.
@@ -40,48 +37,14 @@ export function AuroraShaderGradient(props: {
       }}
       aria-hidden="true"
     >
-      {/* 1. 3D WebGL Fluid Water Gradient Canvas */}
-      <div className="absolute inset-0 scale-105 filter blur-[12px] transition-all duration-700">
-        <ShaderGradientCanvas
-          style={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }}
-          pixelDensity={1}
-          fov={45}
-        >
-          <ShaderGradient
-            control="props"
-            animate="on"
-            brightness={1.08}
-            cAzimuthAngle={180}
-            cDistance={3.6}
-            cPolarAngle={90}
-            cameraZoom={1}
-            color1={activeColor1}
-            color2={activeColor2}
-            color3={activeColor3}
-            envPreset="city"
-            grain="off"
-            lightType="3d"
-            positionX={-1.4}
-            positionY={0}
-            positionZ={0}
-            range="disabled"
-            rangeEnd={40}
-            rangeStart={0}
-            reflection={0.04}
-            rotationX={0}
-            rotationY={10}
-            rotationZ={50}
-            shader="defaults"
-            type="waterPlane"
-            uAmplitude={1}
-            uDensity={1.1}
-            uFrequency={3.8}
-            uSpeed={props.speed ?? 0.3}
-            uStrength={3.5}
-            uTime={0}
-            wireframe={false}
-          />
-        </ShaderGradientCanvas>
+      {/* 1. Ambient Fluid Gradient Canvas */}
+      <div className="absolute inset-0 scale-105 filter blur-[32px] transition-all duration-700">
+        <div
+          className="absolute -top-1/4 -left-1/4 w-[150%] h-[150%] opacity-60"
+          style={{
+            background: `radial-gradient(ellipse at 30% 20%, ${activeColor1} 0%, transparent 50%), radial-gradient(ellipse at 70% 60%, ${activeColor2} 0%, transparent 50%), radial-gradient(ellipse at 50% 80%, ${activeColor3} 0%, transparent 50%)`,
+          }}
+        />
       </div>
 
       {/* 2. Monochrome Micro-Film Grain */}
