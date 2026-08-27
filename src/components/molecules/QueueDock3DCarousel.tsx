@@ -32,6 +32,7 @@ export function QueueDock3DCarousel(props: {
     showSuccess,
   } = props;
 
+  const isDark = props.theme !== 'light';
   const [isDragging, setIsDragging] = React.useState(false);
   const [dragOffset, setDragOffset] = React.useState({ x: 0, y: 0 });
   const [dragAxis, setDragAxis] = React.useState<'x' | 'y' | null>(null);
@@ -397,10 +398,16 @@ export function QueueDock3DCarousel(props: {
     };
   }, [isDragging, onIndexChange, onActivate, onDragProgress, onLongPressChange]);
 
+  const lastWheelTimeRef = React.useRef(0);
+
   const handleWheel = (e: React.WheelEvent<HTMLDivElement>) => {
     if (isActivating) return;
+    const now = performance.now();
+    if (now - lastWheelTimeRef.current < 220) return;
+
     const delta = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
-    if (Math.abs(delta) > 25) {
+    if (Math.abs(delta) > 18) {
+      lastWheelTimeRef.current = now;
       if (delta > 0) {
         onIndexChange((prev: number) => (prev + 1) % cards.length);
       } else {
@@ -430,13 +437,15 @@ export function QueueDock3DCarousel(props: {
       <div
         className={cn(
           'absolute h-[360px] w-[231px] rounded-[25px] border-[2.5px] pointer-events-none transition-all duration-500 z-0 box-border',
-          isActivating
+          isActivating || showSuccess
             ? 'opacity-0 scale-90 border-blue-500/90'
             : ejectionStage === 'full_eject' || ejectionStage === 'atm_peek'
               ? 'opacity-100 scale-100 border-sky-400 shadow-[0_0_50px_rgba(14,165,233,0.9),inset_0_0_25px_rgba(14,165,233,0.5)] animate-pulse'
               : isDragging && dragAxis === 'y'
                 ? 'opacity-40 scale-100 border-blue-500/90 shadow-[0_0_20px_rgba(10,68,255,0.3)]'
-                : 'opacity-100 scale-100 border-blue-500/80 dark:border-sky-400/80 shadow-[0_0_35px_rgba(10,68,255,0.3),inset_0_0_15px_rgba(10,68,255,0.2)]',
+                : isDark
+                  ? 'opacity-100 scale-100 border-sky-400/80 shadow-[0_0_35px_rgba(10,68,255,0.3),inset_0_0_15px_rgba(10,68,255,0.2)]'
+                  : 'opacity-100 scale-100 border-blue-500/80 shadow-[0_0_35px_rgba(10,68,255,0.2),inset_0_0_15px_rgba(10,68,255,0.1)]',
         )}
         style={{
           transform: 'translate3d(0, 0, -50px)',
@@ -447,7 +456,7 @@ export function QueueDock3DCarousel(props: {
       <div
         className={cn(
           'absolute top-[calc(50%+198px)] z-0 flex flex-col items-center pointer-events-none transition-opacity duration-300',
-          isActivating ? 'opacity-0' : 'opacity-100',
+          isActivating || showSuccess || ejectionStage !== 'idle' ? 'opacity-0' : 'opacity-100',
         )}
         style={{
           transform:
@@ -457,14 +466,22 @@ export function QueueDock3DCarousel(props: {
         }}
       >
         <div className="flex flex-col items-center">
-          <ChevronDown className="animate-bounce text-[#0a44ff] dark:text-sky-400" size={24} strokeWidth={3} />
-          <ChevronDown className="-mt-4 animate-bounce text-[#0a44ff] dark:text-sky-400 delay-150" size={24} strokeWidth={3} />
+          <ChevronDown
+            className={cn('animate-bounce', isDark ? 'text-sky-400' : 'text-[#0a44ff]')}
+            size={24}
+            strokeWidth={3}
+          />
+          <ChevronDown
+            className={cn('-mt-4 animate-bounce delay-150', isDark ? 'text-sky-400' : 'text-[#0a44ff]')}
+            size={24}
+            strokeWidth={3}
+          />
         </div>
       </div>
 
-      {/* 3. Render 3D Cards: Infinite Circular Virtualized Window of +/- 6 slots around effective center */}
-      {Array.from({ length: 13 }, (_, slotIdx) => {
-        const relativeSlot = slotIdx - 6; // -6 to +6
+      {/* 3. Render 3D Cards: Stable Virtualized Window of +/- 3 slots around effective center */}
+      {Array.from({ length: 7 }, (_, slotIdx) => {
+        const relativeSlot = slotIdx - 3; // -3 to +3
         const totalXOffset = (dragAxis === 'x' && isDragging ? dragOffset.x : 0) - spinOffset;
         const offsetCards = -totalXOffset / DOCK_SPACING;
         const effectiveCenter = currentIndex + offsetCards;
@@ -504,7 +521,10 @@ export function QueueDock3DCarousel(props: {
 
       {/* 4. Full-Surface Top Touch/Drag Capture Surface (Spans 100% full width and height of the upper card deck) */}
       <div
-        className="absolute inset-0 z-25 w-full h-full cursor-grab active:cursor-grabbing select-none touch-none"
+        className={cn(
+          'absolute inset-0 z-25 w-full h-full cursor-grab active:cursor-grabbing select-none touch-none',
+          isActivating || showSuccess || ejectionStage !== 'idle' ? 'pointer-events-none' : 'pointer-events-auto',
+        )}
         onPointerDown={handlePointerDown}
       />
     </div>

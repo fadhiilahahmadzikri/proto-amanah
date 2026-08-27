@@ -252,10 +252,10 @@ export function DoctorDashboardScreen(props: {
         ref={tabContentRef}
         key={`tab-${activeTab}`}
         className={cn(
-          'w-full h-full will-change-transform overflow-hidden',
+          'w-full h-full will-change-transform overflow-hidden flex flex-col min-h-0',
           activeTab === 'qr' || activeTab === 'schedule' || activeTab === 'notification' || activeTab === 'account'
             ? 'p-0 select-none'
-            : 'px-5 pt-2 flex flex-col justify-start overflow-y-auto no-scrollbar pb-24 overscroll-none touch-auto select-none',
+            : 'px-5 pt-2 justify-start overflow-y-auto no-scrollbar pb-24 overscroll-none touch-auto select-none',
         )}
       >
         {activeTab === 'home' && (
@@ -365,7 +365,10 @@ export function DoctorDashboardScreen(props: {
       {showPresenceHistory && (
         <div
           ref={presenceScreenRef}
-          className="absolute inset-0 z-40 w-full h-full bg-[#0a0e1a] dark:bg-[#0a0e1a] bg-white shadow-[-12px_0_30px_rgba(0,0,0,0.3)] will-change-transform"
+          className={cn(
+            'absolute inset-0 z-40 w-full h-full shadow-[-12px_0_30px_rgba(0,0,0,0.3)] will-change-transform',
+            isDark ? 'bg-[#0a0e1a]' : 'bg-white',
+          )}
         >
           <PresenceHistoryScreen
             theme={props.theme}
@@ -378,7 +381,10 @@ export function DoctorDashboardScreen(props: {
       {showIdCard && (
         <div
           ref={idCardScreenRef}
-          className="absolute inset-0 z-40 w-full h-full bg-[#070b14] dark:bg-[#070b14] bg-[#f8faff] shadow-[-12px_0_30px_rgba(0,0,0,0.3)] will-change-transform"
+          className={cn(
+            'absolute inset-0 z-40 w-full h-full shadow-[-12px_0_30px_rgba(0,0,0,0.3)] will-change-transform',
+            isDark ? 'bg-[#070b14]' : 'bg-[#f8faff]',
+          )}
         >
           <DoctorIdCardScreen
             theme={props.theme}
@@ -391,7 +397,10 @@ export function DoctorDashboardScreen(props: {
       {showQueueDock && (
         <div
           ref={queueDockScreenRef}
-          className="absolute inset-0 z-40 w-full h-full shadow-[-12px_0_30px_rgba(0,0,0,0.3)] will-change-transform"
+          className={cn(
+            'absolute inset-0 z-40 w-full h-full shadow-[-12px_0_30px_rgba(0,0,0,0.3)] will-change-transform',
+            isDark ? 'bg-[#0a0e1a]' : 'bg-[#f4f7ff]',
+          )}
         >
           <QueueDockScreen
             theme={props.theme}

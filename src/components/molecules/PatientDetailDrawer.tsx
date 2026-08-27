@@ -153,7 +153,10 @@ export function PatientDetailDrawer(props: PatientDetailDrawerProps) {
             e.stopPropagation();
             triggerClose();
           }}
-          className="flex w-full cursor-grab active:cursor-grabbing flex-col items-center justify-center pt-3.5 pb-1 shrink-0 touch-none select-none hover:bg-neutral-50/50 dark:hover:bg-white/5 transition-colors"
+          className={cn(
+            'flex w-full cursor-grab active:cursor-grabbing flex-col items-center justify-center pt-3.5 pb-1 shrink-0 touch-none select-none transition-colors',
+            isDark ? 'hover:bg-white/5' : 'hover:bg-neutral-50/50',
+          )}
         >
           <div className={cn('h-1.25 w-11 rounded-full transition-colors duration-150', isDark ? 'bg-white/25 hover:bg-white/40 active:bg-white/50' : 'bg-neutral-300 hover:bg-neutral-400 active:bg-neutral-500')} />
         </div>

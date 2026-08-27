@@ -47,6 +47,25 @@ function QueueCardCover(props: {
         )}
       />
 
+      {/* Organic Cybernetic Pixel Texture with Smooth Concave Bottom Masking */}
+      <PixelTexture
+        maskGradient="radial-gradient(120% 85% at 50% -5%, rgba(0,0,0,0) 0%, rgba(0,0,0,0) 38%, rgba(0,0,0,0.25) 54%, rgba(0,0,0,0.65) 74%, rgba(0,0,0,0.92) 88%, rgba(0,0,0,1) 100%)"
+        colorMode={isDarkCard ? 'custom' : 'theme'}
+        customColors={
+          isDarkCard
+            ? ['#00d4ff', '#38bdf8', '#0a44ff', '#60a5fa', '#93c5fd']
+            : ['#0a44ff', '#38bdf8', '#93c5fd', '#bfdbfe']
+        }
+        primaryColor={isDarkCard ? '#00d4ff' : '#0a44ff'}
+        secondaryColor={isDarkCard ? '#38bdf8' : '#60a5fa'}
+        opacity={isDarkCard ? 0.32 : 0.22}
+        blendMode={isDarkCard ? 'screen' : 'multiply'}
+        pixelSize={4}
+        gap={1.8}
+        density="subtle"
+        className="z-0 pointer-events-none"
+      />
+
       {/* Center Group: Theme-Respecting Watermark + Queue Number */}
       <div className="z-10 flex flex-col items-center justify-center gap-4 my-auto">
         {/* Watermark Logo (Color respects theme via CSS mask) */}
@@ -358,7 +377,10 @@ export function QueueCardMaster(props: {
               src={props.card.watermarkUrl || '/assets/images/wm.svg'}
               alt="Watermark"
               style={{ transform: 'translateZ(1px)' }}
-              className="absolute -top-4 -left-6 h-52 w-52 object-contain opacity-25 dark:opacity-15 pointer-events-none select-none z-0"
+              className={cn(
+                'absolute -top-4 -left-6 h-52 w-52 object-contain pointer-events-none select-none z-0',
+                isDarkCard ? 'opacity-15' : 'opacity-25',
+              )}
             />
 
             {/* Organic Cybernetic Pixel Texture (Deep Background Layer with Seamless Integration) */}

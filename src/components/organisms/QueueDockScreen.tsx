@@ -1,7 +1,7 @@
 'use client';
 
 import gsap from 'gsap';
-import { Info, X } from 'lucide-react';
+import { History, Info, MoreVertical, X } from 'lucide-react';
 import React from 'react';
 import { BottomNotchedDock } from '@/components/atoms/BottomNotchedDock';
 import { type EjectionStage } from '@/components/atoms/QueueDockCardItem';
@@ -13,6 +13,7 @@ import { PokemonCollectionGridScreen } from '@/components/organisms/PokemonColle
 import { ParamedicToolbox3DSvg } from '@/components/atoms/ParamedicToolbox3DSvg';
 import { QueueActivationOverlay } from '@/components/molecules/QueueActivationOverlay';
 import { QueueDock3DCarousel } from '@/components/molecules/QueueDock3DCarousel';
+import { ScreenHeader } from '@/components/molecules/ScreenHeader';
 import { cn } from '@/lib/utils';
 import {
   DEFAULT_DOCK_CARDS,
@@ -41,6 +42,7 @@ export function QueueDockScreen(props: {
   const [dragProgress, setDragProgress] = React.useState(0);
   const [isLongPressing, setIsLongPressing] = React.useState(false);
   const [dotCount, setDotCount] = React.useState(0);
+  const [showMenu, setShowMenu] = React.useState(false);
 
   const [showInfoModal, setShowInfoModal] = React.useState(false);
   const infoDrawerRef = React.useRef<HTMLDivElement>(null);
@@ -257,6 +259,30 @@ export function QueueDockScreen(props: {
     }, 1800);
   };
 
+  const ejectionTimersRef = React.useRef<NodeJS.Timeout[]>([]);
+
+  const clearEjectionTimers = React.useCallback(() => {
+    ejectionTimersRef.current.forEach((t) => clearTimeout(t));
+    ejectionTimersRef.current = [];
+  }, []);
+
+  React.useEffect(() => {
+    return () => {
+      clearEjectionTimers();
+    };
+  }, [clearEjectionTimers]);
+
+  // Full state reset to guarantee fresh dock state
+  const resetToFreshDock = React.useCallback(() => {
+    clearEjectionTimers();
+    setDragProgress(0);
+    setIsLongPressing(false);
+    setActivationStage('idle');
+    setEjectionStage('idle');
+    setShowSuccess(false);
+    setIsGenieSettled(false);
+  }, [clearEjectionTimers]);
+
   const handleCollectCard = (card: QueueDockCardData) => {
     setCollectedCards((prev) => {
       const filtered = prev.filter((c) => c.id !== card.id);
@@ -265,24 +291,75 @@ export function QueueDockScreen(props: {
     setShowSuccess(false);
     setIsGenieSettled(false);
     resetToFreshDock();
+    setCurrentIndex((prev) => (prev + 1) % cards.length);
     setViewMode('collection');
   };
 
-  const handleCloseOverlay = () => {
-    setShowSuccess(false);
-    setIsGenieSettled(false);
-    resetToFreshDock();
-  };
+  const isGenieClosingRef = React.useRef(false);
 
-  // Full state reset to guarantee fresh dock state
-  const resetToFreshDock = () => {
-    setDragProgress(0);
-    setIsLongPressing(false);
-    setActivationStage('idle');
-    setEjectionStage('idle');
-    setShowSuccess(false);
+  const handleCloseOverlay = React.useCallback(async () => {
+    if (isGenieClosingRef.current) return;
+    isGenieClosingRef.current = true;
+    clearEjectionTimers();
+
+    // 1. Hide the top header and action buttons immediately
     setIsGenieSettled(false);
-  };
+
+    // 2. Step 1: Genie minimize suction of the hero card back down into the slot mouth
+    if (heroCardRef.current) {
+      try {
+        const getTargetRect = (): DOMRect => {
+          const screenRect = screenContainerRef.current?.getBoundingClientRect();
+          const defaultX = screenRect ? screenRect.left + screenRect.width / 2 : window.innerWidth / 2;
+          const defaultY = screenRect ? screenRect.top + screenRect.height - 50 : window.innerHeight - 50;
+          return new DOMRect(defaultX - 20, defaultY - 10, 40, 20);
+        };
+
+        await runGenieAnimation('minimize', heroCardRef.current, getTargetRect, 'bottom');
+      } catch (err) {
+        console.warn('Genie minimize animation error:', err);
+      }
+    }
+
+    // 3. Step 1 (t = 0ms): Overlay closes, bottom dock slot slides up into view (takes 500ms).
+    setShowSuccess(false);
+    setActivationStage('idle');
+    setEjectionStage('dock_appear');
+    setDragProgress(0);
+
+    // 4. Step 2 (t = 200ms): Temen-temen nya dulu yang masuk ke rel 3D!
+    const t1 = setTimeout(() => {
+      setEjectionStage('rail_converge');
+    }, 200);
+
+    // 5. Step 3 (t = 850ms): Setelah teman-temannya sudah di rel, kartu tengah menyembul (ATM peek)!
+    const t2 = setTimeout(() => {
+      setEjectionStage('atm_peek');
+      if (typeof window !== 'undefined' && 'vibrate' in navigator) {
+        try {
+          navigator.vibrate(14);
+        } catch {}
+      }
+    }, 850);
+
+    // 6. Step 4 (t = 1350ms): Kartu tengah meluncur naik dan diposisikan di tengah rel!
+    const t3 = setTimeout(() => {
+      setEjectionStage('full_eject');
+    }, 1350);
+
+    // 7. Step 5 (t = 2000ms): Seluruh rel kartu terkunci kokoh dengan haptic click!
+    const t4 = setTimeout(() => {
+      setEjectionStage('idle');
+      isGenieClosingRef.current = false;
+      if (typeof window !== 'undefined' && 'vibrate' in navigator) {
+        try {
+          navigator.vibrate([15, 25]);
+        } catch {}
+      }
+    }, 2000);
+
+    ejectionTimersRef.current.push(t1, t2, t3, t4);
+  }, [clearEjectionTimers]);
 
   if (viewMode === 'collection') {
     return (
@@ -290,10 +367,12 @@ export function QueueDockScreen(props: {
         collectedCards={collectedCards}
         theme={props.theme}
         onRedraw={() => {
+          clearEjectionTimers();
           resetToFreshDock();
           setViewMode('dock');
         }}
         onBack={() => {
+          clearEjectionTimers();
           resetToFreshDock();
           setViewMode('dock');
         }}
@@ -311,40 +390,100 @@ export function QueueDockScreen(props: {
         props.className,
       )}
     >
-      {/* 1. Screen Header */}
-      <header className="absolute top-0 inset-x-0 z-30 flex items-center justify-between p-5 sm:p-6 pointer-events-none">
-        <button
-          type="button"
-          aria-label="Kembali"
-          className={cn(
-            'p-1.5 -ml-1 hover:opacity-80 active:scale-90 transition-all cursor-pointer pointer-events-auto rounded-full',
-            isDark ? 'text-white hover:bg-white/10' : 'text-slate-800 hover:bg-slate-100',
-          )}
-          onClick={props.onBack}
-        >
-          <X size={22} strokeWidth={2.5} />
-        </button>
+      {/* 1. Master Screen Header - Unified Top App Bar */}
+      <ScreenHeader
+        title=""
+        onBack={props.onBack}
+        theme={props.theme}
+        className={cn(
+          'absolute top-0 inset-x-0 z-30 transition-opacity duration-300 border-none bg-transparent shadow-none',
+          showSuccess ? 'opacity-0 pointer-events-none' : 'opacity-100',
+        )}
+        rightAction={(
+          <div className="relative flex items-center justify-end">
+            <button
+              type="button"
+              aria-label="Menu Opsi Antrean"
+              onClick={() => setShowMenu((prev) => !prev)}
+              className={cn(
+                'p-1.5 -mr-1.5 rounded-full transition-all cursor-pointer active:scale-90 flex items-center justify-center',
+                isDark
+                  ? 'text-neutral-300 hover:text-white hover:bg-white/10'
+                  : 'text-slate-700 hover:text-slate-950 hover:bg-slate-100',
+              )}
+            >
+              <MoreVertical className="h-5 w-5 stroke-[2]" />
+            </button>
 
-        {/* Info Tip Button */}
-        <button
-          type="button"
-          aria-label="Informasi Sistem Antrean"
-          onClick={() => setShowInfoModal(true)}
-          className={cn(
-            'flex items-center justify-center w-7 h-7 rounded-full transition-all cursor-pointer active:scale-90 pointer-events-auto shadow-xs',
-            isDark
-              ? 'bg-white/10 text-neutral-300 hover:text-white hover:bg-white/20'
-              : 'bg-slate-200/70 text-slate-600 hover:text-slate-950 hover:bg-slate-200',
-          )}
-        >
-          <Info className="w-4 h-4 stroke-[2.3]" />
-        </button>
-      </header>
+            {/* Compact Floating Glass Dropdown Menu */}
+            {showMenu && (
+              <>
+                <div
+                  className="fixed inset-0 z-40"
+                  onClick={() => setShowMenu(false)}
+                />
+                <div
+                  className={cn(
+                    'absolute right-0 top-full mt-2 z-50 w-52 py-1.5 rounded-2xl shadow-xl border backdrop-blur-xl animate-in fade-in zoom-in-95 duration-150 select-none flex flex-col',
+                    isDark
+                      ? 'bg-[#111624]/95 border-white/10 text-white shadow-black/80'
+                      : 'bg-white/95 border-slate-100 text-slate-800 shadow-slate-900/10',
+                  )}
+                >
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowMenu(false);
+                      setShowInfoModal(true);
+                    }}
+                    className={cn(
+                      'flex items-center gap-2.5 px-3.5 py-2.5 text-xs font-semibold transition-colors text-left cursor-pointer',
+                      isDark ? 'hover:bg-white/10 text-white' : 'hover:bg-slate-100 text-slate-800',
+                    )}
+                  >
+                    <Info className={cn('w-4 h-4 shrink-0', isDark ? 'text-cyan-400' : 'text-[#0a44ff]')} />
+                    <span>Panduan antrean</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowMenu(false);
+                      setViewMode('collection');
+                    }}
+                    className={cn(
+                      'flex items-center gap-2.5 px-3.5 py-2.5 text-xs font-semibold transition-colors text-left cursor-pointer border-t',
+                      isDark
+                        ? 'hover:bg-white/10 text-neutral-200 border-white/5'
+                        : 'hover:bg-slate-100 text-slate-700 border-slate-100',
+                    )}
+                  >
+                    <History className={cn('w-4 h-4 shrink-0', isDark ? 'text-cyan-400' : 'text-[#0a44ff]')} />
+                    <span>Riwayat antrean</span>
+                    {collectedCards.length > 0 && (
+                      <span
+                        className={cn(
+                          'ml-auto text-[10px] font-bold px-1.5 py-0.5 rounded-full tabular-nums',
+                          isDark
+                            ? 'bg-cyan-500/20 text-cyan-300'
+                            : 'bg-blue-50 text-[#0a44ff] border border-blue-200',
+                        )}
+                      >
+                        {collectedCards.length}
+                      </span>
+                    )}
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
+        )}
+      />
 
       {/* 2. Title & Greeting with Morphing to Center */}
       <div
         className={cn(
-          'absolute top-9 sm:top-11 inset-x-0 z-20 flex flex-col items-center px-4 transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] pointer-events-none',
+          'absolute top-10 sm:top-12 inset-x-0 z-20 flex flex-col items-center px-4 transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] pointer-events-none',
           isMorphingActive
             ? 'translate-y-48 sm:translate-y-56 scale-105'
             : 'translate-y-0 scale-100',
@@ -371,9 +510,9 @@ export function QueueDockScreen(props: {
           className={cn(
             'text-center text-xl sm:text-2xl font-extrabold tracking-tight leading-snug select-none will-change-[filter,transform,opacity]',
             isMorphingActive
-              ? 'text-[#0a44ff] dark:text-[#38bdf8] max-w-[240px]'
+              ? isDark ? 'text-cyan-400 max-w-[240px]' : 'text-[#0a44ff] max-w-[240px]'
               : isNearSlot
-                ? 'text-[#0a44ff] dark:text-[#38bdf8] max-w-[220px]'
+                ? isDark ? 'text-cyan-400 max-w-[220px]' : 'text-[#0a44ff] max-w-[220px]'
                 : isDark ? 'text-white max-w-[200px]' : 'text-slate-900 max-w-[200px]',
           )}
         >
@@ -409,7 +548,7 @@ export function QueueDockScreen(props: {
 
       {/* 4. Notched Clip-Path Bottom Floor Mask with Radiant Slot Light Emitter */}
       <BottomNotchedDock
-        isActivating={isMorphingActive}
+        isActivating={isMorphingActive || showSuccess}
         dragProgress={dragProgress}
         isLongPressing={isLongPressing}
         theme={props.theme}

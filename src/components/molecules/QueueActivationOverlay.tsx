@@ -1,5 +1,5 @@
 import { gsap } from 'gsap';
-import { X } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import React from 'react';
 import { PatientDetailDrawer } from '@/components/molecules/PatientDetailDrawer';
 import { QueueCardMaster } from '@/components/atoms/QueueCardMaster';
@@ -19,25 +19,24 @@ export function QueueActivationOverlay(props: {
   theme?: 'dark' | 'light';
   className?: string;
 }) {
-  const { showSuccess, isGenieSettled, activeCard, cardRef, onClose, onRedraw, onActionClick, onRevealApex, theme = 'dark' } = props;
   const [showDetail, setShowDetail] = React.useState(false);
-  const isDark = theme === 'dark';
+  const isDark = (props.theme ?? 'dark') === 'dark';
 
-  if (!showSuccess) {
+  if (!props.showSuccess) {
     return null;
   }
 
   const handleCollectClick = () => {
-    const cardEl = (cardRef && typeof cardRef !== 'function' ? cardRef.current : null) as HTMLElement | null;
+    const cardEl = (props.cardRef && typeof props.cardRef !== 'function' ? props.cardRef.current : null) as HTMLElement | null;
     if (!cardEl) {
-      onActionClick?.();
+      props.onActionClick?.();
       return;
     }
 
     // Ultra-graceful & elegant 3D Card Retreat choreography (slow & cinematic)
     const tl = gsap.timeline({
       onComplete: () => {
-        onActionClick?.();
+        props.onActionClick?.();
       },
     });
 
@@ -64,52 +63,62 @@ export function QueueActivationOverlay(props: {
   return (
     <div
       className={cn(
-        'absolute inset-0 z-40 flex flex-col px-6 pt-6 backdrop-blur-md transition-opacity duration-500 select-none',
-        isDark ? 'bg-[#0a0e1a]/95 text-white' : 'bg-[#f8faff]/95 text-neutral-900',
-        showSuccess ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none',
+        'absolute inset-0 z-40 flex flex-col px-5 pt-3 pb-6 backdrop-blur-md transition-opacity duration-500 select-none',
+        isDark ? 'bg-[#0a0e1a]/95 text-white' : 'bg-[#f8faff]/95 text-slate-900',
+        props.showSuccess ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none',
         props.className,
       )}
     >
-      {/* Top Header - Sentence case: Antrean terpilih */}
+      {/* Top Header - Unified standard styling with optical centering */}
       <header
         className={cn(
-          'flex w-full items-center justify-between transition-all duration-500 shrink-0',
-          isGenieSettled ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-3 pointer-events-none',
+          'relative z-10 flex w-full items-center justify-between transition-all duration-500 shrink-0 pt-2',
+          props.isGenieSettled ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-3 pointer-events-none',
         )}
       >
         <button
           type="button"
-          aria-label="Tutup"
+          aria-label="Kembali"
           className={cn(
-            'p-2 rounded-full hover:opacity-80 transition-opacity cursor-pointer',
-            isDark ? 'text-white' : 'text-slate-800',
+            'p-1.5 -ml-1.5 rounded-full transition-all cursor-pointer active:scale-90 flex items-center justify-center',
+            isDark
+              ? 'text-neutral-200 hover:text-white hover:bg-white/10'
+              : 'text-slate-700 hover:text-slate-950 hover:bg-slate-100',
           )}
-          onClick={onClose}
+          onClick={props.onClose}
         >
-          <X size={20} strokeWidth={2.5} />
+          <ArrowLeft className="h-6 w-6 stroke-[2]" />
         </button>
-        <span className={cn('text-sm font-semibold tracking-tight', isDark ? 'text-slate-300' : 'text-slate-600')}>
+
+        <span
+          className={cn(
+            'text-base font-bold tracking-tight text-center truncate',
+            isDark ? 'text-white' : 'text-[#14103B]',
+          )}
+        >
           Antrean terpilih
         </span>
+
+        <div className="w-9 h-9" />
       </header>
 
       {/* Activated Hero Card */}
       <div className="mt-2 flex flex-col flex-1 items-center justify-center">
         <div
-          ref={cardRef}
+          ref={props.cardRef}
           className={cn(
             'w-full max-w-[320px] flex justify-center shrink-0 will-change-transform',
-            isGenieSettled ? 'opacity-100' : 'opacity-0',
+            props.isGenieSettled ? 'opacity-100' : 'opacity-0',
           )}
         >
-          {activeCard && (
+          {props.activeCard && (
             <QueueCardMaster
-              card={activeCard}
+              card={props.activeCard}
               isRevealed={true}
-              isSpinReady={isGenieSettled}
+              isSpinReady={props.isGenieSettled}
               badgeText="ANTREAN AKTIF"
-              theme={theme}
-              onRevealApex={onRevealApex}
+              theme={props.theme}
+              onRevealApex={props.onRevealApex}
               onCardClick={() => setShowDetail(true)}
             />
           )}
@@ -119,7 +128,7 @@ export function QueueActivationOverlay(props: {
         <div
           className={cn(
             'mb-6 mt-auto w-full flex flex-col gap-2.5 transition-all duration-500 delay-150',
-            isGenieSettled ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6 pointer-events-none',
+            props.isGenieSettled ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6 pointer-events-none',
           )}
         >
           {/* Primary Action: Panggil & Proses Pasien */}
@@ -139,7 +148,7 @@ export function QueueActivationOverlay(props: {
           {/* Secondary Action: Pilih Antrean Lain */}
           <button
             type="button"
-            onClick={onRedraw ?? onClose}
+            onClick={props.onRedraw ?? props.onClose}
             className={cn(
               'w-full rounded-2xl py-3 text-xs font-semibold active:scale-98 transition-all cursor-pointer text-center',
               isDark
@@ -155,9 +164,9 @@ export function QueueActivationOverlay(props: {
       {/* Patient Detail Master Drawer */}
       <PatientDetailDrawer
         isOpen={showDetail}
-        patient={activeCard ?? null}
+        patient={props.activeCard ?? null}
         onClose={() => setShowDetail(false)}
-        theme={theme}
+        theme={props.theme}
       />
     </div>
   );

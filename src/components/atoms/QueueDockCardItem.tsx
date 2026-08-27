@@ -9,7 +9,7 @@ import {
   type QueueDockCardData,
 } from '@/types/queue-dock.types';
 
-export type EjectionStage = 'idle' | 'atm_plunge' | 'dock_appear' | 'atm_peek' | 'full_eject';
+export type EjectionStage = 'idle' | 'atm_plunge' | 'dock_appear' | 'rail_converge' | 'atm_peek' | 'full_eject';
 
 import { QueueCardMaster } from './QueueCardMaster';
 
@@ -30,24 +30,13 @@ export function QueueDockCardItem(props: {
   onPointerDown?: (e: React.PointerEvent<HTMLDivElement>) => void;
   className?: string;
 }) {
-  const {
-    card,
-    index,
-    currentIndex,
-    dragOffset,
-    dragAxis,
-    isDragging,
-    isActivating,
-    ejectionStage = 'idle',
-    onSelect,
-    onPointerDown,
-  } = props;
+  const ejectionStage = props.ejectionStage ?? 'idle';
 
   // Compute offset from center active card index
-  let distanceFromCenter = index - currentIndex;
+  let distanceFromCenter = props.index - props.currentIndex;
 
-  if (isDragging && dragAxis !== 'y') {
-    distanceFromCenter += dragOffset.x / DOCK_SPACING;
+  if (props.isDragging && props.dragAxis !== 'y') {
+    distanceFromCenter += props.dragOffset.x / DOCK_SPACING;
   }
 
   // Clamped angle along the U-railway arc
@@ -64,67 +53,87 @@ export function QueueDockCardItem(props: {
   let rotateZ = -distanceFromCenter * DOCK_MAX_ROTATION_Z;
   let rotateY = distanceFromCenter * DOCK_MAX_ROTATION_Y;
   let z = 5 - Math.abs(distanceFromCenter) * Math.abs(DOCK_CURVE_DEPTH);
-  let zIndex = Math.round(20 - Math.abs(distanceFromCenter) * 2);
-  const opacity = 1;
+  let zIndex = Math.round(30 - Math.abs(distanceFromCenter) * 4);
+  let opacity = Math.max(0, Math.min(1, 1 - Math.max(0, Math.abs(distanceFromCenter) - 0.85) * 0.95));
 
   // Pull-down activation gesture handling (stays strictly in front of the target frame, 100% solid)
-  if (dragAxis === 'y' && dragOffset.y > 0 && index === currentIndex) {
-    y += dragOffset.y;
+  if (props.dragAxis === 'y' && props.dragOffset.y > 0 && props.index === props.currentIndex) {
+    y += props.dragOffset.y;
     z = 20;
     zIndex = 50;
   }
 
-  // Activation animation state (disperse left & right offscreen, center card plunges completely down offscreen through slot)
-  if (isActivating) {
-    if (index < currentIndex) {
-      x = -550 - (currentIndex - index) * 120;
+  // Activation & Ejection dispersion state:
+  const isDispersed =
+    props.isActivating ||
+    Boolean(props.showSuccess) ||
+    ejectionStage === 'dock_appear';
+
+  if (isDispersed) {
+    if (props.index < props.currentIndex) {
+      x = -550 - (props.currentIndex - props.index) * 120;
       y = -40;
       z = -200;
       rotateZ = -45;
       rotateY = -35;
-    } else if (index > currentIndex) {
-      x = 550 + (index - currentIndex) * 120;
+      opacity = 0;
+    } else if (props.index > props.currentIndex) {
+      x = 550 + (props.index - props.currentIndex) * 120;
       y = -40;
       z = -200;
       rotateZ = 45;
       rotateY = 35;
+      opacity = 0;
     } else {
+      // Center card plunged deep in slot
       x = 0;
       y = 650;
       z = 20;
       zIndex = 50;
       rotateY = 0;
       rotateZ = 0;
+      opacity = props.showSuccess ? 0 : 1;
     }
-  } else if (ejectionStage === 'dock_appear') {
-    // Stage 1 of Cancellation: Dock slot appears first; card sits completely offscreen below the phone frame
-    if (index === currentIndex) {
+  } else if (ejectionStage === 'rail_converge') {
+    // Stage: "Temen-temen nya dulu yang masuk!"
+    // Surrounding friend cards have their normal U-railway coordinates and fly in smoothly (opacity = 1)
+    // Center card remains deep in the slot waiting for its friends to take their positions
+    if (props.index === props.currentIndex) {
       x = 0;
       y = 650;
       z = 20;
       zIndex = 50;
       rotateY = 0;
       rotateZ = 0;
+      opacity = 0;
+    } else {
+      opacity = 1;
     }
   } else if (ejectionStage === 'atm_peek') {
-    // Stage 2 of Cancellation: ATM-style peek - emerges from way below off-screen up into the slot mouth
-    if (index === currentIndex) {
+    // Stage: Friends already seated; center card peeks out of the slot mouth
+    if (props.index === props.currentIndex) {
       x = 0;
       y = 165;
       z = 20;
       zIndex = 50;
       rotateY = 0;
       rotateZ = 0;
+      opacity = 1;
+    } else {
+      opacity = 1;
     }
   } else if (ejectionStage === 'full_eject') {
-    // Stage 3 of Cancellation: Card glides all the way up into the strader frame
-    if (index === currentIndex) {
+    // Stage: Center card rises from slot mouth and glides gracefully into the center frame!
+    if (props.index === props.currentIndex) {
       x = 0;
       y = 0;
       z = 20;
       zIndex = 50;
       rotateY = 0;
       rotateZ = 0;
+      opacity = 1;
+    } else {
+      opacity = 1;
     }
   }
 
@@ -137,18 +146,26 @@ export function QueueDockCardItem(props: {
       onDragStart={(e) => e.preventDefault()}
       className={cn(
         'absolute h-[335px] w-[212px] will-change-transform select-none touch-none pointer-events-auto cursor-grab active:cursor-grabbing',
-        index !== currentIndex ? 'cursor-pointer' : '',
-        isActivating
+        props.index !== props.currentIndex ? 'cursor-pointer' : '',
+        props.isActivating || Boolean(props.showSuccess)
           ? 'transition-all duration-600 ease-in'
-          : ejectionStage === 'dock_appear' && index === currentIndex
+          : ejectionStage === 'dock_appear'
             ? 'transition-none'
-            : ejectionStage === 'atm_peek' && index === currentIndex
-              ? 'transition-all duration-500 ease-out'
-              : ejectionStage === 'full_eject' && index === currentIndex
-                ? 'transition-all duration-650 ease-[cubic-bezier(0.18,0.89,0.32,1.28)]'
-                : isDragging
-                  ? 'transition-none'
-                  : 'transition-all duration-500 ease-[cubic-bezier(0.25,1,0.5,1)]',
+            : ejectionStage === 'rail_converge'
+              ? props.index === props.currentIndex
+                ? 'transition-none'
+                : 'transition-all duration-600 ease-[cubic-bezier(0.22,1,0.36,1)]'
+              : ejectionStage === 'atm_peek'
+                ? props.index === props.currentIndex
+                  ? 'transition-all duration-450 ease-out'
+                  : 'transition-all duration-500 ease-[cubic-bezier(0.25,1,0.5,1)]'
+                : ejectionStage === 'full_eject'
+                  ? props.index === props.currentIndex
+                    ? 'transition-all duration-650 ease-[cubic-bezier(0.18,0.89,0.32,1.28)]'
+                    : 'transition-all duration-500 ease-[cubic-bezier(0.25,1,0.5,1)]'
+                  : props.isDragging
+                    ? 'transition-none'
+                    : 'transition-all duration-500 ease-[cubic-bezier(0.25,1,0.5,1)]',
         props.className,
       )}
       style={{
@@ -156,17 +173,18 @@ export function QueueDockCardItem(props: {
         transformOrigin: 'center 20%',
         opacity,
         zIndex,
+        pointerEvents: opacity > 0.05 ? 'auto' : 'none',
         touchAction: 'none',
       }}
       onClick={(e) => {
-        if (!isDragging && index !== currentIndex) {
+        if (!props.isDragging && props.index !== props.currentIndex) {
           e.stopPropagation();
-          onSelect?.(index);
+          props.onSelect?.(props.index);
         }
       }}
-      onPointerDown={onPointerDown}
+      onPointerDown={props.onPointerDown}
     >
-      <QueueCardMaster card={card} theme={props.theme} onPointerDown={onPointerDown} />
+      <QueueCardMaster card={props.card} theme={props.theme} onPointerDown={props.onPointerDown} />
     </div>
   );
 }
