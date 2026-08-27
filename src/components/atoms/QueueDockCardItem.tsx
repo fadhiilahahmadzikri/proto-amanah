@@ -11,10 +11,13 @@ import {
 
 export type EjectionStage = 'idle' | 'dock_appear' | 'atm_peek' | 'full_eject';
 
+import { QueueCardMaster } from './QueueCardMaster';
+
 export function QueueDockCardItem(props: {
   card: QueueDockCardData;
   index: number;
   currentIndex: number;
+  totalCards?: number;
   dragOffset: { x: number; y: number };
   dragAxis: 'x' | 'y' | null;
   isDragging: boolean;
@@ -35,10 +38,14 @@ export function QueueDockCardItem(props: {
     ejectionStage = 'idle',
   } = props;
 
-  const offsetRatio = dragOffset.x / DOCK_SPACING;
-  const distanceFromCenter = index - currentIndex + offsetRatio;
+  // Compute offset from center active card index
+  let distanceFromCenter = index - currentIndex;
 
-  // U-Railway Track Trigonometry: cards glide seamlessly along the U-curve like train carriages on rails
+  if (dragAxis === 'x' && isDragging) {
+    distanceFromCenter += dragOffset.x / DOCK_SPACING;
+  }
+
+  // Clamped angle along the U-railway arc
   const angleDeg = distanceFromCenter * DOCK_RAIL_ANGLE_STEP;
   const angleRad = (angleDeg * Math.PI) / 180;
 
@@ -51,7 +58,7 @@ export function QueueDockCardItem(props: {
   // 3. Tangent rotation along the U-curve (Left card tilts clockwise, Right card tilts counter-clockwise)
   let rotateZ = -distanceFromCenter * DOCK_MAX_ROTATION_Z;
   let rotateY = distanceFromCenter * DOCK_MAX_ROTATION_Y;
-  let z = -Math.abs(distanceFromCenter) * Math.abs(DOCK_CURVE_DEPTH);
+  let z = 5 - Math.abs(distanceFromCenter) * Math.abs(DOCK_CURVE_DEPTH);
   let zIndex = Math.round(20 - Math.abs(distanceFromCenter) * 2);
   const opacity = 1;
 
@@ -121,8 +128,7 @@ export function QueueDockCardItem(props: {
   return (
     <div
       className={cn(
-        'absolute flex h-[320px] w-[195px] flex-col overflow-hidden rounded-[16px] p-4 sm:p-5 shadow-[0_20px_40px_rgba(0,0,0,0.8)] will-change-transform select-none',
-        card.bgClass,
+        'absolute will-change-transform select-none',
         isActivating
           ? 'transition-all duration-600 ease-in'
           : ejectionStage === 'dock_appear' && index === currentIndex
@@ -143,94 +149,7 @@ export function QueueDockCardItem(props: {
         zIndex,
       }}
     >
-      {/* Brand Header */}
-      <div className="mb-auto flex items-center justify-between z-10">
-        <span
-          className={cn(
-            'text-lg font-bold tracking-tight uppercase',
-            card.id === 'zomato'
-              ? 'text-[#f50]'
-              : card.id === 'spotify'
-                ? 'text-[#1DB954]'
-                : card.id === 'netflix'
-                  ? 'text-[#E50914]'
-                  : 'text-white',
-          )}
-        >
-          {card.brand}
-        </span>
-        <span className="text-[10px] font-semibold tracking-wider text-white/50 px-2 py-0.5 rounded-full bg-white/10 backdrop-blur-sm">
-          VOUCHER
-        </span>
-      </div>
-
-      {/* Card Content Anatomy */}
-      <div className="z-10 mt-6 flex flex-col">
-        <div className="text-3xl font-black leading-tight text-white tracking-tight">
-          {card.title}
-        </div>
-        <div className="text-base font-bold text-white/90 tracking-wide">{card.subtitle}</div>
-        {card.desc && (
-          <p className="mt-2 text-xs font-medium text-white/70 line-clamp-2">{card.desc}</p>
-        )}
-      </div>
-
-      {/* Bespoke Graphical Elements for each of the 10 distinct brands */}
-      {card.id === 'amazon' && (
-        <div className="absolute bottom-4 right-4 text-white/25 pointer-events-none">
-          <svg
-            width="56"
-            height="56"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.5"
-            aria-hidden="true"
-          >
-            <path d="M20 12v10H4V12M2 7h20v5H2zM12 22V7M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7zM12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z" />
-          </svg>
-        </div>
-      )}
-      {card.id === 'airtel' && (
-        <div className="absolute bottom-0 right-0 h-32 w-32 rounded-tl-full bg-white/10" />
-      )}
-      {card.id === 'zomato' && (
-        <div className="absolute -bottom-10 -right-10 h-40 w-40 rounded-full border-4 border-[#f50]/25" />
-      )}
-      {card.id === 'spotify' && (
-        <div className="absolute bottom-4 right-4 flex items-end gap-1 opacity-40">
-              <div className="w-1.5 h-6 bg-[#1DB954] rounded-full animate-pulse" />
-              <div className="w-1.5 h-10 bg-[#1DB954] rounded-full animate-pulse delay-100" />
-              <div className="w-1.5 h-8 bg-[#1DB954] rounded-full animate-pulse delay-200" />
-              <div className="w-1.5 h-12 bg-[#1DB954] rounded-full animate-pulse delay-300" />
-            </div>
-          )}
-          {card.id === 'apple' && (
-            <div className="absolute -bottom-8 -right-8 h-36 w-36 rounded-full bg-white/5 border border-white/15 backdrop-blur-md" />
-          )}
-          {card.id === 'disney' && (
-            <div className="absolute bottom-0 right-0 h-36 w-36 bg-radial from-cyan-400/20 via-transparent to-transparent blur-xl" />
-          )}
-          {card.id === 'grab' && (
-            <div className="absolute -bottom-6 -right-6 h-28 w-28 rotate-45 border-2 border-emerald-400/30 bg-emerald-500/10" />
-          )}
-          {card.id === 'gojek' && (
-            <div className="absolute -bottom-8 -right-8 flex h-36 w-36 items-center justify-center rounded-full border-2 border-lime-400/20">
-              <div className="h-20 w-20 rounded-full border-2 border-lime-400/30" />
-            </div>
-          )}
-          {card.id === 'netflix' && (
-            <div className="absolute bottom-0 right-3 flex h-28 w-14 items-end">
-              <div className="h-full w-4 bg-[#E50914]/20 shadow-[0_0_15px_#E50914]" />
-            </div>
-          )}
-          {card.id === 'halodoc' && (
-            <div className="absolute bottom-4 right-4 text-pink-400/25">
-              <svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                <path d="M19 10.5h-5.5V5c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v5.5H5c-.83 0-1.5.67-1.5 1.5s.67 1.5 1.5 1.5h5.5V19c0 .83.67 1.5 1.5 1.5s1.5-.67 1.5-1.5v-5.5H19c.83 0 1.5-.67 1.5-1.5s-.67-1.5-1.5-1.5z" />
-              </svg>
-            </div>
-          )}
+      <QueueCardMaster card={card} />
     </div>
   );
 }

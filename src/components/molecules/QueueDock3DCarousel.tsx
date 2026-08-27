@@ -187,10 +187,10 @@ export function QueueDock3DCarousel(props: {
       onMouseDown={handleStart}
       onTouchStart={handleStart}
     >
-      {/* 1. Target Alignment Glow Frame (Glows brightly when card snaps / ejects back in) */}
+      {/* 1. Target Alignment Glow Frame (Positioned at Z = -50px, strictly behind all cards during drag) */}
       <div
         className={cn(
-          'absolute h-[331px] w-[206px] rounded-[21.5px] border-[2.5px] pointer-events-none transition-all duration-500 z-0 box-border',
+          'absolute h-[360px] w-[231px] rounded-[25px] border-[2.5px] pointer-events-none transition-all duration-500 z-0 box-border',
           isActivating
             ? 'opacity-0 scale-90 border-orange-500/90'
             : ejectionStage === 'full_eject' || ejectionStage === 'atm_peek'
@@ -200,7 +200,7 @@ export function QueueDock3DCarousel(props: {
                 : 'opacity-100 scale-100 border-orange-500/90 shadow-[0_0_35px_rgba(255,153,0,0.4),inset_0_0_15px_rgba(255,153,0,0.3)]',
         )}
         style={{
-          transform: 'translate3d(0, 0, -20px)',
+          transform: 'translate3d(0, 0, -50px)',
         }}
       />
 

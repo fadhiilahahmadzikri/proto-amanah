@@ -1,5 +1,6 @@
 'use client';
 
+import gsap from 'gsap';
 import { X } from 'lucide-react';
 import React from 'react';
 import { BottomNotchedDock } from '@/components/atoms/BottomNotchedDock';
@@ -16,6 +17,8 @@ import {
   type QueueDockCardData,
 } from '@/types/queue-dock.types';
 
+import { runGenieAnimation } from '@/lib/genie-renderer';
+
 export function QueueDockScreen(props: {
   cards?: QueueDockCardData[];
   theme?: 'dark' | 'light';
@@ -28,17 +31,67 @@ export function QueueDockScreen(props: {
   const [activationStage, setActivationStage] = React.useState<'idle' | 'plunging' | 'activating'>('idle');
   const [ejectionStage, setEjectionStage] = React.useState<EjectionStage>('idle');
   const [showSuccess, setShowSuccess] = React.useState(false);
+  const [isGenieSettled, setIsGenieSettled] = React.useState(false);
   const [dragProgress, setDragProgress] = React.useState(0);
   const [isLongPressing, setIsLongPressing] = React.useState(false);
 
   const confettiRef = React.useRef<ConfettiCanvasHandle>(null);
+  const textRef = React.useRef<HTMLHeadingElement>(null);
+  const heroCardRef = React.useRef<HTMLDivElement>(null);
+  const screenContainerRef = React.useRef<HTMLDivElement>(null);
+
+  const [displayedHeadline, setDisplayedHeadline] = React.useState('Pilih antrean dokter Anda');
+  const prevHeadlineRef = React.useRef('Pilih antrean dokter Anda');
 
   const isPlungingOrActive = activationStage === 'plunging' || activationStage === 'activating';
   const isMorphingActive = activationStage === 'activating';
 
+  const currentCard = cards[currentIndex];
+  const isNearSlot = dragProgress >= 0.75 && !isPlungingOrActive;
+
+  let headlineText = 'Pilih antrean dokter Anda';
+  if (isMorphingActive) {
+    headlineText = 'Activating the offer for you...';
+  } else if (isNearSlot) {
+    headlineText = 'Release to activate offer';
+  }
+
+  // Native GSAP Text Blurry Morph Transformation
+  React.useEffect(() => {
+    if (prevHeadlineRef.current === headlineText) return;
+    prevHeadlineRef.current = headlineText;
+
+    if (!textRef.current) {
+      setDisplayedHeadline(headlineText);
+      return;
+    }
+
+    gsap.killTweensOf(textRef.current);
+    gsap.to(textRef.current, {
+      filter: 'blur(8px)',
+      opacity: 0,
+      scale: 0.94,
+      duration: 0.18,
+      ease: 'power2.in',
+      onComplete: () => {
+        setDisplayedHeadline(headlineText);
+        gsap.fromTo(
+          textRef.current,
+          { filter: 'blur(8px)', opacity: 0, scale: 1.06 },
+          {
+            filter: 'blur(0px)',
+            opacity: 1,
+            scale: 1,
+            duration: 0.32,
+            ease: 'power2.out',
+          },
+        );
+      },
+    });
+  }, [headlineText]);
+
   const handleActivate = React.useCallback(() => {
     // Stage 1 (t = 0ms): Card plunges completely down into the slot mouth off-screen
-    // Header, dock slot, and progress bar remain unchanged during the plunge!
     setActivationStage('plunging');
 
     if (typeof window !== 'undefined' && 'vibrate' in navigator) {
@@ -53,22 +106,53 @@ export function QueueDockScreen(props: {
       setActivationStage('activating');
     }, 600);
 
-    // Stage 3 (t = 3000ms): Success voucher overlay appears with celebratory confetti!
-    setTimeout(() => {
+    // Stage 3 (t = 2800ms): Eject the SAME card from the bottom slot mouth using the macOS Genie wave!
+    setTimeout(async () => {
       setShowSuccess(true);
+      setIsGenieSettled(false);
+
+      const getTargetRect = (): DOMRect => {
+        const screenRect = screenContainerRef.current?.getBoundingClientRect();
+        const defaultX = screenRect ? screenRect.left + screenRect.width / 2 : window.innerWidth / 2;
+        const defaultY = screenRect ? screenRect.top + screenRect.height - 50 : window.innerHeight - 50;
+        return new DOMRect(defaultX - 20, defaultY - 10, 40, 20);
+      };
+
+      if (heroCardRef.current) {
+        try {
+          await runGenieAnimation('open', heroCardRef.current, getTargetRect, 'bottom');
+        } catch {}
+      }
+
+      setIsGenieSettled(true);
       confettiRef.current?.fire();
-    }, 3000);
+    }, 2800);
   }, []);
 
-  const handleCloseOverlay = React.useCallback(() => {
-    // Step 1 (t = 0ms): Overlay closes, bottom dock slot slides up into view (takes 500ms).
-    // The card remains 100% off-screen way below the bottom of the device frame.
+  const handleCloseOverlay = React.useCallback(async () => {
+    setIsGenieSettled(false);
+
+    // Step 1: Genie minimize suction of the hero card back down into the slot mouth
+    const getTargetRect = (): DOMRect => {
+      const screenRect = screenContainerRef.current?.getBoundingClientRect();
+      const defaultX = screenRect ? screenRect.left + screenRect.width / 2 : window.innerWidth / 2;
+      const defaultY = screenRect ? screenRect.top + screenRect.height - 50 : window.innerHeight - 50;
+      return new DOMRect(defaultX - 20, defaultY - 10, 40, 20);
+    };
+
+    if (heroCardRef.current) {
+      try {
+        await runGenieAnimation('minimize', heroCardRef.current, getTargetRect, 'bottom');
+      } catch {}
+    }
+
+    // Step 2 (t = 0ms): Overlay closes, bottom dock slot slides up into view (takes 500ms).
     setShowSuccess(false);
     setActivationStage('idle');
     setEjectionStage('dock_appear');
     setDragProgress(0);
 
-    // Step 2 (t = 550ms): Strictly AFTER the dock slot is 100% rendered and docked,
+    // Step 3 (t = 550ms): Strictly AFTER the dock slot is 100% rendered and docked,
     // the card ascends from beneath the screen into the slot mouth (ATM peek)!
     setTimeout(() => {
       setEjectionStage('atm_peek');
@@ -79,12 +163,12 @@ export function QueueDockScreen(props: {
       }
     }, 550);
 
-    // Step 3 (t = 1250ms): After presenting the head, the card glides all the way up into the strader frame!
+    // Step 4 (t = 1250ms): After presenting the head, the card glides all the way up into the strader frame!
     setTimeout(() => {
       setEjectionStage('full_eject');
     }, 1250);
 
-    // Step 4 (t = 1900ms): Card locks firmly into the frame with strader snap glow & haptic click
+    // Step 5 (t = 1900ms): Card locks firmly into the frame with strader snap glow & haptic click
     setTimeout(() => {
       setEjectionStage('idle');
       if (typeof window !== 'undefined' && 'vibrate' in navigator) {
@@ -95,18 +179,9 @@ export function QueueDockScreen(props: {
     }, 1900);
   }, []);
 
-  const currentCard = cards[currentIndex];
-  const isNearSlot = dragProgress >= 0.75 && !isPlungingOrActive;
-
-  let headlineText = 'Pilih antrean dokter Anda';
-  if (isMorphingActive) {
-    headlineText = 'Activating the offer for you...';
-  } else if (isNearSlot) {
-    headlineText = 'Release to activate offer';
-  }
-
   return (
     <div
+      ref={screenContainerRef}
       className={cn(
         'relative flex h-full w-full flex-col overflow-hidden bg-[#0f0f0f] font-sans text-white select-none',
         props.className,
@@ -147,10 +222,11 @@ export function QueueDockScreen(props: {
           </svg>
         </div>
 
-        {/* Morphing Headline Text (Solid yellow, max 2 words per line wrap) */}
+        {/* Morphing Headline Text with GSAP Blurry Morph (Solid yellow, max 2 words per line wrap) */}
         <h1
+          ref={textRef}
           className={cn(
-            'text-center text-xl sm:text-2xl font-bold leading-snug transition-all duration-300 select-none',
+            'text-center text-xl sm:text-2xl font-bold leading-snug select-none will-change-[filter,transform,opacity]',
             isMorphingActive
               ? 'text-yellow-400 max-w-[220px]'
               : isNearSlot
@@ -158,7 +234,7 @@ export function QueueDockScreen(props: {
                 : 'text-white max-w-[170px]',
           )}
         >
-          {headlineText}
+          {displayedHeadline}
         </h1>
 
         {/* Morphing Sun Orange Gradient Progress Bar */}
@@ -202,7 +278,9 @@ export function QueueDockScreen(props: {
       <QueueActivationOverlay
         isActivating={isMorphingActive}
         showSuccess={showSuccess}
+        isGenieSettled={isGenieSettled}
         activeCard={currentCard}
+        cardRef={heroCardRef}
         onClose={handleCloseOverlay}
         onActionClick={() => {
           if (currentCard) {
