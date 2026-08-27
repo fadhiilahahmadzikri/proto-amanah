@@ -1,5 +1,6 @@
 import { gsap } from 'gsap';
 import { X } from 'lucide-react';
+import React from 'react';
 import { QueueCardMaster } from '@/components/atoms/QueueCardMaster';
 import { cn } from '@/lib/utils';
 import type { QueueDockCardData } from '@/types/queue-dock.types';
@@ -99,29 +100,6 @@ export function QueueActivationOverlay(props: {
               onRevealApex={onRevealApex}
             />
           )}
-        </div>
-
-        {/* Steps / Info (Fades in ONLY AFTER card is settled) */}
-        <div
-          className={cn(
-            'mt-5 w-full transition-all duration-500 delay-100',
-            isGenieSettled ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4 pointer-events-none',
-          )}
-        >
-          <div className="flex items-center justify-between mb-2">
-            <h3 className="text-xs font-bold text-white uppercase tracking-wider">
-              {activeCard?.brand ?? 'Pokémon Card'}
-            </h3>
-            <span className="text-[10px] font-semibold text-yellow-400 bg-yellow-400/10 px-2 py-0.5 rounded-full border border-yellow-400/20">
-              {activeCard?.rarity ?? 'Rare Holo'}
-            </span>
-          </div>
-          <div className="flex items-start space-x-3 bg-white/5 p-3 rounded-2xl border border-white/10">
-            <div className="text-sm font-black text-amber-400">★</div>
-            <p className="text-xs font-medium text-gray-300">
-              {activeCard?.desc ?? 'Official Pokémon card revealed from mystery deck!'}
-            </p>
-          </div>
         </div>
 
         {/* Action Buttons: Collect Card & Draw Another Card (Fades in ONLY AFTER card is settled) */}

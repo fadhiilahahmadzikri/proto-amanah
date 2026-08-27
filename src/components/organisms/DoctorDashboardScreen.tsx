@@ -396,9 +396,6 @@ export function DoctorDashboardScreen(props: {
           <QueueDockScreen
             theme={props.theme}
             onBack={() => handleBackFromQueueDock()}
-            onSelectCard={(card) => {
-              showToast(`Antrean ${card.brand} berhasil diproses`);
-            }}
           />
         </div>
       )}
