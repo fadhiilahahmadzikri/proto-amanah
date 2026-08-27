@@ -391,7 +391,7 @@ export function DoctorDashboardScreen(props: {
       {showQueueDock && (
         <div
           ref={queueDockScreenRef}
-          className="absolute inset-0 z-40 w-full h-full bg-[#0f0f0f] text-white shadow-[-12px_0_30px_rgba(0,0,0,0.3)] will-change-transform"
+          className="absolute inset-0 z-40 w-full h-full shadow-[-12px_0_30px_rgba(0,0,0,0.3)] will-change-transform"
         >
           <QueueDockScreen
             theme={props.theme}

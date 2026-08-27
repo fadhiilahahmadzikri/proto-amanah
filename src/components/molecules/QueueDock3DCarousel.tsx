@@ -17,6 +17,7 @@ export function QueueDock3DCarousel(props: {
   isActivating: boolean;
   ejectionStage?: EjectionStage;
   showSuccess: boolean;
+  theme?: 'dark' | 'light';
   className?: string;
 }) {
   const {
@@ -425,17 +426,17 @@ export function QueueDock3DCarousel(props: {
       onPointerCancel={handlePointerUp}
       onWheel={handleWheel}
     >
-      {/* 1. Target Alignment Glow Frame (Positioned at Z = -50px, strictly behind all cards during drag) */}
+      {/* 1. Target Alignment Glow Frame */}
       <div
         className={cn(
           'absolute h-[360px] w-[231px] rounded-[25px] border-[2.5px] pointer-events-none transition-all duration-500 z-0 box-border',
           isActivating
-            ? 'opacity-0 scale-90 border-orange-500/90'
+            ? 'opacity-0 scale-90 border-blue-500/90'
             : ejectionStage === 'full_eject' || ejectionStage === 'atm_peek'
-              ? 'opacity-100 scale-100 border-amber-400 shadow-[0_0_50px_rgba(255,153,0,0.95),inset_0_0_25px_rgba(255,153,0,0.6)] animate-pulse'
+              ? 'opacity-100 scale-100 border-sky-400 shadow-[0_0_50px_rgba(14,165,233,0.9),inset_0_0_25px_rgba(14,165,233,0.5)] animate-pulse'
               : isDragging && dragAxis === 'y'
-                ? 'opacity-30 scale-100 border-orange-500/90 shadow-[0_0_20px_rgba(255,153,0,0.3)]'
-                : 'opacity-100 scale-100 border-orange-500/90 shadow-[0_0_35px_rgba(255,153,0,0.4),inset_0_0_15px_rgba(255,153,0,0.3)]',
+                ? 'opacity-40 scale-100 border-blue-500/90 shadow-[0_0_20px_rgba(10,68,255,0.3)]'
+                : 'opacity-100 scale-100 border-blue-500/80 dark:border-sky-400/80 shadow-[0_0_35px_rgba(10,68,255,0.3),inset_0_0_15px_rgba(10,68,255,0.2)]',
         )}
         style={{
           transform: 'translate3d(0, 0, -50px)',
@@ -456,8 +457,8 @@ export function QueueDock3DCarousel(props: {
         }}
       >
         <div className="flex flex-col items-center">
-          <ChevronDown className="animate-bounce text-orange-500" size={24} strokeWidth={3} />
-          <ChevronDown className="-mt-4 animate-bounce text-orange-500 delay-150" size={24} strokeWidth={3} />
+          <ChevronDown className="animate-bounce text-[#0a44ff] dark:text-sky-400" size={24} strokeWidth={3} />
+          <ChevronDown className="-mt-4 animate-bounce text-[#0a44ff] dark:text-sky-400 delay-150" size={24} strokeWidth={3} />
         </div>
       </div>
 
@@ -491,6 +492,7 @@ export function QueueDock3DCarousel(props: {
             ejectionStage={ejectionStage}
             isLongPressing={isLongPressing}
             showSuccess={showSuccess}
+            theme={props.theme}
             onSelect={(clickedVirtualIndex) => {
               const targetIndex = ((clickedVirtualIndex % cards.length) + cards.length) % cards.length;
               onIndexChange(targetIndex);

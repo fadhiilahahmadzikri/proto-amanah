@@ -9,7 +9,7 @@ import {
   type QueueDockCardData,
 } from '@/types/queue-dock.types';
 
-export type EjectionStage = 'idle' | 'dock_appear' | 'atm_peek' | 'full_eject';
+export type EjectionStage = 'idle' | 'atm_plunge' | 'dock_appear' | 'atm_peek' | 'full_eject';
 
 import { QueueCardMaster } from './QueueCardMaster';
 
@@ -25,6 +25,7 @@ export function QueueDockCardItem(props: {
   ejectionStage?: EjectionStage;
   isLongPressing?: boolean;
   showSuccess?: boolean;
+  theme?: 'dark' | 'light';
   onSelect?: (index: number) => void;
   onPointerDown?: (e: React.PointerEvent<HTMLDivElement>) => void;
   className?: string;
@@ -165,7 +166,7 @@ export function QueueDockCardItem(props: {
       }}
       onPointerDown={onPointerDown}
     >
-      <QueueCardMaster card={card} onPointerDown={onPointerDown} />
+      <QueueCardMaster card={card} theme={props.theme} onPointerDown={onPointerDown} />
     </div>
   );
 }

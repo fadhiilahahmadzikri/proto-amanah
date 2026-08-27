@@ -74,7 +74,7 @@ export function renderGenieFrame(
     );
   }
 
-  // Draw radiant glow burst at the dock point
+  // Draw radiant glow burst at the dock point (theme cyan & royal blue)
   const glowRaw = direction === 'minimize' ? rawT : 1 - rawT;
   if (glowRaw > 0.7) {
     const a = eOut2((glowRaw - 0.7) / 0.3) * 0.45;
@@ -86,8 +86,8 @@ export function renderGenieFrame(
       dockPoint.y,
       80,
     );
-    g.addColorStop(0, `rgba(255, 153, 0, ${a})`);
-    g.addColorStop(0.4, `rgba(234, 88, 12, ${a * 0.65})`);
+    g.addColorStop(0, `rgba(56, 189, 248, ${a})`);
+    g.addColorStop(0.4, `rgba(10, 68, 255, ${a * 0.65})`);
     g.addColorStop(1, 'transparent');
     ctx.fillStyle = g;
     ctx.fillRect(0, 0, canvasWidth, canvasHeight);
@@ -153,7 +153,7 @@ export async function runGenieAnimation(
       const fCtx = fallbackCanvas.getContext('2d');
       if (fCtx) {
         fCtx.scale(dpr, dpr);
-        fCtx.fillStyle = '#1e1b4b';
+        fCtx.fillStyle = '#0c1427';
         if ('roundRect' in fCtx && typeof (fCtx as any).roundRect === 'function') {
           (fCtx as any).roundRect(0, 0, windowWidth, windowHeight, 20);
         } else {
