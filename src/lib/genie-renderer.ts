@@ -103,9 +103,23 @@ export async function runGenieAnimation(
   getTargetRect: () => DOMRect,
   dockPosition: DockPosition = 'bottom',
 ): Promise<void> {
-  const popRect = popoverElement.getBoundingClientRect();
-  const windowWidth = popRect.width;
-  const windowHeight = popRect.height;
+  // Ensure element is active in DOM layout
+  popoverElement.style.transition = 'none';
+  popoverElement.style.opacity = '0';
+  popoverElement.style.visibility = 'visible';
+  popoverElement.style.pointerEvents = 'none';
+
+  void popoverElement.offsetHeight;
+
+  let popRect = popoverElement.getBoundingClientRect();
+  let windowWidth = Math.round(popRect.width);
+  let windowHeight = Math.round(popRect.height);
+
+  if (windowWidth <= 0 || windowHeight <= 0) {
+    const screenWidth = typeof window !== 'undefined' ? window.innerWidth : 375;
+    windowWidth = Math.min(340, screenWidth - 48);
+    windowHeight = Math.round(windowWidth / 0.718);
+  }
 
   // Capture fresh snapshot on open using html-to-image
   if (direction === 'open') {
@@ -114,13 +128,6 @@ export async function runGenieAnimation(
 
   if (direction === 'open' || !cachedSnapshot) {
     try {
-      popoverElement.style.transition = 'none';
-      popoverElement.style.opacity = '0';
-      popoverElement.style.visibility = 'visible';
-      popoverElement.style.pointerEvents = 'none';
-
-      void popoverElement.offsetHeight;
-
       cachedSnapshot = await toCanvas(popoverElement, {
         pixelRatio: Math.min(typeof window !== 'undefined' ? window.devicePixelRatio || 1 : 1, 2),
         width: windowWidth,
@@ -137,20 +144,45 @@ export async function runGenieAnimation(
         },
       });
     } catch (err) {
-      console.error('Failed to capture genie snapshot:', err);
-      if (direction === 'open') {
-        popoverElement.style.opacity = '1';
-        popoverElement.style.pointerEvents = 'auto';
+      console.warn('toCanvas snapshot fallback generated:', err);
+      // Fallback: draw directly to an offscreen canvas
+      const fallbackCanvas = document.createElement('canvas');
+      const dpr = Math.min(typeof window !== 'undefined' ? window.devicePixelRatio || 1 : 1, 2);
+      fallbackCanvas.width = windowWidth * dpr;
+      fallbackCanvas.height = windowHeight * dpr;
+      const fCtx = fallbackCanvas.getContext('2d');
+      if (fCtx) {
+        fCtx.scale(dpr, dpr);
+        fCtx.fillStyle = '#1e1b4b';
+        if ('roundRect' in fCtx && typeof (fCtx as any).roundRect === 'function') {
+          (fCtx as any).roundRect(0, 0, windowWidth, windowHeight, 20);
+        } else {
+          fCtx.rect(0, 0, windowWidth, windowHeight);
+        }
+        fCtx.fill();
+
+        const imgEl = popoverElement.querySelector('img');
+        if (imgEl && imgEl.complete && imgEl.naturalWidth > 0) {
+          try {
+            fCtx.drawImage(imgEl, 0, 0, windowWidth, windowHeight);
+          } catch {}
+        }
       }
-      return;
+      cachedSnapshot = fallbackCanvas;
     }
   }
 
-  if (!cachedSnapshot) return;
+  if (!cachedSnapshot) {
+    if (direction === 'open') {
+      popoverElement.style.opacity = '1';
+      popoverElement.style.pointerEvents = 'auto';
+    }
+    return;
+  }
 
   const windowPoint: Point = {
-    x: popRect.left,
-    y: popRect.top,
+    x: popRect.left || ((window.innerWidth - windowWidth) / 2),
+    y: popRect.top || 80,
   };
 
   const canvasWidth = window.innerWidth;

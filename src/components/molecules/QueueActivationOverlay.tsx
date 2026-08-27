@@ -13,7 +13,11 @@ export function QueueActivationOverlay(props: {
   onActionClick?: () => void;
   className?: string;
 }) {
-  const { showSuccess, isGenieSettled, activeCard, cardRef, onClose, onActionClick } = props;
+  const { isActivating, showSuccess, isGenieSettled, activeCard, cardRef, onClose, onActionClick } = props;
+
+  if (!showSuccess && !isActivating) {
+    return null;
+  }
 
   return (
     <div
@@ -41,14 +45,14 @@ export function QueueActivationOverlay(props: {
         <span className="text-sm font-semibold tracking-wide text-gray-300">Bantuan</span>
       </header>
 
-      {/* Activated Hero Card (Spewed first via Genie animation - 100% Identical instance of QueueCardMaster) */}
-      <div className="mt-4 flex flex-col flex-1">
-        <div ref={cardRef} className="w-full shrink-0">
+      {/* Activated Hero Card (Spewed first via Genie animation - Expanded full size) */}
+      <div className="mt-2 flex flex-col flex-1 items-center justify-center">
+        <div ref={cardRef} className="w-full max-w-[320px] flex justify-center shrink-0">
           {activeCard && (
             <QueueCardMaster
               card={activeCard}
-              badgeText="VOUCHER AKTIF"
-              className="!w-full !h-[330px] shadow-2xl"
+              isRevealed={true}
+              badgeText="POKÉMON TCG"
             />
           )}
         </div>
@@ -60,16 +64,23 @@ export function QueueActivationOverlay(props: {
             isGenieSettled ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4 pointer-events-none',
           )}
         >
-          <h3 className="mb-2 text-xs font-bold text-white">Bagaimana cara proses antrean?</h3>
-          <div className="flex items-start space-x-3">
-            <div className="text-sm font-black text-gray-500">1</div>
+          <div className="flex items-center justify-between mb-2">
+            <h3 className="text-xs font-bold text-white uppercase tracking-wider">
+              {activeCard?.brand ?? 'Pokémon Card'}
+            </h3>
+            <span className="text-[10px] font-semibold text-yellow-400 bg-yellow-400/10 px-2 py-0.5 rounded-full border border-yellow-400/20">
+              {activeCard?.rarity ?? 'Rare Holo'}
+            </span>
+          </div>
+          <div className="flex items-start space-x-3 bg-white/5 p-3 rounded-2xl border border-white/10">
+            <div className="text-sm font-black text-amber-400">★</div>
             <p className="text-xs font-medium text-gray-300">
-              Tunjukkan nomor antrean saat memasuki <span className="font-bold text-white">Poli Praktik</span>
+              {activeCard?.desc ?? 'Kartu Pokémon resmi berhasil di-reveal dari mystery deck!'}
             </p>
           </div>
         </div>
 
-        {/* Action Buttons: Panggil Antrean & Batal (Fades in ONLY AFTER card is settled) */}
+        {/* Action Buttons: Koleksi Kartu & Tarik Kartu Lain (Fades in ONLY AFTER card is settled) */}
         <div
           className={cn(
             'mb-6 mt-auto w-full flex flex-col gap-3 transition-all duration-500 delay-150',
@@ -79,16 +90,16 @@ export function QueueActivationOverlay(props: {
           <button
             type="button"
             onClick={onActionClick ?? onClose}
-            className="w-full rounded-full bg-[#ff9900] hover:bg-[#ffaa22] py-3.5 text-base font-bold text-black shadow-[0_0_20px_rgba(255,153,0,0.4)] active:scale-98 transition-all cursor-pointer text-center"
+            className="w-full rounded-full bg-gradient-to-r from-amber-500 to-yellow-400 hover:from-amber-400 hover:to-yellow-300 py-3.5 text-base font-bold text-black shadow-[0_0_25px_rgba(251,191,36,0.45)] active:scale-98 transition-all cursor-pointer text-center"
           >
-            Panggil / Masuk Antrean
+            Koleksi Kartu
           </button>
           <button
             type="button"
             onClick={onClose}
             className="w-full rounded-full py-3 text-sm font-semibold text-gray-400 hover:text-white active:scale-98 transition-all cursor-pointer text-center bg-transparent hover:bg-white/5"
           >
-            Batal
+            Tarik Kartu Lain
           </button>
         </div>
       </div>

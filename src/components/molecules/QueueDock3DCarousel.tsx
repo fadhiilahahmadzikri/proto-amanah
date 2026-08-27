@@ -3,7 +3,6 @@ import React from 'react';
 import { type EjectionStage, QueueDockCardItem } from '@/components/atoms/QueueDockCardItem';
 import { cn } from '@/lib/utils';
 import {
-  DOCK_ACTIVATION_THRESHOLD,
   DOCK_SPACING,
   type QueueDockCardData,
 } from '@/types/queue-dock.types';
@@ -37,18 +36,26 @@ export function QueueDock3DCarousel(props: {
   const [dragAxis, setDragAxis] = React.useState<'x' | 'y' | null>(null);
   const [isLongPressing, setIsLongPressing] = React.useState(false);
 
-  const prevIndexRef = React.useRef(currentIndex);
-  const dragStartRef = React.useRef({ x: 0, y: 0 });
-  const dragAxisRef = React.useRef<'x' | 'y' | null>(null);
+  // Stable references to prevent listener re-attachment on every frame
+  const stateRef = React.useRef({
+    isDragging: false,
+    dragOffset: { x: 0, y: 0 },
+    dragAxis: null as 'x' | 'y' | null,
+    startX: 0,
+    startY: 0,
+    currentIndex,
+    totalCards: cards.length,
+    isActivating,
+  });
+
+  stateRef.current.currentIndex = currentIndex;
+  stateRef.current.totalCards = cards.length;
+  stateRef.current.isActivating = isActivating;
+
   const longPressTimerRef = React.useRef<NodeJS.Timeout | null>(null);
   const containerRef = React.useRef<HTMLDivElement>(null);
 
   React.useEffect(() => {
-    if (prevIndexRef.current === currentIndex) {
-      return undefined;
-    }
-
-    prevIndexRef.current = currentIndex;
     if (typeof window !== 'undefined' && 'vibrate' in navigator) {
       try {
         navigator.vibrate(10);
@@ -56,21 +63,25 @@ export function QueueDock3DCarousel(props: {
         // Ignore if vibration is not permitted
       }
     }
-    return undefined;
   }, [currentIndex]);
 
-  const handleStart = (e: React.MouseEvent | React.TouchEvent) => {
-    if (isActivating) return;
+  const handlePointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (stateRef.current.isActivating) return;
+
+    const targetEl = e.target as HTMLElement;
+    console.log('[3D CAROUSEL] PointerDown at', e.clientX, e.clientY, '| Target:', targetEl?.tagName, targetEl?.className);
+
+    stateRef.current.isDragging = true;
+    stateRef.current.dragAxis = null;
+    stateRef.current.startX = e.clientX;
+    stateRef.current.startY = e.clientY;
+    stateRef.current.dragOffset = { x: 0, y: 0 };
+
     setIsDragging(true);
-    dragAxisRef.current = null;
     setDragAxis(null);
+    setDragOffset({ x: 0, y: 0 });
 
-    const clientX = 'clientX' in e ? e.clientX : e.touches[0]?.clientX ?? 0;
-    const clientY = 'clientY' in e ? e.clientY : e.touches[0]?.clientY ?? 0;
-
-    dragStartRef.current = { x: clientX, y: clientY };
-
-    // Long press detection: triggers smoldering heatwave on the slot rim
+    if (longPressTimerRef.current) clearTimeout(longPressTimerRef.current);
     longPressTimerRef.current = setTimeout(() => {
       setIsLongPressing(true);
       onLongPressChange?.(true);
@@ -82,17 +93,105 @@ export function QueueDock3DCarousel(props: {
     }, 320);
   };
 
-  const handleMove = React.useCallback(
-    (e: MouseEvent | TouchEvent) => {
-      if (!isDragging || isActivating) return;
+  const handlePointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (!stateRef.current.isDragging || stateRef.current.isActivating) return;
 
-      const clientX = 'clientX' in e ? e.clientX : e.touches[0]?.clientX ?? 0;
-      const clientY = 'clientY' in e ? e.clientY : e.touches[0]?.clientY ?? 0;
+    const deltaX = e.clientX - stateRef.current.startX;
+    const deltaY = e.clientY - stateRef.current.startY;
 
-      const deltaX = clientX - dragStartRef.current.x;
-      const deltaY = clientY - dragStartRef.current.y;
+    if (Math.abs(deltaX) > 4 || Math.abs(deltaY) > 4) {
+      if (longPressTimerRef.current) {
+        clearTimeout(longPressTimerRef.current);
+        longPressTimerRef.current = null;
+      }
+      setIsLongPressing(false);
+      onLongPressChange?.(false);
+    }
 
-      if (Math.abs(deltaX) > 6 || Math.abs(deltaY) > 6) {
+    // Dynamic directional resolution (never rigid lock on initial sub-pixel jitter)
+    let axis: 'x' | 'y' = 'x';
+    if (deltaY > 10 && deltaY > Math.abs(deltaX) * 0.7) {
+      axis = 'y';
+    } else {
+      axis = 'x';
+    }
+
+    stateRef.current.dragAxis = axis;
+    setDragAxis(axis);
+
+    if (axis === 'x') {
+      stateRef.current.dragOffset = { x: deltaX, y: 0 };
+      setDragOffset({ x: deltaX, y: 0 });
+      onDragProgress?.(0);
+    } else {
+      const offsetY = Math.max(0, deltaY);
+      stateRef.current.dragOffset = { x: 0, y: offsetY };
+      setDragOffset({ x: 0, y: offsetY });
+      onDragProgress?.(Math.min(1, offsetY / 80));
+    }
+  };
+
+  const handlePointerUp = (e: React.PointerEvent<HTMLDivElement>) => {
+    try {
+      if (e.currentTarget.hasPointerCapture(e.pointerId)) {
+        e.currentTarget.releasePointerCapture(e.pointerId);
+      }
+    } catch {}
+
+    if (longPressTimerRef.current) {
+      clearTimeout(longPressTimerRef.current);
+      longPressTimerRef.current = null;
+    }
+    setIsLongPressing(false);
+    onLongPressChange?.(false);
+
+    if (!stateRef.current.isDragging || stateRef.current.isActivating) return;
+    stateRef.current.isDragging = false;
+    setIsDragging(false);
+
+    const { dragAxis: activeAxis, dragOffset: activeOffset, currentIndex: curIdx, totalCards: total } = stateRef.current;
+
+    if (activeAxis === 'x') {
+      const floatShift = -activeOffset.x / DOCK_SPACING;
+      let roundedShift = Math.round(floatShift);
+
+      // Flick assistance: if user flicked (>= 30px) but didn't cross 0.5 card threshold
+      if (roundedShift === 0 && Math.abs(activeOffset.x) >= 30) {
+        roundedShift = activeOffset.x < 0 ? 1 : -1;
+      }
+
+      const targetIndex = Math.max(0, Math.min(total - 1, curIdx + roundedShift));
+      onIndexChange(targetIndex);
+      onDragProgress?.(0);
+    } else if (activeAxis === 'y') {
+      if (activeOffset.y > 45) {
+        onDragProgress?.(1);
+        setDragOffset({ x: 0, y: 0 });
+        stateRef.current.dragOffset = { x: 0, y: 0 };
+        stateRef.current.dragAxis = null;
+        setDragAxis(null);
+        onActivate();
+        return;
+      }
+      onDragProgress?.(0);
+    }
+
+    setDragOffset({ x: 0, y: 0 });
+    stateRef.current.dragOffset = { x: 0, y: 0 };
+    stateRef.current.dragAxis = null;
+    setDragAxis(null);
+  };
+
+  React.useEffect(() => {
+    if (!isDragging) return undefined;
+
+    const handleWindowPointerMove = (e: PointerEvent) => {
+      if (!stateRef.current.isDragging || stateRef.current.isActivating) return;
+
+      const deltaX = e.clientX - stateRef.current.startX;
+      const deltaY = e.clientY - stateRef.current.startY;
+
+      if (Math.abs(deltaX) > 4 || Math.abs(deltaY) > 4) {
         if (longPressTimerRef.current) {
           clearTimeout(longPressTimerRef.current);
           longPressTimerRef.current = null;
@@ -101,91 +200,122 @@ export function QueueDock3DCarousel(props: {
         onLongPressChange?.(false);
       }
 
-      if (!dragAxisRef.current) {
-        const axis = Math.abs(deltaX) > Math.abs(deltaY) ? 'x' : 'y';
-        dragAxisRef.current = axis;
-        setDragAxis(axis);
+      let axis: 'x' | 'y' = 'x';
+      if (deltaY > 8 && deltaY > Math.abs(deltaX) * 0.6) {
+        axis = 'y';
+      } else {
+        axis = 'x';
       }
 
-      if (dragAxisRef.current === 'x') {
+      stateRef.current.dragAxis = axis;
+      setDragAxis(axis);
+
+      if (axis === 'x') {
+        stateRef.current.dragOffset = { x: deltaX, y: 0 };
         setDragOffset({ x: deltaX, y: 0 });
         onDragProgress?.(0);
-      } else if (dragAxisRef.current === 'y') {
+      } else {
         const offsetY = Math.max(0, deltaY);
+        stateRef.current.dragOffset = { x: 0, y: offsetY };
         setDragOffset({ x: 0, y: offsetY });
-        onDragProgress?.(Math.min(1, offsetY / DOCK_ACTIVATION_THRESHOLD));
+        onDragProgress?.(Math.min(1, offsetY / 65));
       }
-    },
-    [isDragging, isActivating, onDragProgress, onLongPressChange],
-  );
+    };
 
-  const handleEnd = React.useCallback(() => {
-    if (longPressTimerRef.current) {
-      clearTimeout(longPressTimerRef.current);
-      longPressTimerRef.current = null;
-    }
-    setIsLongPressing(false);
-    onLongPressChange?.(false);
-
-    if (!isDragging || isActivating) return;
-    setIsDragging(false);
-
-    if (dragAxisRef.current === 'x') {
-      const offsetRatio = dragOffset.x / DOCK_SPACING;
-      if (offsetRatio < -0.22 && currentIndex < cards.length - 1) {
-        onIndexChange((prev: number) => prev + 1);
-      } else if (offsetRatio > 0.22 && currentIndex > 0) {
-        onIndexChange((prev: number) => prev - 1);
+    const handleWindowPointerUp = () => {
+      if (longPressTimerRef.current) {
+        clearTimeout(longPressTimerRef.current);
+        longPressTimerRef.current = null;
       }
-      onDragProgress?.(0);
-    } else if (dragAxisRef.current === 'y') {
-      if (dragOffset.y > DOCK_ACTIVATION_THRESHOLD) {
-        onDragProgress?.(1);
-        setDragOffset({ x: 0, y: 0 });
-        dragAxisRef.current = null;
-        setDragAxis(null);
-        setIsDragging(false);
-        onActivate();
-        return;
+      setIsLongPressing(false);
+      onLongPressChange?.(false);
+
+      if (!stateRef.current.isDragging || stateRef.current.isActivating) return;
+      stateRef.current.isDragging = false;
+      setIsDragging(false);
+
+      const { dragAxis: activeAxis, dragOffset: activeOffset, currentIndex: curIdx, totalCards: total } = stateRef.current;
+
+      if (activeAxis === 'x') {
+        const floatShift = -activeOffset.x / DOCK_SPACING;
+        let roundedShift = Math.round(floatShift);
+
+        // Flick assistance or edge tap
+        if (roundedShift === 0 && Math.abs(activeOffset.x) >= 30) {
+          roundedShift = activeOffset.x < 0 ? 1 : -1;
+        } else if (Math.abs(activeOffset.x) < 8 && Math.abs(activeOffset.y) < 8 && containerRef.current) {
+          // Tap on left/right side of the upper deck surface
+          const rect = containerRef.current.getBoundingClientRect();
+          const clickX = stateRef.current.startX - rect.left;
+          if (clickX < rect.width * 0.3) {
+            roundedShift = -1;
+          } else if (clickX > rect.width * 0.7) {
+            roundedShift = 1;
+          }
+        }
+
+        const targetIndex = Math.max(0, Math.min(total - 1, curIdx + roundedShift));
+        console.log('[3D CAROUSEL] Snapped precisely to targetIndex:', targetIndex);
+        onIndexChange(targetIndex);
+        onDragProgress?.(0);
+      } else if (activeAxis === 'y') {
+        if (activeOffset.y > 45) {
+          onDragProgress?.(1);
+          setDragOffset({ x: 0, y: 0 });
+          stateRef.current.dragOffset = { x: 0, y: 0 };
+          stateRef.current.dragAxis = null;
+          setDragAxis(null);
+          onActivate();
+          return;
+        }
+        onDragProgress?.(0);
       }
-      onDragProgress?.(0);
-    }
 
-    setDragOffset({ x: 0, y: 0 });
-    dragAxisRef.current = null;
-    setDragAxis(null);
-  }, [isDragging, isActivating, dragOffset, currentIndex, cards.length, onIndexChange, onActivate, onDragProgress, onLongPressChange]);
+      setDragOffset({ x: 0, y: 0 });
+      stateRef.current.dragOffset = { x: 0, y: 0 };
+      stateRef.current.dragAxis = null;
+      setDragAxis(null);
+    };
 
-  React.useEffect(() => {
-    const handleMouseUp = () => handleEnd();
-    const handleMouseMove = (e: MouseEvent) => handleMove(e);
-    const handleTouchMove = (e: TouchEvent) => handleMove(e);
-
-    if (isDragging) {
-      window.addEventListener('mousemove', handleMouseMove);
-      window.addEventListener('mouseup', handleMouseUp);
-      window.addEventListener('touchmove', handleTouchMove, { passive: false });
-      window.addEventListener('touchend', handleMouseUp);
-    }
+    window.addEventListener('pointermove', handleWindowPointerMove, { passive: false });
+    window.addEventListener('pointerup', handleWindowPointerUp);
+    window.addEventListener('pointercancel', handleWindowPointerUp);
 
     return () => {
-      window.removeEventListener('mousemove', handleMouseMove);
-      window.removeEventListener('mouseup', handleMouseUp);
-      window.removeEventListener('touchmove', handleTouchMove);
-      window.removeEventListener('touchend', handleMouseUp);
+      window.removeEventListener('pointermove', handleWindowPointerMove);
+      window.removeEventListener('pointerup', handleWindowPointerUp);
+      window.removeEventListener('pointercancel', handleWindowPointerUp);
     };
-  }, [isDragging, handleMove, handleEnd]);
+  }, [isDragging, onIndexChange, onActivate, onDragProgress, onLongPressChange]);
+
+  const handleWheel = (e: React.WheelEvent<HTMLDivElement>) => {
+    if (isActivating) return;
+    const delta = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
+    if (Math.abs(delta) > 25) {
+      if (delta > 0 && currentIndex < cards.length - 1) {
+        onIndexChange((prev: number) => Math.min(cards.length - 1, prev + 1));
+      } else if (delta < 0 && currentIndex > 0) {
+        onIndexChange((prev: number) => Math.max(0, prev - 1));
+      }
+    }
+  };
 
   return (
     <div
       ref={containerRef}
       className={cn(
-        'card-container relative -mt-36 sm:-mt-44 flex flex-1 items-center justify-center cursor-grab active:cursor-grabbing select-none',
+        'card-container relative flex h-full w-full items-center justify-center cursor-grab active:cursor-grabbing select-none touch-none pt-8 sm:pt-10',
         props.className,
       )}
-      style={{ perspective: '1000px', transformStyle: 'preserve-3d' }}
-      onMouseDown={handleStart}
-      onTouchStart={handleStart}
+      data-interactive="true"
+      draggable={false}
+      onDragStart={(e) => e.preventDefault()}
+      style={{ perspective: '1000px', transformStyle: 'preserve-3d', touchAction: 'none' }}
+      onPointerDown={handlePointerDown}
+      onPointerMove={handlePointerMove}
+      onPointerUp={handlePointerUp}
+      onPointerCancel={handlePointerUp}
+      onWheel={handleWheel}
     >
       {/* 1. Target Alignment Glow Frame (Positioned at Z = -50px, strictly behind all cards during drag) */}
       <div
@@ -223,22 +353,38 @@ export function QueueDock3DCarousel(props: {
         </div>
       </div>
 
-      {/* 3. Render 3D Cards (Strictly on top of Chevron) */}
-      {cards.map((card, index) => (
-        <QueueDockCardItem
-          key={card.id}
-          card={card}
-          index={index}
-          currentIndex={currentIndex}
-          dragOffset={dragOffset}
-          dragAxis={dragAxis}
-          isDragging={isDragging}
-          isActivating={isActivating}
-          ejectionStage={ejectionStage}
-          isLongPressing={isLongPressing}
-          showSuccess={showSuccess}
-        />
-      ))}
+      {/* 3. Render 3D Cards (Virtualized window of +/- 6 cards around active position for ultra-smooth 60fps with 1400+ cards) */}
+      {cards.map((card, index) => {
+        const offsetCards = dragAxis === 'x' && isDragging ? -dragOffset.x / DOCK_SPACING : 0;
+        const effectiveCenter = currentIndex + offsetCards;
+        if (Math.abs(index - effectiveCenter) > 6.5) {
+          return null;
+        }
+
+        return (
+          <QueueDockCardItem
+            key={card.id || index}
+            card={card}
+            index={index}
+            currentIndex={currentIndex}
+            dragOffset={dragOffset}
+            dragAxis={dragAxis}
+            isDragging={isDragging}
+            isActivating={isActivating}
+            ejectionStage={ejectionStage}
+            isLongPressing={isLongPressing}
+            showSuccess={showSuccess}
+            onSelect={onIndexChange}
+            onPointerDown={handlePointerDown}
+          />
+        );
+      })}
+
+      {/* 4. Full-Surface Top Touch/Drag Capture Surface (Spans 100% full width and height of the upper card deck) */}
+      <div
+        className="absolute inset-0 z-25 w-full h-full cursor-grab active:cursor-grabbing select-none touch-none"
+        onPointerDown={handlePointerDown}
+      />
     </div>
   );
 }

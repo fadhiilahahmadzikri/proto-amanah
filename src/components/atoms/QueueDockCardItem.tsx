@@ -25,6 +25,8 @@ export function QueueDockCardItem(props: {
   ejectionStage?: EjectionStage;
   isLongPressing?: boolean;
   showSuccess?: boolean;
+  onSelect?: (index: number) => void;
+  onPointerDown?: (e: React.PointerEvent<HTMLDivElement>) => void;
   className?: string;
 }) {
   const {
@@ -36,12 +38,14 @@ export function QueueDockCardItem(props: {
     isDragging,
     isActivating,
     ejectionStage = 'idle',
+    onSelect,
+    onPointerDown,
   } = props;
 
   // Compute offset from center active card index
   let distanceFromCenter = index - currentIndex;
 
-  if (dragAxis === 'x' && isDragging) {
+  if (isDragging && dragAxis !== 'y') {
     distanceFromCenter += dragOffset.x / DOCK_SPACING;
   }
 
@@ -63,7 +67,7 @@ export function QueueDockCardItem(props: {
   const opacity = 1;
 
   // Pull-down activation gesture handling (stays strictly in front of the target frame, 100% solid)
-  if (dragAxis === 'y' && dragOffset.y > 0 && Math.abs(distanceFromCenter) < 0.5) {
+  if (dragAxis === 'y' && dragOffset.y > 0 && index === currentIndex) {
     y += dragOffset.y;
     z = 20;
     zIndex = 50;
@@ -127,8 +131,12 @@ export function QueueDockCardItem(props: {
 
   return (
     <div
+      data-interactive="true"
+      draggable={false}
+      onDragStart={(e) => e.preventDefault()}
       className={cn(
-        'absolute will-change-transform select-none',
+        'absolute h-[335px] w-[212px] will-change-transform select-none touch-none pointer-events-auto cursor-grab active:cursor-grabbing',
+        index !== currentIndex ? 'cursor-pointer' : '',
         isActivating
           ? 'transition-all duration-600 ease-in'
           : ejectionStage === 'dock_appear' && index === currentIndex
@@ -147,9 +155,17 @@ export function QueueDockCardItem(props: {
         transformOrigin: 'center 20%',
         opacity,
         zIndex,
+        touchAction: 'none',
       }}
+      onClick={(e) => {
+        if (!isDragging && index !== currentIndex) {
+          e.stopPropagation();
+          onSelect?.(index);
+        }
+      }}
+      onPointerDown={onPointerDown}
     >
-      <QueueCardMaster card={card} />
+      <QueueCardMaster card={card} onPointerDown={onPointerDown} />
     </div>
   );
 }

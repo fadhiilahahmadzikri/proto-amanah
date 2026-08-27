@@ -17,6 +17,7 @@ import {
   type QueueDockCardData,
 } from '@/types/queue-dock.types';
 
+import { usePokemonCards } from '@/hooks/use-pokemon-cards';
 import { runGenieAnimation } from '@/lib/genie-renderer';
 
 export function QueueDockScreen(props: {
@@ -26,7 +27,8 @@ export function QueueDockScreen(props: {
   onSelectCard?: (card: QueueDockCardData) => void;
   className?: string;
 }) {
-  const cards = props.cards ?? DEFAULT_DOCK_CARDS;
+  const pokemonData = usePokemonCards();
+  const cards = props.cards ?? (pokemonData.cards.length > 0 ? pokemonData.cards : DEFAULT_DOCK_CARDS);
   const [currentIndex, setCurrentIndex] = React.useState(1);
   const [activationStage, setActivationStage] = React.useState<'idle' | 'plunging' | 'activating'>('idle');
   const [ejectionStage, setEjectionStage] = React.useState<EjectionStage>('idle');
@@ -40,8 +42,8 @@ export function QueueDockScreen(props: {
   const heroCardRef = React.useRef<HTMLDivElement>(null);
   const screenContainerRef = React.useRef<HTMLDivElement>(null);
 
-  const [displayedHeadline, setDisplayedHeadline] = React.useState('Pilih antrean dokter Anda');
-  const prevHeadlineRef = React.useRef('Pilih antrean dokter Anda');
+  const [displayedHeadline, setDisplayedHeadline] = React.useState('Pilih kartu misteri Pokémon');
+  const prevHeadlineRef = React.useRef('Pilih kartu misteri Pokémon');
 
   const isPlungingOrActive = activationStage === 'plunging' || activationStage === 'activating';
   const isMorphingActive = activationStage === 'activating';
@@ -49,11 +51,11 @@ export function QueueDockScreen(props: {
   const currentCard = cards[currentIndex];
   const isNearSlot = dragProgress >= 0.75 && !isPlungingOrActive;
 
-  let headlineText = 'Pilih antrean dokter Anda';
+  let headlineText = 'Pilih kartu misteri Pokémon';
   if (isMorphingActive) {
-    headlineText = 'Activating the offer for you...';
+    headlineText = 'Membuka misteri Pokémon...';
   } else if (isNearSlot) {
-    headlineText = 'Release to activate offer';
+    headlineText = 'Lepas untuk reveal Pokémon!';
   }
 
   // Native GSAP Text Blurry Morph Transformation
@@ -182,32 +184,36 @@ export function QueueDockScreen(props: {
   return (
     <div
       ref={screenContainerRef}
+      onPointerDown={(e) => {
+        const targetEl = e.target as HTMLElement;
+        console.log('[SCREEN ROOT] PointerDown at', e.clientX, e.clientY, '| Target:', targetEl?.tagName, targetEl?.className);
+      }}
       className={cn(
         'relative flex h-full w-full flex-col overflow-hidden bg-[#0f0f0f] font-sans text-white select-none',
         props.className,
       )}
     >
       {/* 1. Screen Header */}
-      <header className="z-10 flex items-center justify-between p-5 sm:p-6 shrink-0">
+      <header className="absolute top-0 inset-x-0 z-30 flex items-center justify-between p-5 sm:p-6 pointer-events-none">
         <button
           type="button"
           aria-label="Kembali"
-          className="p-1.5 -ml-1 text-white hover:opacity-80 active:scale-90 transition-all cursor-pointer"
+          className="p-1.5 -ml-1 text-white hover:opacity-80 active:scale-90 transition-all cursor-pointer pointer-events-auto"
           onClick={props.onBack}
         >
           <X size={22} strokeWidth={2.5} />
         </button>
-        <span className="text-xs font-semibold tracking-wide text-gray-300">S&K Antrean</span>
+        <span className="text-xs font-semibold tracking-wide text-gray-300 pointer-events-auto">S&K Antrean</span>
       </header>
 
       {/* 2. Title & Greeting with 100% Pure Morphing to Center (Starts ONLY after card is swallowed) */}
       <div
         className={cn(
-          'z-20 mt-1 flex flex-col items-center shrink-0 px-4 transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)]',
+          'absolute top-12 sm:top-14 inset-x-0 z-20 flex flex-col items-center px-4 transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] pointer-events-none',
           isMorphingActive
             ? 'translate-y-48 sm:translate-y-56 scale-105'
             : 'translate-y-0 scale-100',
-          showSuccess ? 'opacity-0 pointer-events-none' : 'opacity-100',
+          showSuccess ? 'opacity-0' : 'opacity-100',
         )}
       >
         {/* Morphing Gift Icon (Solid Yellow on activating or near slot, no glow) */}
@@ -271,7 +277,7 @@ export function QueueDockScreen(props: {
         isActivating={isMorphingActive}
         dragProgress={dragProgress}
         isLongPressing={isLongPressing}
-        label="Drag down to activate offer"
+        label="Tarik kartu ke bawah untuk reveal"
       />
 
       {/* 5. Activation & Success Overlay */}

@@ -2,111 +2,236 @@ import React from 'react';
 import { cn } from '@/lib/utils';
 import type { QueueDockCardData } from '@/types/queue-dock.types';
 
+export const POKEMON_CARD_BACK = 'https://tcg.pokemon.com/assets/img/global/tcg-card-back-2x.jpg';
+
+const round = (value: number, precision = 3) => parseFloat(value.toFixed(precision));
+const clamp = (value: number, min = 0, max = 100) => Math.min(Math.max(value, min), max);
+const adjust = (value: number, fromMin: number, fromMax: number, toMin: number, toMax: number) => {
+  return round(toMin + ((toMax - toMin) * (value - fromMin)) / (fromMax - fromMin));
+};
+
 export function QueueCardMaster(props: {
   card: QueueDockCardData;
+  isRevealed?: boolean;
   badgeText?: string;
   className?: string;
+  onPointerDown?: (e: React.PointerEvent<HTMLDivElement>) => void;
   children?: React.ReactNode;
 }) {
-  const card = props.card;
-  const badge = props.badgeText ?? 'VOUCHER';
+  const { card, isRevealed = false, className, onPointerDown, children } = props;
+  const [imgSrc, setImgSrc] = React.useState<string | undefined>(card.imageUrl);
+  const [isInteracting, setIsInteracting] = React.useState(false);
+  const cardRef = React.useRef<HTMLDivElement>(null);
+  const rafRef = React.useRef<number | null>(null);
 
+  // Holographic shader spring / pointer state
+  const [pointer, setPointer] = React.useState({
+    x: 50,
+    y: 50,
+    rx: 0,
+    ry: 0,
+    bgX: 50,
+    bgY: 50,
+    opacity: 0,
+  });
+
+  React.useEffect(() => {
+    setImgSrc(card.imageUrl);
+  }, [card.imageUrl]);
+
+  // Initial showcase sparkle when revealed
+  React.useEffect(() => {
+    if (!isRevealed) return;
+
+    let step = 0;
+    const interval = setInterval(() => {
+      step += 0.08;
+      const rx = Math.sin(step) * 14;
+      const ry = Math.cos(step) * 14;
+      const px = 50 + Math.sin(step) * 35;
+      const py = 50 + Math.cos(step) * 35;
+
+      setPointer({
+        x: round(px),
+        y: round(py),
+        rx: round(rx),
+        ry: round(ry),
+        bgX: adjust(px, 0, 100, 37, 63),
+        bgY: adjust(py, 0, 100, 33, 67),
+        opacity: 0.85,
+      });
+
+      if (step >= Math.PI * 2.2) {
+        clearInterval(interval);
+        // Smooth return to neutral rest
+        setTimeout(() => {
+          setPointer({ x: 50, y: 50, rx: 0, ry: 0, bgX: 50, bgY: 50, opacity: 0 });
+        }, 300);
+      }
+    }, 25);
+
+    return () => clearInterval(interval);
+  }, [isRevealed]);
+
+  const handlePointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (!cardRef.current) return;
+    setIsInteracting(true);
+
+    const rect = cardRef.current.getBoundingClientRect();
+    const absX = e.clientX - rect.left;
+    const absY = e.clientY - rect.top;
+
+    const percentX = clamp(round((100 / rect.width) * absX));
+    const percentY = clamp(round((100 / rect.height) * absY));
+    const centerX = percentX - 50;
+    const centerY = percentY - 50;
+
+    if (rafRef.current) cancelAnimationFrame(rafRef.current);
+
+    rafRef.current = requestAnimationFrame(() => {
+      setPointer({
+        x: round(percentX),
+        y: round(percentY),
+        rx: round(-(centerX / 3.2)),
+        ry: round(centerY / 3.2),
+        bgX: adjust(percentX, 0, 100, 37, 63),
+        bgY: adjust(percentY, 0, 100, 33, 67),
+        opacity: 1,
+      });
+    });
+  };
+
+  const handlePointerLeave = () => {
+    if (rafRef.current) cancelAnimationFrame(rafRef.current);
+    setIsInteracting(false);
+    setPointer({
+      x: 50,
+      y: 50,
+      rx: 0,
+      ry: 0,
+      bgX: 50,
+      bgY: 50,
+      opacity: 0,
+    });
+  };
+
+  // Unrevealed state (default on 3D rail): Displays authentic Pokémon card back
+  if (!isRevealed) {
+    return (
+      <div
+        className={cn(
+          'relative flex h-[335px] w-[212px] shrink-0 flex-col overflow-hidden rounded-[18px] shadow-[0_20px_45px_rgba(0,0,0,0.85)] select-none bg-[#0c142c] border border-blue-400/20 box-border pointer-events-auto cursor-grab active:cursor-grabbing',
+          className,
+        )}
+        draggable={false}
+        onDragStart={(e) => e.preventDefault()}
+        onPointerDown={onPointerDown}
+      >
+        {/* Official Pokémon TCG Card Back Image */}
+        <img
+          src={POKEMON_CARD_BACK}
+          alt="Pokémon Mystery Card Back"
+          className="absolute inset-0 h-full w-full object-cover pointer-events-none select-none"
+          loading="eager"
+          draggable={false}
+          onDragStart={(e) => e.preventDefault()}
+        />
+
+        {/* Glossy Sheen Overlay */}
+        <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/10 to-transparent pointer-events-none" />
+
+        {/* Outer Bevel Stroke */}
+        <div className="absolute inset-0 rounded-[18px] ring-1 ring-inset ring-white/15 pointer-events-none" />
+
+        {children}
+      </div>
+    );
+  }
+
+  const primaryType = (card.types?.[0] ?? card.subtitle ?? 'lightning').toLowerCase();
+  const rarity = (card.rarity ?? card.title ?? 'rare holo').toLowerCase();
+  const subtypes = (card.subtypes?.join(' ') ?? 'basic').toLowerCase();
+  const supertype = (card.supertype ?? 'pokémon').toLowerCase();
+  const number = (card.number ?? card.id ?? '160').toLowerCase();
+  const set = (card.set ?? 'swsh12pt5').toLowerCase();
+
+  const centerX = pointer.x - 50;
+  const centerY = pointer.y - 50;
+  const fromCenter = clamp(Math.sqrt(centerX * centerX + centerY * centerY) / 50, 0, 1);
+
+  const dynamicStyles = {
+    '--pointer-x': `${pointer.x}%`,
+    '--pointer-y': `${pointer.y}%`,
+    '--pointer-from-center': `${fromCenter}`,
+    '--pointer-from-top': `${pointer.y / 100}`,
+    '--pointer-from-left': `${pointer.x / 100}`,
+    '--card-opacity': `${pointer.opacity}`,
+    '--rotate-x': `${pointer.rx}deg`,
+    '--rotate-y': `${pointer.ry}deg`,
+    '--background-x': `${pointer.bgX}%`,
+    '--background-y': `${pointer.bgY}%`,
+    '--card-scale': '1',
+    '--translate-x': '0px',
+    '--translate-y': '0px',
+  } as React.CSSProperties;
+
+  // Revealed state (on Page 2): 100% Fidelity 3D Holographic Foil & Glitter Shader
   return (
     <div
+      ref={cardRef}
       className={cn(
-        'relative flex h-[335px] w-[212px] shrink-0 flex-col overflow-hidden rounded-[18px] p-4 sm:p-5 shadow-[0_20px_40px_rgba(0,0,0,0.8)] select-none bg-[#121212]',
-        card.bgClass,
-        props.className,
+        'pokemon-holo-card interactive masked',
+        primaryType,
+        isInteracting ? 'interacting active' : '',
+        'aspect-[0.718] w-full max-w-[340px] select-none cursor-pointer',
+        className,
       )}
+      data-rarity={rarity}
+      data-subtypes={subtypes}
+      data-supertype={supertype}
+      data-number={number}
+      data-set={set}
+      style={dynamicStyles}
+      onPointerMove={handlePointerMove}
+      onPointerLeave={handlePointerLeave}
     >
-      {/* 1. Brand Header */}
-      <div className="mb-auto flex items-center justify-between z-10 relative">
-        <span
-          className={cn(
-            'text-lg font-bold tracking-tight uppercase',
-            card.id === 'zomato'
-              ? 'text-[#f50]'
-              : card.id === 'spotify'
-                ? 'text-[#1DB954]'
-                : card.id === 'netflix'
-                  ? 'text-[#E50914]'
-                  : 'text-white',
-          )}
-        >
-          {card.brand}
-        </span>
-        <span className="text-[10px] font-semibold tracking-wider text-white/70 px-2.5 py-0.5 rounded-full bg-white/10 backdrop-blur-sm whitespace-nowrap shrink-0">
-          {badge}
-        </span>
+      <div className="card__translater">
+        <div className="card__rotator">
+          {/* Card Back */}
+          <img
+            className="card__back"
+            src={POKEMON_CARD_BACK}
+            alt="The back of a Pokemon Card"
+            loading="lazy"
+            width="660"
+            height="921"
+          />
+
+          {/* Card Front with Holographic Shine & Glare Shaders */}
+          <div className="card__front">
+            {imgSrc && (
+              <img
+                src={imgSrc}
+                alt={`${card.brand} Pokemon Card`}
+                loading="eager"
+                width="660"
+                height="921"
+                onError={() => {
+                  if (imgSrc.includes('_hires.png')) {
+                    setImgSrc(imgSrc.replace('_hires.png', '.png'));
+                  } else if (card.spriteUrl) {
+                    setImgSrc(card.spriteUrl);
+                  }
+                }}
+              />
+            )}
+            <div className="card__shine" />
+            <div className="card__glare" />
+          </div>
+        </div>
       </div>
 
-      {/* 2. Card Main Typography Anatomy */}
-      <div className="z-10 relative mt-6 flex flex-col">
-        <div className="text-3xl font-black leading-tight text-white tracking-tight">
-          {card.title}
-        </div>
-        <div className="text-base font-bold text-white/90 tracking-wide mt-0.5">
-          {card.subtitle}
-        </div>
-        {card.desc && (
-          <p className="mt-2 text-xs font-medium text-white/70 line-clamp-2">{card.desc}</p>
-        )}
-      </div>
-
-      {/* 3. Bespoke Graphical Elements for each brand variant */}
-      {card.id === 'amazon' && (
-        <div className="absolute bottom-4 right-4 text-white/25 pointer-events-none">
-          <svg
-            width="56"
-            height="56"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.5"
-            aria-hidden="true"
-          >
-            <path d="M20 12v10H4V12M2 7h20v5H2zM12 22V7M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7zM12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z" />
-          </svg>
-        </div>
-      )}
-      {card.id === 'airtel' && (
-        <div className="absolute bottom-0 right-0 h-32 w-32 rounded-tl-full bg-white/10 pointer-events-none" />
-      )}
-      {card.id === 'zomato' && (
-        <div className="absolute -bottom-10 -right-10 h-40 w-40 rounded-full border-4 border-[#f50]/25 pointer-events-none" />
-      )}
-      {card.id === 'spotify' && (
-        <div className="absolute bottom-4 right-4 flex items-end gap-1 opacity-40 pointer-events-none">
-          <div className="w-1.5 h-6 bg-[#1DB954] rounded-full animate-pulse" />
-          <div className="w-1.5 h-10 bg-[#1DB954] rounded-full animate-pulse delay-100" />
-          <div className="w-1.5 h-8 bg-[#1DB954] rounded-full animate-pulse delay-200" />
-          <div className="w-1.5 h-12 bg-[#1DB954] rounded-full animate-pulse delay-300" />
-        </div>
-      )}
-      {card.id === 'apple' && (
-        <div className="absolute -bottom-8 -right-8 h-36 w-36 rounded-full bg-white/5 border border-white/15 backdrop-blur-md pointer-events-none" />
-      )}
-      {card.id === 'disney' && (
-        <div className="absolute bottom-0 right-0 h-36 w-36 bg-radial from-cyan-400/20 via-transparent to-transparent blur-xl pointer-events-none" />
-      )}
-      {card.id === 'grab' && (
-        <div className="absolute -bottom-6 -right-6 h-28 w-28 rotate-45 border-2 border-emerald-400/30 bg-emerald-500/10 pointer-events-none" />
-      )}
-      {card.id === 'gojek' && (
-        <div className="absolute -bottom-8 -right-8 flex h-36 w-36 items-center justify-center rounded-full border-2 border-lime-400/20 pointer-events-none">
-          <div className="h-20 w-20 rounded-full border-2 border-lime-400/30" />
-        </div>
-      )}
-      {card.id === 'netflix' && (
-        <div className="absolute bottom-0 right-3 flex h-28 w-14 items-end pointer-events-none">
-          <div className="h-full w-4 bg-[#E50914]/20 shadow-[0_0_15px_#E50914]" />
-        </div>
-      )}
-      {card.id === 'halodoc' && (
-        <div className="absolute -bottom-8 -right-8 h-32 w-32 rounded-full bg-[#FF2D55]/15 blur-xl pointer-events-none" />
-      )}
-
-      {props.children}
+      {children}
     </div>
   );
 }
