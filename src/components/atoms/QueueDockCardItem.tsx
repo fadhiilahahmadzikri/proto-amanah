@@ -58,8 +58,8 @@ export function QueueDockCardItem(props: {
   // Pull-down activation gesture handling (stays strictly in front of the target frame, 100% solid)
   if (dragAxis === 'y' && dragOffset.y > 0 && Math.abs(distanceFromCenter) < 0.5) {
     y += dragOffset.y;
-    z = 10;
-    zIndex = 40;
+    z = 20;
+    zIndex = 50;
   }
 
   // Activation animation state (disperse left & right offscreen, center card plunges completely down offscreen through slot)
@@ -79,7 +79,8 @@ export function QueueDockCardItem(props: {
     } else {
       x = 0;
       y = 650;
-      z = -40;
+      z = 20;
+      zIndex = 50;
       rotateY = 0;
       rotateZ = 0;
     }
@@ -88,7 +89,8 @@ export function QueueDockCardItem(props: {
     if (index === currentIndex) {
       x = 0;
       y = 650;
-      z = -40;
+      z = 20;
+      zIndex = 50;
       rotateY = 0;
       rotateZ = 0;
     }
@@ -97,7 +99,18 @@ export function QueueDockCardItem(props: {
     if (index === currentIndex) {
       x = 0;
       y = 165;
-      z = -10;
+      z = 20;
+      zIndex = 50;
+      rotateY = 0;
+      rotateZ = 0;
+    }
+  } else if (ejectionStage === 'full_eject') {
+    // Stage 3 of Cancellation: Card glides all the way up into the strader frame
+    if (index === currentIndex) {
+      x = 0;
+      y = 0;
+      z = 20;
+      zIndex = 50;
       rotateY = 0;
       rotateZ = 0;
     }
@@ -111,7 +124,7 @@ export function QueueDockCardItem(props: {
         'absolute flex h-[320px] w-[195px] flex-col overflow-hidden rounded-[16px] p-4 sm:p-5 shadow-[0_20px_40px_rgba(0,0,0,0.8)] will-change-transform select-none',
         card.bgClass,
         isActivating
-          ? 'transition-all duration-700 ease-out'
+          ? 'transition-all duration-600 ease-in'
           : ejectionStage === 'dock_appear' && index === currentIndex
             ? 'transition-none'
             : ejectionStage === 'atm_peek' && index === currentIndex

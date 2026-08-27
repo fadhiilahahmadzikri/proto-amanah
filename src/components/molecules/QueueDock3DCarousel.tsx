@@ -200,7 +200,7 @@ export function QueueDock3DCarousel(props: {
                 : 'opacity-100 scale-100 border-orange-500/90 shadow-[0_0_35px_rgba(255,153,0,0.4),inset_0_0_15px_rgba(255,153,0,0.3)]',
         )}
         style={{
-          transform: 'translate3d(0, 0, 0px)',
+          transform: 'translate3d(0, 0, -20px)',
         }}
       />
 

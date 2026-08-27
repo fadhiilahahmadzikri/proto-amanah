@@ -25,7 +25,7 @@ export function QueueDockScreen(props: {
 }) {
   const cards = props.cards ?? DEFAULT_DOCK_CARDS;
   const [currentIndex, setCurrentIndex] = React.useState(1);
-  const [isActivating, setIsActivating] = React.useState(false);
+  const [activationStage, setActivationStage] = React.useState<'idle' | 'plunging' | 'activating'>('idle');
   const [ejectionStage, setEjectionStage] = React.useState<EjectionStage>('idle');
   const [showSuccess, setShowSuccess] = React.useState(false);
   const [dragProgress, setDragProgress] = React.useState(0);
@@ -33,20 +33,38 @@ export function QueueDockScreen(props: {
 
   const confettiRef = React.useRef<ConfettiCanvasHandle>(null);
 
-  const handleActivate = React.useCallback(() => {
-    setIsActivating(true);
+  const isPlungingOrActive = activationStage === 'plunging' || activationStage === 'activating';
+  const isMorphingActive = activationStage === 'activating';
 
+  const handleActivate = React.useCallback(() => {
+    // Stage 1 (t = 0ms): Card plunges completely down into the slot mouth off-screen
+    // Header, dock slot, and progress bar remain unchanged during the plunge!
+    setActivationStage('plunging');
+
+    if (typeof window !== 'undefined' && 'vibrate' in navigator) {
+      try {
+        navigator.vibrate(20);
+      } catch {}
+    }
+
+    // Stage 2 (t = 600ms): Strictly AFTER card is 100% swallowed and invisible:
+    // Header morphs & glides down to center, sun orange progress bar appears & fills, dock slides down!
+    setTimeout(() => {
+      setActivationStage('activating');
+    }, 600);
+
+    // Stage 3 (t = 3000ms): Success voucher overlay appears with celebratory confetti!
     setTimeout(() => {
       setShowSuccess(true);
       confettiRef.current?.fire();
-    }, 2500);
+    }, 3000);
   }, []);
 
   const handleCloseOverlay = React.useCallback(() => {
     // Step 1 (t = 0ms): Overlay closes, bottom dock slot slides up into view (takes 500ms).
     // The card remains 100% off-screen way below the bottom of the device frame.
     setShowSuccess(false);
-    setIsActivating(false);
+    setActivationStage('idle');
     setEjectionStage('dock_appear');
     setDragProgress(0);
 
@@ -78,6 +96,14 @@ export function QueueDockScreen(props: {
   }, []);
 
   const currentCard = cards[currentIndex];
+  const isNearSlot = dragProgress >= 0.75 && !isPlungingOrActive;
+
+  let headlineText = 'Pilih antrean dokter Anda';
+  if (isMorphingActive) {
+    headlineText = 'Activating the offer for you...';
+  } else if (isNearSlot) {
+    headlineText = 'Release to activate offer';
+  }
 
   return (
     <div
@@ -99,21 +125,21 @@ export function QueueDockScreen(props: {
         <span className="text-xs font-semibold tracking-wide text-gray-300">S&K Antrean</span>
       </header>
 
-      {/* 2. Title & Greeting with 100% Pure Morphing to Center */}
+      {/* 2. Title & Greeting with 100% Pure Morphing to Center (Starts ONLY after card is swallowed) */}
       <div
         className={cn(
           'z-20 mt-1 flex flex-col items-center shrink-0 px-4 transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)]',
-          isActivating
+          isMorphingActive
             ? 'translate-y-48 sm:translate-y-56 scale-105'
             : 'translate-y-0 scale-100',
           showSuccess ? 'opacity-0 pointer-events-none' : 'opacity-100',
         )}
       >
-        {/* Morphing Gift Icon (Solid Yellow on activating, no glow) */}
+        {/* Morphing Gift Icon (Solid Yellow on activating or near slot, no glow) */}
         <div
           className={cn(
-            'mb-3 transition-colors duration-300',
-            isActivating ? 'text-yellow-400' : 'text-red-500',
+            'mb-3 transition-all duration-300',
+            isMorphingActive || isNearSlot ? 'text-yellow-400 scale-105' : 'text-red-500 scale-100',
           )}
         >
           <svg width="34" height="34" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
@@ -125,25 +151,27 @@ export function QueueDockScreen(props: {
         <h1
           className={cn(
             'text-center text-xl sm:text-2xl font-bold leading-snug transition-all duration-300 select-none',
-            isActivating
+            isMorphingActive
               ? 'text-yellow-400 max-w-[220px]'
-              : 'text-white max-w-[170px]',
+              : isNearSlot
+                ? 'text-yellow-400 max-w-[190px]'
+                : 'text-white max-w-[170px]',
           )}
         >
-          {isActivating ? 'Activating the offer for you...' : 'Pilih antrean dokter Anda'}
+          {headlineText}
         </h1>
 
         {/* Morphing Sun Orange Gradient Progress Bar */}
         <div
           className={cn(
             'mt-6 h-1.5 w-48 overflow-hidden rounded-full bg-white/15 p-[0.5px] transition-opacity duration-500',
-            isActivating ? 'opacity-100' : 'opacity-0 pointer-events-none',
+            isMorphingActive ? 'opacity-100' : 'opacity-0 pointer-events-none',
           )}
         >
           <div
             className={cn(
               'h-full rounded-full bg-gradient-to-r from-[#ff9900] via-[#ea580c] to-[#f59e0b] shadow-[0_0_8px_rgba(234,88,12,0.6)]',
-              isActivating ? 'w-full transition-all duration-[2400ms] ease-out' : 'w-0 transition-none',
+              isMorphingActive ? 'w-full transition-all duration-[2400ms] ease-out' : 'w-0 transition-none',
             )}
           />
         </div>
@@ -157,14 +185,14 @@ export function QueueDockScreen(props: {
         onActivate={handleActivate}
         onDragProgress={setDragProgress}
         onLongPressChange={setIsLongPressing}
-        isActivating={isActivating}
+        isActivating={isPlungingOrActive}
         ejectionStage={ejectionStage}
         showSuccess={showSuccess}
       />
 
       {/* 4. Notched Clip-Path Bottom Floor Mask with Radiant Slot Light Emitter */}
       <BottomNotchedDock
-        isActivating={isActivating}
+        isActivating={isMorphingActive}
         dragProgress={dragProgress}
         isLongPressing={isLongPressing}
         label="Drag down to activate offer"
@@ -172,7 +200,7 @@ export function QueueDockScreen(props: {
 
       {/* 5. Activation & Success Overlay */}
       <QueueActivationOverlay
-        isActivating={isActivating}
+        isActivating={isMorphingActive}
         showSuccess={showSuccess}
         activeCard={currentCard}
         onClose={handleCloseOverlay}
