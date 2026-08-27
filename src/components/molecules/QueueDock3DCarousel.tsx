@@ -265,7 +265,7 @@ export function QueueDock3DCarousel(props: {
           roundedShift = activeOffset.x < 0 ? 1 : -1;
         }
 
-        const targetIndex = Math.max(0, Math.min(total - 1, curIdx + roundedShift));
+        const targetIndex = ((curIdx + roundedShift) % total + total) % total;
         onIndexChange(targetIndex);
         onDragProgress?.(0);
       } else if (activeAxis === 'y') {
@@ -362,8 +362,7 @@ export function QueueDock3DCarousel(props: {
             }
           }
 
-          const targetIndex = Math.max(0, Math.min(total - 1, curIdx + roundedShift));
-          console.log('[3D CAROUSEL] Snapped precisely to targetIndex:', targetIndex);
+          const targetIndex = ((curIdx + roundedShift) % total + total) % total;
           onIndexChange(targetIndex);
           onDragProgress?.(0);
         } else if (activeAxis === 'y') {
@@ -401,10 +400,10 @@ export function QueueDock3DCarousel(props: {
     if (isActivating) return;
     const delta = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
     if (Math.abs(delta) > 25) {
-      if (delta > 0 && currentIndex < cards.length - 1) {
-        onIndexChange((prev: number) => Math.min(cards.length - 1, prev + 1));
-      } else if (delta < 0 && currentIndex > 0) {
-        onIndexChange((prev: number) => Math.max(0, prev - 1));
+      if (delta > 0) {
+        onIndexChange((prev: number) => (prev + 1) % cards.length);
+      } else {
+        onIndexChange((prev: number) => ((prev - 1) % cards.length + cards.length) % cards.length);
       }
     }
   };
@@ -462,14 +461,17 @@ export function QueueDock3DCarousel(props: {
         </div>
       </div>
 
-      {/* 3. Render 3D Cards (Virtualized window of +/- 6 cards around active position for ultra-smooth 60fps with 1400+ cards) */}
-      {cards.map((card, index) => {
+      {/* 3. Render 3D Cards: Infinite Circular Virtualized Window of +/- 6 slots around effective center */}
+      {Array.from({ length: 13 }, (_, slotIdx) => {
+        const relativeSlot = slotIdx - 6; // -6 to +6
         const totalXOffset = (dragAxis === 'x' && isDragging ? dragOffset.x : 0) - spinOffset;
         const offsetCards = -totalXOffset / DOCK_SPACING;
         const effectiveCenter = currentIndex + offsetCards;
-        if (Math.abs(index - effectiveCenter) > 6.5) {
-          return null;
-        }
+        const centerFloor = Math.round(effectiveCenter);
+        const virtualIndex = centerFloor + relativeSlot;
+        const actualCardIndex = ((virtualIndex % cards.length) + cards.length) % cards.length;
+        const card = cards[actualCardIndex];
+        if (!card) return null;
 
         const effectiveDragOffset = {
           x: totalXOffset,
@@ -478,9 +480,9 @@ export function QueueDock3DCarousel(props: {
 
         return (
           <QueueDockCardItem
-            key={card.id || index}
+            key={`slot-${virtualIndex}-${card.id || actualCardIndex}`}
             card={card}
-            index={index}
+            index={virtualIndex}
             currentIndex={currentIndex}
             dragOffset={effectiveDragOffset}
             dragAxis={spinOffset !== 0 ? 'x' : dragAxis}
@@ -489,7 +491,10 @@ export function QueueDock3DCarousel(props: {
             ejectionStage={ejectionStage}
             isLongPressing={isLongPressing}
             showSuccess={showSuccess}
-            onSelect={onIndexChange}
+            onSelect={(clickedVirtualIndex) => {
+              const targetIndex = ((clickedVirtualIndex % cards.length) + cards.length) % cards.length;
+              onIndexChange(targetIndex);
+            }}
             onPointerDown={handlePointerDown}
           />
         );

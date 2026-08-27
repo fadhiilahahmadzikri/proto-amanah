@@ -20,37 +20,48 @@ export function BottomNotchedDock(props: {
         className,
       )}
     >
-      {/* 1. Interior Slot Radiant Semi-Circular Halo Emitter (20% Initial Base Glow -> 100% on Drag) */}
       <div
-        className="absolute top-0 inset-x-0 flex flex-col items-center pointer-events-none transition-all duration-300 z-0 overflow-visible"
+        className="absolute top-0 inset-x-0 flex flex-col items-center pointer-events-none transition-all duration-700 z-0 overflow-visible"
         style={{
           opacity: isLongPressing ? 1 : 0.2 + activeProgress * 0.8,
         }}
       >
-        {/* Superheated Molten Thermal Aura on Long-Press */}
+        {/* Natural Thermal Rising Heat Beam on Long-Press (Slow gradual buildup over ~1.2s) */}
         <div
           className={cn(
-            'absolute -top-24 h-[175px] w-[245px] rounded-t-full bg-gradient-to-t from-red-600 via-orange-500 to-amber-300 blur-xl transition-all duration-300 pointer-events-none',
-            isLongPressing ? 'opacity-100 scale-105 animate-pulse' : 'opacity-0 scale-90',
+            'absolute -top-36 h-[220px] w-[260px] rounded-t-full bg-gradient-to-t from-amber-600/90 via-orange-500/60 to-transparent blur-2xl transition-all duration-1000 ease-out pointer-events-none origin-bottom',
+            isLongPressing
+              ? 'opacity-100 scale-y-100 scale-x-105 animate-pulse'
+              : 'opacity-0 scale-y-50 scale-x-90',
+          )}
+        />
+
+        {/* Inner Golden Heat Core */}
+        <div
+          className={cn(
+            'absolute -top-24 h-[160px] w-[200px] rounded-t-full bg-gradient-to-t from-amber-500/80 via-yellow-400/40 to-transparent blur-xl transition-all duration-1200 ease-out pointer-events-none origin-bottom',
+            isLongPressing
+              ? 'opacity-90 scale-y-100 scale-x-100'
+              : 'opacity-0 scale-y-30 scale-x-80',
           )}
         />
 
         {/* Semi-Circular Radial Volumetric Dome Halo */}
         <div
           className={cn(
-            'relative -top-16 h-[150px] w-[245px] rounded-t-full bg-gradient-to-t from-amber-400/85 via-orange-500/40 to-transparent blur-xl transition-all duration-200',
-            isLongPressing ? 'scale-110 from-orange-500/90 via-red-500/60' : '',
+            'relative -top-16 h-[150px] w-[245px] rounded-t-full bg-gradient-to-t from-amber-400/85 via-orange-500/40 to-transparent blur-xl transition-all duration-700',
+            isLongPressing ? 'scale-110 from-orange-500/80 via-amber-500/50' : '',
           )}
           style={{
-            transform: isLongPressing ? 'scale(1.1)' : `scale(${0.92 + activeProgress * 0.28})`,
+            transform: isLongPressing ? 'scale(1.08)' : `scale(${0.92 + activeProgress * 0.28})`,
           }}
         />
 
         {/* Interior Cavity Core Radial Aperture Glow */}
         <div
           className={cn(
-            'absolute top-2 h-[45px] w-[235px] rounded-full blur-md transition-all duration-300',
-            isLongPressing ? 'bg-orange-500 shadow-[0_0_25px_#ea580c] scale-105' : 'bg-amber-300/90',
+            'absolute top-2 h-[45px] w-[235px] rounded-full blur-md transition-all duration-800',
+            isLongPressing ? 'bg-amber-500 shadow-[0_0_25px_#f59e0b] scale-105' : 'bg-amber-300/90',
           )}
           style={{
             opacity: isLongPressing ? 1 : 0.45 + activeProgress * 0.55,
@@ -95,24 +106,24 @@ export function BottomNotchedDock(props: {
             fill="none"
           />
 
-          {/* 3. Dedicated Superheated Molten Glow strictly on the Straight Core Lip (X: 100 -> 290, Y: 40) */}
+          {/* 3. Dedicated Natural Molten Glow strictly on the Straight Core Lip (X: 100 -> 290, Y: 40) */}
           <path
             d="M 100 40 L 290 40"
             stroke="url(#straightMoltenGlow)"
-            strokeWidth={isLongPressing ? 10 : 0}
+            strokeWidth={isLongPressing ? 8 : 0}
             strokeLinecap="round"
             fill="none"
-            className={cn('transition-all duration-300', isLongPressing ? 'opacity-100 blur-[5px]' : 'opacity-0')}
+            className={cn('transition-all duration-1000 ease-out', isLongPressing ? 'opacity-100 blur-[4px]' : 'opacity-0')}
           />
 
-          {/* 4. Dedicated White-Hot Incandescent Core Filament strictly on the Straight Core Lip (X: 100 -> 290, Y: 40) */}
+          {/* 4. Dedicated Warm Radiant Core Filament strictly on the Straight Core Lip (X: 100 -> 290, Y: 40) */}
           <path
             d="M 100 40 L 290 40"
             stroke="url(#straightMoltenCore)"
-            strokeWidth={isLongPressing ? 3.5 : 0}
+            strokeWidth={isLongPressing ? 3 : 0}
             strokeLinecap="round"
             fill="none"
-            className={cn('transition-all duration-300', isLongPressing ? 'opacity-100' : 'opacity-0')}
+            className={cn('transition-all duration-1000 ease-out', isLongPressing ? 'opacity-100' : 'opacity-0')}
           />
 
           {/* Gradients: Elevated Warm Brown Box Surface + Deep Cavity + Wide Aperture Rim + Straight Molten Core */}
@@ -149,18 +160,18 @@ export function BottomNotchedDock(props: {
               <stop offset="100%" stopColor="#92400e" stopOpacity="0.05" />
             </linearGradient>
             <linearGradient id="straightMoltenGlow" x1="0%" y1="0%" x2="100%" y2="0%">
-              <stop offset="0%" stopColor="#ef4444" stopOpacity="0.3" />
-              <stop offset="18%" stopColor="#f97316" stopOpacity="0.9" />
+              <stop offset="0%" stopColor="#d97706" stopOpacity="0.2" />
+              <stop offset="20%" stopColor="#f59e0b" stopOpacity="0.85" />
               <stop offset="50%" stopColor="#fde047" stopOpacity="1" />
-              <stop offset="82%" stopColor="#f97316" stopOpacity="0.9" />
-              <stop offset="100%" stopColor="#ef4444" stopOpacity="0.3" />
+              <stop offset="80%" stopColor="#f59e0b" stopOpacity="0.85" />
+              <stop offset="100%" stopColor="#d97706" stopOpacity="0.2" />
             </linearGradient>
             <linearGradient id="straightMoltenCore" x1="0%" y1="0%" x2="100%" y2="0%">
-              <stop offset="0%" stopColor="#f97316" stopOpacity="0.4" />
-              <stop offset="25%" stopColor="#fbbf24" stopOpacity="0.95" />
+              <stop offset="0%" stopColor="#d97706" stopOpacity="0.3" />
+              <stop offset="25%" stopColor="#fbbf24" stopOpacity="0.9" />
               <stop offset="50%" stopColor="#fef08a" stopOpacity="1" />
-              <stop offset="75%" stopColor="#fbbf24" stopOpacity="0.95" />
-              <stop offset="100%" stopColor="#f97316" stopOpacity="0.4" />
+              <stop offset="75%" stopColor="#fbbf24" stopOpacity="0.9" />
+              <stop offset="100%" stopColor="#d97706" stopOpacity="0.3" />
             </linearGradient>
           </defs>
         </svg>

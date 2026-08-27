@@ -1,6 +1,7 @@
 'use client';
 
 import {
+  AppWindow,
   Bell,
   Calendar,
   Check,
@@ -255,6 +256,21 @@ export function DevToolsRouteSwitcher(props: {
     return prototypeConfig.initialScreen === screen;
   };
 
+  const handleOpenEmulatorWindow = () => {
+    if (typeof window === 'undefined') return;
+    const width = 425;
+    const height = 910;
+    const left = Math.max(0, Math.round(window.screenX + (window.outerWidth - width) / 2));
+    const top = Math.max(0, Math.round(window.screenY + (window.outerHeight - height) / 2));
+    const currentUrl = new URL(window.location.href);
+    currentUrl.searchParams.set('emulator', 'true');
+    window.open(
+      currentUrl.toString(),
+      'iPhoneEmulatorWindow',
+      `width=${width},height=${height},left=${left},top=${top},menubar=no,toolbar=no,location=no,status=no,resizable=yes,scrollbars=no`,
+    );
+  };
+
   return (
     <div className={cn('relative z-50 select-none', props.className)}>
       {/* 1. Minimalist Floating Capsule */}
@@ -347,6 +363,22 @@ export function DevToolsRouteSwitcher(props: {
           )}
         >
           {isDark ? <Sun className="h-3.5 w-3.5" /> : <Moon className="h-3.5 w-3.5" />}
+        </button>
+
+        {/* Standalone iPhone Emulator Pop-out Trigger */}
+        <button
+          type="button"
+          aria-label="Buka di Jendela Emulator Sendiri (Hug Frame)"
+          title="Buka di Jendela Emulator Sendiri (Hug Frame)"
+          onClick={handleOpenEmulatorWindow}
+          className={cn(
+            'p-1.5 rounded-full transition-colors cursor-pointer',
+            isDark
+              ? 'hover:bg-white/10 text-neutral-300'
+              : 'hover:bg-slate-100 text-slate-600',
+          )}
+        >
+          <AppWindow className="h-3.5 w-3.5" />
         </button>
       </div>
 

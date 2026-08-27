@@ -90,36 +90,50 @@ export function AuthPrototype() {
     handleInputChange('fullName', user.name);
   };
 
+  const [isEmulatorMode, setIsEmulatorMode] = React.useState(false);
+
+  React.useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      setIsEmulatorMode(params.get('emulator') === 'true');
+    }
+  }, []);
+
   return (
     <div
       className={cn(
-        'relative flex min-h-screen w-full items-center justify-center p-4 sm:p-6 selection:bg-blue-500 selection:text-white overflow-hidden transition-all duration-700 ease-in-out',
-        theme === 'dark'
+        'relative flex min-h-screen w-full items-center justify-center selection:bg-blue-500 selection:text-white overflow-hidden transition-all duration-700 ease-in-out',
+        isEmulatorMode
+          ? 'p-0 bg-neutral-950 text-white'
+          : 'p-4 sm:p-6',
+        !isEmulatorMode && (theme === 'dark'
           ? 'bg-gradient-to-b from-neutral-900 via-neutral-950 to-black text-white'
-          : 'bg-gradient-to-br from-[#f8fafc] via-[#f1f5f9] to-[#e2e8f0] text-neutral-900',
+          : 'bg-gradient-to-br from-[#f8fafc] via-[#f1f5f9] to-[#e2e8f0] text-neutral-900'),
       )}
     >
-      {/* Apple Studio Frosted Glass Blurry Ambient Mesh Layers */}
-      {theme === 'dark' ? (
-        <>
-          {/* Dark Mode Cosmic Glow */}
-          <div className="pointer-events-none absolute top-1/2 left-1/2 h-[560px] w-[560px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-blue-600/15 blur-[140px] transition-all duration-1000" />
-          <div className="pointer-events-none absolute top-1/4 left-1/3 h-[400px] w-[400px] rounded-full bg-indigo-500/10 blur-[120px] transition-all duration-1000" />
-        </>
-      ) : (
-        <>
-          {/* Light Mode Apple Frosted Glass Morph Glow Orbs */}
-          <div className="pointer-events-none absolute -top-24 -left-24 h-[620px] w-[620px] rounded-full bg-gradient-to-tr from-sky-400/25 via-blue-300/20 to-indigo-300/25 blur-[130px] transition-all duration-1000" />
-          <div className="pointer-events-none absolute -bottom-24 -right-24 h-[620px] w-[620px] rounded-full bg-gradient-to-bl from-violet-300/20 via-pink-200/15 to-sky-200/25 blur-[140px] transition-all duration-1000" />
-          <div className="pointer-events-none absolute top-1/2 left-1/2 h-[480px] w-[480px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-white/60 blur-[100px] transition-all duration-1000" />
-        </>
+      {/* Apple Studio Frosted Glass Blurry Ambient Mesh Layers (Hidden in Standalone Emulator Mode) */}
+      {!isEmulatorMode && (
+        theme === 'dark' ? (
+          <>
+            {/* Dark Mode Cosmic Glow */}
+            <div className="pointer-events-none absolute top-1/2 left-1/2 h-[560px] w-[560px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-blue-600/15 blur-[140px] transition-all duration-1000" />
+            <div className="pointer-events-none absolute top-1/4 left-1/3 h-[400px] w-[400px] rounded-full bg-indigo-500/10 blur-[120px] transition-all duration-1000" />
+          </>
+        ) : (
+          <>
+            {/* Light Mode Apple Frosted Glass Morph Glow Orbs */}
+            <div className="pointer-events-none absolute -top-24 -left-24 h-[620px] w-[620px] rounded-full bg-gradient-to-tr from-sky-400/25 via-blue-300/20 to-indigo-300/25 blur-[130px] transition-all duration-1000" />
+            <div className="pointer-events-none absolute -bottom-24 -right-24 h-[620px] w-[620px] rounded-full bg-gradient-to-bl from-violet-300/20 via-pink-200/15 to-sky-200/25 blur-[140px] transition-all duration-1000" />
+            <div className="pointer-events-none absolute top-1/2 left-1/2 h-[480px] w-[480px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-white/60 blur-[100px] transition-all duration-1000" />
+          </>
+        )
       )}
 
       {/* Main iPhone Device Frame with Edge Swipe & Attached ADB-style DevTools Toolbar */}
       <main className="relative z-20 flex flex-col items-center justify-center w-full">
         {/* Floating DevTools Toolbar Attached Directly Above Phone Frame */}
         {prototypeConfig.enableDevTools && (
-          <div className="mb-2 sm:mb-2.5 z-50 flex items-center justify-center">
+          <div className={cn('z-50 flex items-center justify-center', isEmulatorMode ? 'mb-1 scale-90' : 'mb-2 sm:mb-2.5')}>
             <DevToolsRouteSwitcher
               currentScreen={currentScreen}
               activeTab={dashboardTab}
@@ -135,6 +149,7 @@ export function AuthPrototype() {
         <PhoneFrame
           isDarkContent={isDarkScreen}
           onSwipeBack={handleSwipeBack}
+          className={isEmulatorMode ? 'my-0 sm:my-0' : undefined}
         >
           {currentScreen === 'onboarding' ? (
             <OnboardingScreen

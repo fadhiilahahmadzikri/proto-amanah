@@ -28,7 +28,6 @@ export function QueueCardMaster(props: {
   const rafRef = React.useRef<number | null>(null);
   const springDecayRafRef = React.useRef<number | null>(null);
 
-  // Holographic shader spring / pointer state
   const [pointer, setPointer] = React.useState({
     x: 50,
     y: 50,
@@ -319,8 +318,6 @@ export function QueueCardMaster(props: {
                 onError={() => {
                   if (imgSrc.includes('_hires.png')) {
                     setImgSrc(imgSrc.replace('_hires.png', '.png'));
-                  } else if (card.spriteUrl) {
-                    setImgSrc(card.spriteUrl);
                   }
                 }}
               />

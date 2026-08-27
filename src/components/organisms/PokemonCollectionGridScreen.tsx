@@ -24,7 +24,6 @@ export function PokemonCollectionGridScreen(props: {
         className,
       )}
     >
-      {/* 1. Header Bar (Clean title without subtitle, vector base-color buttons) */}
       <header className="z-20 flex items-center justify-between px-4 pt-5 pb-3 shrink-0 border-b border-white/10 bg-[#0f0f0f]/90 backdrop-blur-md">
         <button
           type="button"
@@ -39,7 +38,6 @@ export function PokemonCollectionGridScreen(props: {
           Pokémon Binder
         </h1>
 
-        {/* Top Redraw Button (Vector base color only) */}
         <button
           type="button"
           aria-label="Redraw"
@@ -50,7 +48,6 @@ export function PokemonCollectionGridScreen(props: {
         </button>
       </header>
 
-      {/* 2. Collection Cards Grid Viewport (3 Cards per row, no hover animations, no redundant pill tags) */}
       <div className="flex-1 overflow-y-auto px-3.5 pt-4 pb-6 no-scrollbar">
         {collectedCards.length === 0 ? (
           <div className="flex h-full flex-col items-center justify-center py-16 text-center">
@@ -68,7 +65,6 @@ export function PokemonCollectionGridScreen(props: {
                 onClick={() => setSelectedCard(card)}
                 className="relative flex flex-col overflow-hidden rounded-xl bg-white/[0.04] p-1.5 border border-white/10 active:scale-95 cursor-pointer shadow-[0_4px_15px_rgba(0,0,0,0.4)]"
               >
-                {/* Card Artwork (Clean, no redundant pill badge, no hover animation) */}
                 <div className="relative aspect-[0.718] w-full overflow-hidden rounded-lg bg-black/40">
                   <img
                     src={card.imageUrl ?? card.spriteUrl}
@@ -78,7 +74,6 @@ export function PokemonCollectionGridScreen(props: {
                   />
                 </div>
 
-                {/* Card Name */}
                 <div className="mt-1.5 px-0.5 text-center">
                   <span className="text-[11px] font-semibold text-white truncate block">{card.brand}</span>
                 </div>
