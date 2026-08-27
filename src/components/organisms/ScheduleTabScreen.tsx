@@ -17,9 +17,9 @@ import {
 import { id as idLocale } from 'date-fns/locale';
 import { gsap } from 'gsap';
 import {
-  AlertCircle,
   Calendar,
   CalendarDays,
+  CalendarOff,
   Check,
   ChevronDown,
   ChevronLeft,
@@ -36,7 +36,9 @@ import React from 'react';
 import { AuroraBackground } from '@/components/atoms/AuroraBackground';
 import { QueueBadge } from '@/components/atoms/QueueBadge';
 import { DateCarouselStrip } from '@/components/molecules/DateCarouselStrip';
+import { M3Banner } from '@/components/molecules/M3Banner';
 import { ScreenHeader } from '@/components/molecules/ScreenHeader';
+import { useModalStore } from '@/features/portal/hooks/use-modal-store';
 import { useScheduleStore } from '@/features/schedule/hooks/use-schedule-store';
 import { cn } from '@/lib/utils';
 import type {
@@ -334,7 +336,7 @@ const SelectionModal = (props: {
         </div>
 
         {/* Scrollable Content Body */}
-        <div className="flex w-full flex-1 flex-col px-6 pt-3 pb-8 overflow-y-auto no-scrollbar select-text gap-3.5">
+        <div className="flex w-full flex-1 flex-col px-6 pt-3 pb-16 sm:pb-20 overflow-y-auto no-scrollbar select-text gap-3.5">
           {/* Manual Input / Search Field */}
           <form onSubmit={handleManualSubmit} className="flex gap-2 shrink-0">
           <div className="relative flex-1">
@@ -501,6 +503,31 @@ export function ScheduleTabScreen(props: {
   const isDayCuti = currentDaySetting.isCuti;
   const currentSchedules = schedulesMap[selectedDateKey] ?? [];
   const targetDailyQuota = currentDaySetting.targetQuota;
+
+  // Mitigation Undo Toast State for Accidental Reopen Schedule Action
+  const [undoToast, setUndoToast] = React.useState<{
+    dateKey: string;
+    previousSetting: { targetQuota: number; isCuti: boolean; cutiReason?: string };
+    previousSchedules?: DoctorSchedule[];
+  } | null>(null);
+
+  const handleUndoReopenSchedule = () => {
+    if (!undoToast) return;
+    setDaySettingsMap(prev => ({
+      ...prev,
+      [undoToast.dateKey]: undoToast.previousSetting,
+    }));
+    if (undoToast.previousSchedules !== undefined) {
+      setSchedulesMap(prev => ({
+        ...prev,
+        [undoToast.dateKey]: undoToast.previousSchedules ?? [],
+      }));
+    }
+    setUndoToast(null);
+  };
+
+  const { openModal, closeModal } = useModalStore();
+
   // View Mode: 'overview' (Showcase Pasien Booking) vs 'sessions' (Halaman Detail Jadwal Sesi Praktik) vs 'session-patients' (Halaman Daftar Pasien Booking Sesi)
   const VIEW_MODE_ORDER: ('overview' | 'sessions' | 'session-patients')[] = ['overview', 'sessions', 'session-patients'];
   const [viewMode, setViewModeState] = React.useState<'overview' | 'sessions' | 'session-patients'>('overview');
@@ -685,6 +712,19 @@ export function ScheduleTabScreen(props: {
   const [sessions, setSessions] = React.useState<FormSessionItem[]>(INITIAL_SESSIONS);
   const [activeModalTarget, setActiveModalTarget] = React.useState<ActiveModalTarget | null>(null);
 
+  // Synchronize any active modal/drawer with the master app shell to automatically hide BottomNavBar
+  const isAnyModalOpenInSchedule = isDrawerOpen || isDetailDrawerOpen || isPatientDetailModalOpen || isDocScheduleDrawerOpen || Boolean(activeModalTarget);
+
+  React.useEffect(() => {
+    if (isAnyModalOpenInSchedule) {
+      openModal();
+      return () => {
+        closeModal();
+      };
+    }
+    return undefined;
+  }, [isAnyModalOpenInSchedule, openModal, closeModal]);
+
   // POC Session Toggling
   const toggleSession = (sessionId: string, forcedState: boolean | null = null) => {
     setSessions(prev =>
@@ -868,6 +908,26 @@ export function ScheduleTabScreen(props: {
     setIsDrawerOpen(true);
   };
 
+  // Reopen Practice from Cuti State -> Unlocks day and automatically opens Add Schedule Form Drawer
+  const handleReopenSchedule = (dateKey: string) => {
+    const prevSetting = daySettingsMap[dateKey] ?? { targetQuota: 8, isCuti: true, cutiReason: 'Dokter Cuti Praktik' };
+    const prevSchedules = schedulesMap[dateKey] ?? [];
+
+    setDaySettingsMap(prev => ({
+      ...prev,
+      [dateKey]: { ...(prev[dateKey] ?? { targetQuota: 8 }), isCuti: false },
+    }));
+
+    setUndoToast({
+      dateKey,
+      previousSetting: prevSetting,
+      previousSchedules: prevSchedules,
+    });
+
+    // Automatically open the Tambah Jadwal drawer for this newly unlocked date
+    handleOpenAddDrawer(selectedDate);
+  };
+
   // Open Edit Schedule Drawer
   const handleOpenEditDrawer = (sch: DoctorSchedule) => {
     setEditingSchedule(sch);
@@ -1030,9 +1090,13 @@ export function ScheduleTabScreen(props: {
           viewMode !== 'session-patients' ? (
             <button
               type="button"
-              aria-label="Tambah Jadwal Baru"
+              aria-label={isDayCuti ? 'Buka Jadwal & Tambah Sesi' : 'Tambah Jadwal Baru'}
               onClick={() => {
-                handleOpenAddDrawer(selectedDate);
+                if (isDayCuti) {
+                  handleReopenSchedule(selectedDateKey);
+                } else {
+                  handleOpenAddDrawer(selectedDate);
+                }
               }}
               className={cn(
                 'p-1.5 -mr-1.5 rounded-full transition-all cursor-pointer active:scale-90 flex items-center justify-center',
@@ -1047,11 +1111,31 @@ export function ScheduleTabScreen(props: {
         }
       />
 
+      {/* Official Material Design 3 Banner: Docked DIRECTLY Below Top App Bar */}
+      {isDayCuti && (
+        <M3Banner
+          variant="warning"
+          primaryText="Dokter Cuti Praktik"
+          supportingText="Semua jadwal dinonaktifkan."
+          theme={props.theme}
+          primaryAction={{
+            label: 'Buka Jadwal',
+            onClick: () => handleReopenSchedule(selectedDateKey),
+          }}
+          secondaryAction={{
+            label: 'Kalender Cuti',
+            onClick: () => {
+              setIsDocScheduleDrawerOpen(true);
+            },
+          }}
+        />
+      )}
+
       {/* 2. Full-Height Scrollable Content Viewport with Android Slide Motion */}
       <div
         ref={contentViewportRef}
         key={`view-${viewMode}`}
-        className="w-full h-full overflow-y-auto overflow-x-hidden no-scrollbar px-5 pt-20 pb-36 flex flex-col gap-3.5 will-change-transform"
+        className="flex-1 min-h-0 w-full overflow-y-auto overflow-x-hidden no-scrollbar px-5 pt-2.5 pb-36 sm:pb-40 flex flex-col gap-3.5 will-change-transform"
       >
         {viewMode === 'overview' ? (
           /* VIEW 1: OVERVIEW & SHOWCASE PASIEN BOOKING */
@@ -1084,33 +1168,25 @@ export function ScheduleTabScreen(props: {
                       cy="24"
                       r="19"
                       fill="transparent"
-                      stroke={isDayCuti ? '#f59e0b' : 'url(#capacityRadialGradient)'}
+                      stroke="url(#capacityRadialGradient)"
                       strokeWidth="4"
                       strokeDasharray={119.38}
-                      strokeDashoffset={119.38 - (119.38 * (isDayCuti ? 0 : capacityPercentage)) / 100}
+                      strokeDashoffset={119.38 - (119.38 * capacityPercentage) / 100}
                       strokeLinecap="round"
                       className="transition-all duration-700 ease-out"
                     />
                   </svg>
                   {/* Radial Center Value */}
                   <span className={cn('absolute text-[9.5px] font-bold tracking-tight', isDark ? 'text-white' : 'text-slate-900')}>
-                    {isDayCuti ? '0%' : `${capacityPercentage}%`}
+                    {`${capacityPercentage}%`}
                   </span>
                 </div>
 
                 {/* Capacity Label & Real Patient Count */}
                 <div className="flex flex-col justify-center min-w-0">
-                  <div className="flex items-center gap-1.5">
-                    <span className={cn('text-xs font-bold tracking-tight', isDark ? 'text-white' : 'text-slate-900')}>
-                      Kapasitas Hari Ini
-                    </span>
-                    {isDayCuti && (
-                      <span className="px-1.5 py-0.2 rounded-full text-[9.5px] font-bold inline-flex items-center gap-1 shrink-0 bg-amber-500/20 text-amber-400">
-                        <span className="h-1.5 w-1.5 rounded-full bg-amber-400" />
-                        Cuti
-                      </span>
-                    )}
-                  </div>
+                  <span className={cn('text-xs font-bold tracking-tight', isDark ? 'text-white' : 'text-slate-900')}>
+                    Kapasitas Hari Ini
+                  </span>
                   <p className={cn('text-[11px] font-medium mt-0.5', isDark ? 'text-neutral-400' : 'text-slate-500')}>
                     <span className={cn('font-bold', isDark ? 'text-cyan-400' : 'text-blue-600')}>
                       {totalBookedPatientsToday}
@@ -1153,36 +1229,7 @@ export function ScheduleTabScreen(props: {
               />
             </div>
 
-            {/* 3. Cuti Alert Banner if Day is on Cuti */}
-            {isDayCuti && (
-              <div
-                className={cn(
-                  'p-3 rounded-2xl border text-xs font-semibold flex items-center justify-between gap-3 animate-in fade-in',
-                  isDark
-                    ? 'bg-amber-950/30 border-amber-500/30 text-amber-300'
-                    : 'bg-amber-50 border-amber-200 text-amber-800',
-                )}
-              >
-                <div className="flex items-center gap-2">
-                  <AlertCircle className="h-4 w-4 shrink-0 text-amber-500" />
-                  <span>Dokter Cuti Praktik: Seluruh jadwal dinonaktifkan.</span>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setDaySettingsMap(prev => ({
-                      ...prev,
-                      [selectedDateKey]: { ...currentDaySetting, isCuti: false },
-                    }));
-                  }}
-                  className="px-2.5 py-1 rounded-lg bg-amber-500 text-amber-950 font-bold text-[11px] shrink-0 hover:bg-amber-400 transition-colors cursor-pointer"
-                >
-                  Buka Jadwal
-                </button>
-              </div>
-            )}
-
-            {/* 4. Showcase Daftar Pasien Booking Hari Ini */}
+            {/* 3. Showcase Daftar Pasien Booking Hari Ini */}
             <div className="flex flex-col gap-3 mt-1">
               <div className="flex justify-between items-center px-1">
                 <h3
@@ -1348,49 +1395,80 @@ export function ScheduleTabScreen(props: {
               ) : (
                 <div
                   className={cn(
-                    'p-8 rounded-[30px] border text-center flex flex-col items-center gap-3 transition-colors',
+                    'p-5 sm:p-6 rounded-2xl sm:rounded-3xl border text-center flex flex-col items-center gap-2.5 transition-colors',
                     isDark ? 'bg-white/5 border-white/10' : 'bg-slate-50 border-slate-200/80',
                   )}
                 >
-                  <div className={cn('p-3 rounded-2xl', isDark ? 'bg-white/5 text-neutral-400' : 'bg-white text-slate-400')}>
-                    <Users className="h-6 w-6" />
+                  <div className={cn('p-2.5 rounded-xl', isDark ? 'bg-white/5 text-neutral-400' : 'bg-white text-slate-400')}>
+                    {isDayCuti ? <CalendarOff className="h-5 w-5" /> : <Users className="h-5 w-5" />}
                   </div>
-                  <div className="space-y-1">
-                    <h4 className={cn('text-sm font-bold', isDark ? 'text-white' : 'text-slate-900')}>
-                      Belum Ada Pasien Booking
+                  <div className="space-y-0.5">
+                    <h4 className={cn('text-xs sm:text-sm font-bold', isDark ? 'text-white' : 'text-slate-900')}>
+                      {isDayCuti ? 'Jadwal Dinonaktifkan (Cuti)' : 'Belum Ada Pasien Booking'}
                     </h4>
-                    <p className={cn('text-xs max-w-xs', isDark ? 'text-neutral-400' : 'text-slate-500')}>
+                    <p className={cn('text-[11.5px] max-w-xs leading-relaxed', isDark ? 'text-neutral-400' : 'text-slate-500')}>
                       {isDayCuti
-                        ? 'Dokter sedang cuti pada tanggal ini.'
+                        ? 'Dokter sedang cuti pada tanggal ini. Buka jadwal untuk mulai mengatur sesi praktik.'
                         : 'Belum ada pasien yang mendaftar pada sesi praktik di tanggal ini.'}
                     </p>
                   </div>
                   <div className="flex flex-col w-full max-w-xs gap-2 pt-1">
-                    <button
-                      type="button"
-                      onClick={() => handleOpenAddDrawer(selectedDate)}
-                      className={cn(
-                        'w-full flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-xs font-bold shadow-md transition-all cursor-pointer active:scale-95',
-                        isDark
-                          ? 'bg-cyan-500 hover:bg-cyan-400 text-cyan-950 shadow-cyan-500/20'
-                          : 'bg-blue-600 hover:bg-blue-700 text-white shadow-blue-600/25',
-                      )}
-                    >
-                      <Plus className="h-4 w-4" />
-                      <span>Tambah Jadwal</span>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setViewMode('sessions')}
-                      className={cn(
-                        'w-full py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer border text-center',
-                        isDark
-                          ? 'border-white/15 text-neutral-200 hover:bg-white/10'
-                          : 'border-slate-200 text-slate-700 hover:bg-white',
-                      )}
-                    >
-                      Lihat Sesi Dokter
-                    </button>
+                    {isDayCuti ? (
+                      <>
+                        <button
+                          type="button"
+                          onClick={() => handleReopenSchedule(selectedDateKey)}
+                          className={cn(
+                            'w-full flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-xs font-bold shadow-md transition-all cursor-pointer active:scale-95',
+                            isDark
+                              ? 'bg-cyan-500 hover:bg-cyan-400 text-cyan-950 shadow-cyan-500/20'
+                              : 'bg-blue-600 hover:bg-blue-700 text-white shadow-blue-600/25',
+                          )}
+                        >
+                          <span>Buka Jadwal</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setIsDocScheduleDrawerOpen(true)}
+                          className={cn(
+                            'w-full py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer border text-center',
+                            isDark
+                              ? 'border-white/15 text-neutral-200 hover:bg-white/10'
+                              : 'border-slate-200 text-slate-700 hover:bg-white',
+                          )}
+                        >
+                          Lihat Kalender Cuti
+                        </button>
+                      </>
+                    ) : (
+                      <>
+                        <button
+                          type="button"
+                          onClick={() => handleOpenAddDrawer(selectedDate)}
+                          className={cn(
+                            'w-full flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-xs font-bold shadow-md transition-all cursor-pointer active:scale-95',
+                            isDark
+                              ? 'bg-cyan-500 hover:bg-cyan-400 text-cyan-950 shadow-cyan-500/20'
+                              : 'bg-blue-600 hover:bg-blue-700 text-white shadow-blue-600/25',
+                          )}
+                        >
+                          <Plus className="h-3.5 w-3.5" />
+                          <span>Tambah Jadwal</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setViewMode('sessions')}
+                          className={cn(
+                            'w-full py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer border text-center',
+                            isDark
+                              ? 'border-white/15 text-neutral-200 hover:bg-white/10'
+                              : 'border-slate-200 text-slate-700 hover:bg-white',
+                          )}
+                        >
+                          Lihat Sesi Dokter
+                        </button>
+                      </>
+                    )}
                   </div>
                 </div>
               )}
@@ -1413,35 +1491,6 @@ export function ScheduleTabScreen(props: {
                 {currentSchedules.length} Sesi Aktif
               </span>
             </div>
-
-            {/* Cuti Alert Banner if Day is on Cuti */}
-            {isDayCuti && (
-              <div
-                className={cn(
-                  'p-3 rounded-2xl border text-xs font-semibold flex items-center justify-between gap-3 animate-in fade-in',
-                  isDark
-                    ? 'bg-amber-950/30 border-amber-500/30 text-amber-300'
-                    : 'bg-amber-50 border-amber-200 text-amber-800',
-                )}
-              >
-                <div className="flex items-center gap-2">
-                  <AlertCircle className="h-4 w-4 shrink-0 text-amber-500" />
-                  <span>Dokter Cuti Praktik: Seluruh jadwal dinonaktifkan.</span>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setDaySettingsMap(prev => ({
-                      ...prev,
-                      [selectedDateKey]: { ...currentDaySetting, isCuti: false },
-                    }));
-                  }}
-                  className="px-2.5 py-1 rounded-lg bg-amber-500 text-amber-950 font-bold text-[11px] shrink-0 hover:bg-amber-400 transition-colors cursor-pointer"
-                >
-                  Buka Jadwal
-                </button>
-              </div>
-            )}
 
             {/* Doctor Practice Session Cards */}
             <div className="flex flex-col gap-3">
@@ -2958,9 +3007,9 @@ export function ScheduleTabScreen(props: {
           onClose={() => setActiveModalTarget(null)}
           title={
             activeModalTarget.type === 'from'
-              ? 'Pilih Waktu Mulai (From)'
+              ? 'Pilih Waktu Mulai'
               : activeModalTarget.type === 'to'
-                ? 'Pilih Waktu Selesai (To)'
+                ? 'Pilih Waktu Selesai'
                 : activeModalTarget.type === 'room'
                   ? 'Pilih Ruang Praktik'
                   : 'Pilih Poli / Spesialisasi'
@@ -3015,6 +3064,30 @@ export function ScheduleTabScreen(props: {
           }}
           isDark={isDark}
         />
+      )}
+
+      {/* Actionable Undo Snackbar (Material Design 3 Mitigation) */}
+      {undoToast && (
+        <div className="absolute bottom-20 inset-x-4 z-40 flex items-center justify-between p-3 rounded-xl bg-slate-900 text-white dark:bg-neutral-800 dark:text-neutral-100 shadow-xl border border-white/10 animate-in fade-in slide-in-from-bottom-2 duration-200 select-none">
+          <span className="text-xs font-medium">Jadwal praktik diaktifkan</span>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={handleUndoReopenSchedule}
+              className="text-xs font-bold text-cyan-400 hover:text-cyan-300 transition-colors px-2 py-1 cursor-pointer"
+            >
+              Urungkan
+            </button>
+            <button
+              type="button"
+              aria-label="Tutup notifikasi"
+              onClick={() => setUndoToast(null)}
+              className="p-1 rounded-full text-white/60 hover:text-white transition-colors cursor-pointer"
+            >
+              <X className="w-3.5 h-3.5" />
+            </button>
+          </div>
+        </div>
       )}
     </div>
   );

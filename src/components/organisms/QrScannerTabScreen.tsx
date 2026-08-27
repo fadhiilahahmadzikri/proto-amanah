@@ -22,6 +22,8 @@ import {
 import React from 'react';
 import { QrCodeSvg } from '@/components/atoms/QrCodeSvg';
 import { OtpInput } from '@/components/molecules/OtpInput';
+import { useDoctorStore } from '@/features/doctor/hooks/use-doctor-store';
+import { useModalStore } from '@/features/portal/hooks/use-modal-store';
 import { cn } from '@/lib/utils';
 
 export function QrScannerTabScreen(props: {
@@ -30,6 +32,8 @@ export function QrScannerTabScreen(props: {
   className?: string;
 }) {
   const isDark = props.theme === 'dark';
+  const { profile: doctorProfile } = useDoctorStore();
+  const { openModal, closeModal } = useModalStore();
   const [isFlashOn, setIsFlashOn] = React.useState(false);
   const [isScanned, setIsScanned] = React.useState(false);
   const [isDrawerOpen, setIsDrawerOpen] = React.useState(true);
@@ -40,6 +44,17 @@ export function QrScannerTabScreen(props: {
   const [cameraStatus, setCameraStatus] = React.useState<
     'idle' | 'requesting' | 'active' | 'denied' | 'unsupported'
   >('idle');
+
+  // Sync active sub-drawers with modal store
+  React.useEffect(() => {
+    if (isDrawerOpen && drawerView !== 'menu') {
+      openModal();
+      return () => {
+        closeModal();
+      };
+    }
+    return undefined;
+  }, [isDrawerOpen, drawerView, openModal, closeModal]);
 
   // Video Element & MediaStream Refs
   const videoRef = React.useRef<HTMLVideoElement>(null);
@@ -777,7 +792,7 @@ export function QrScannerTabScreen(props: {
                     isDark ? 'text-emerald-300/90' : 'text-emerald-800',
                   )}
                 >
-                  dr. Andika Perkasa • Poli Anak
+                  {doctorProfile.name} • {doctorProfile.role}
                 </span>
                 <span
                   className={cn(

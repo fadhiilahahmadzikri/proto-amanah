@@ -1,32 +1,30 @@
 'use client';
 
 import React from 'react';
-import { ConfigButton } from '@/components/atoms/ConfigButton';
-import { ThemeSwitcher } from '@/components/atoms/ThemeSwitcher';
 import type { BottomNavTab } from '@/components/molecules/BottomNavBar';
-import { CredentialsConfigModal } from '@/components/molecules/CredentialsConfigModal';
 import { DevToolsRouteSwitcher } from '@/components/molecules/DevToolsRouteSwitcher';
 import { ChangePasswordScreen } from '@/components/organisms/ChangePasswordScreen';
 import { DoctorDashboardScreen } from '@/components/organisms/DoctorDashboardScreen';
+import { DoctorIdCardScreen } from '@/components/organisms/DoctorIdCardScreen';
 import { ForgotPasswordScreen } from '@/components/organisms/ForgotPasswordScreen';
 import { LoginScreen } from '@/components/organisms/LoginScreen';
 import { OnboardingScreen } from '@/components/organisms/OnboardingScreen';
 import { OtpScreen } from '@/components/organisms/OtpScreen';
 import { PhoneFrame } from '@/components/organisms/PhoneFrame';
+import { PresenceHistoryScreen } from '@/components/organisms/PresenceHistoryScreen';
 import { SignUpScreen } from '@/components/organisms/SignUpScreen';
 import { SuccessScreen } from '@/components/organisms/SuccessScreen';
-import { prototypeConfig } from '@/config/prototype.config';
+import { getEffectiveInitialConfig, prototypeConfig } from '@/config/prototype.config';
 import { useAuthPrototype } from '@/features/auth/hooks/use-auth-prototype';
 import { cn } from '@/lib/utils';
 
 export function AuthPrototype() {
-  const [theme, setTheme] = React.useState<'dark' | 'light'>(
-    prototypeConfig.initialTheme ?? 'dark',
-  );
-  const [dashboardTab, setDashboardTab] = React.useState<BottomNavTab>(
-    prototypeConfig.initialDashboardTab ?? 'home',
-  );
-  const [isConfigOpen, setIsConfigOpen] = React.useState(false);
+  const [theme, setTheme] = React.useState<'dark' | 'light'>(() => {
+    return getEffectiveInitialConfig().initialTheme;
+  });
+  const [dashboardTab, setDashboardTab] = React.useState<BottomNavTab>(() => {
+    return getEffectiveInitialConfig().initialDashboardTab;
+  });
 
   const {
     currentScreen,
@@ -49,7 +47,12 @@ export function AuthPrototype() {
     handleLogout,
   } = useAuthPrototype();
 
-  const isDarkScreen = currentScreen === 'onboarding' || currentScreen === 'dashboard';
+  const isDarkScreen =
+    currentScreen === 'onboarding'
+      ? true
+      : currentScreen === 'dashboard' || currentScreen === 'id-card' || currentScreen === 'presence-history'
+        ? theme === 'dark'
+        : true;
 
   const toggleTheme = () => {
     setTheme(prev => (prev === 'dark' ? 'light' : 'dark'));
@@ -68,6 +71,8 @@ export function AuthPrototype() {
       navigateTo('login');
     } else if (currentScreen === 'dashboard') {
       navigateTo('onboarding');
+    } else if (currentScreen === 'id-card' || currentScreen === 'presence-history') {
+      navigateTo('dashboard');
     }
   };
 
@@ -94,39 +99,6 @@ export function AuthPrototype() {
           : 'bg-gradient-to-br from-[#f8fafc] via-[#f1f5f9] to-[#e2e8f0] text-neutral-900',
       )}
     >
-      {/* Top Left Floating DevTools Route Switcher (Configurable) */}
-      {prototypeConfig.enableDevTools && (
-        <div className="fixed top-4 left-4 z-50 sm:top-6 sm:left-6">
-          <DevToolsRouteSwitcher
-            currentScreen={currentScreen}
-            activeTab={dashboardTab}
-            onNavigateScreen={navigateTo}
-            onNavigateTab={setDashboardTab}
-            theme={theme}
-            onToggleTheme={toggleTheme}
-            onOpenCredentialsModal={() => setIsConfigOpen(true)}
-          />
-        </div>
-      )}
-
-      {/* Top Right Studio Controls: Theme Switcher & Config Button */}
-      <div className="fixed top-4 right-4 z-50 flex flex-col gap-2.5 sm:top-6 sm:right-6">
-        <ThemeSwitcher theme={theme} onToggle={toggleTheme} />
-        <ConfigButton
-          theme={theme}
-          isOpen={isConfigOpen}
-          onClick={() => setIsConfigOpen(prev => !prev)}
-        />
-      </div>
-
-      {/* Prototype Credentials Config Modal */}
-      <CredentialsConfigModal
-        isOpen={isConfigOpen}
-        onClose={() => setIsConfigOpen(false)}
-        onSelectUser={handleSelectCredential}
-        theme={theme}
-      />
-
       {/* Apple Studio Frosted Glass Blurry Ambient Mesh Layers */}
       {theme === 'dark' ? (
         <>
@@ -143,8 +115,23 @@ export function AuthPrototype() {
         </>
       )}
 
-      {/* Main iPhone Device Frame with Edge Swipe & Liquid Glass Touch Cursor */}
-      <main className="relative z-20 flex items-center justify-center w-full">
+      {/* Main iPhone Device Frame with Edge Swipe & Attached ADB-style DevTools Toolbar */}
+      <main className="relative z-20 flex flex-col items-center justify-center w-full">
+        {/* Floating DevTools Toolbar Attached Directly Above Phone Frame */}
+        {prototypeConfig.enableDevTools && (
+          <div className="mb-2 sm:mb-2.5 z-50 flex items-center justify-center">
+            <DevToolsRouteSwitcher
+              currentScreen={currentScreen}
+              activeTab={dashboardTab}
+              onNavigateScreen={navigateTo}
+              onNavigateTab={setDashboardTab}
+              theme={theme}
+              onToggleTheme={toggleTheme}
+              onSelectCredential={handleSelectCredential}
+            />
+          </div>
+        )}
+
         <PhoneFrame
           isDarkContent={isDarkScreen}
           onSwipeBack={handleSwipeBack}
@@ -164,6 +151,16 @@ export function AuthPrototype() {
               activeTab={dashboardTab}
               onTabChange={setDashboardTab}
               onLogout={handleLogout}
+            />
+          ) : currentScreen === 'id-card' ? (
+            <DoctorIdCardScreen
+              theme={theme}
+              onBack={() => navigateTo('dashboard')}
+            />
+          ) : currentScreen === 'presence-history' ? (
+            <PresenceHistoryScreen
+              theme={theme}
+              onBack={() => navigateTo('dashboard')}
             />
           ) : (
             <div className="relative flex h-full w-full flex-col justify-end overflow-hidden bg-neutral-950">

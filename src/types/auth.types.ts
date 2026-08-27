@@ -6,7 +6,9 @@ export type AuthScreen =
   | 'otp'
   | 'change-password'
   | 'success'
-  | 'dashboard';
+  | 'dashboard'
+  | 'id-card'
+  | 'presence-history';
 
 export type AuthFormData = {
   fullName: string;

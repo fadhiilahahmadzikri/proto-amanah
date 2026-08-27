@@ -478,7 +478,7 @@ export function PresenceHistoryScreen(props: {
       {/* 2. Full-Height Content Viewport */}
       {filteredRecords.length === 0 ? (
         /* Isolated Empty State: Pure and clean full-height container without timeline elements */
-        <div className="w-full h-full flex-1 flex flex-col items-center justify-center text-center px-6 pt-20 pb-28">
+        <div className="flex-1 min-h-0 w-full flex flex-col items-center justify-center text-center px-6 pt-4 pb-28">
           <div className={cn('w-16 h-16 rounded-3xl flex items-center justify-center mb-4 border transition-colors', isDark ? 'bg-white/5 border-white/10 text-neutral-400' : 'bg-slate-100 border-slate-200 text-slate-500')}>
             <Filter className="w-8 h-8 opacity-60" />
           </div>
@@ -517,7 +517,7 @@ export function PresenceHistoryScreen(props: {
         </div>
       ) : (
         /* Normal Full Timeline Viewport */
-        <div className="w-full h-full flex-1 overflow-y-auto overflow-x-hidden no-scrollbar px-5 pt-20 pb-28 flex flex-col gap-5">
+        <div className="flex-1 min-h-0 w-full overflow-y-auto overflow-x-hidden no-scrollbar px-5 pt-3 pb-36 sm:pb-40 flex flex-col gap-5">
           {/* Header Row: Timeline Title + Info Button + Compact Icon-Based Action Buttons (Filter & Download) */}
           <div className="flex items-center justify-between shrink-0 select-none">
             <div className="flex items-center gap-2">

@@ -1,4 +1,4 @@
-import { Calendar, CheckSquare, Contact, History, Search } from 'lucide-react';
+import { Calendar, CheckSquare, Contact, History, Search, Users } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { QuickActionItem } from '@/types/portal.types';
 
@@ -20,6 +20,8 @@ export function QuickActionButton(props: {
         return <Calendar className="h-6 w-6" />;
       case 'search':
         return <Search className="h-6 w-6" />;
+      case 'antrean':
+        return <Users className="h-6 w-6 stroke-[2.2]" />;
       case 'idCard':
         return <Contact className="h-6 w-6" />;
       default:

@@ -22,7 +22,8 @@ import {
 import React from 'react';
 import { ClayIcon } from '@/components/atoms/ClayIcon';
 import { DoctorAvatar } from '@/components/atoms/DoctorAvatar';
-import portalData from '@/data/portal/portal-data.json';
+import { useDoctorStore } from '@/features/doctor/hooks/use-doctor-store';
+import { useModalStore } from '@/features/portal/hooks/use-modal-store';
 import { cn } from '@/lib/utils';
 
 type SettingsItem = {
@@ -117,23 +118,31 @@ export function AccountTabScreen(props: {
   className?: string;
 }) {
   const isDark = props.theme === 'dark';
-  const profile = portalData.profile;
+  const { profile, updateProfile, setAvatarUrl } = useDoctorStore();
 
   // Image Upload State & Ref
   const fileInputRef = React.useRef<HTMLInputElement>(null);
-  const [avatarUrl, setAvatarUrl] = React.useState(profile.avatarUrl);
 
   // Edit Profile States
   const [showEditModal, setShowEditModal] = React.useState(false);
-  const [phone, setPhone] = React.useState('+62 812-3456-7890');
-  const [email, setEmail] = React.useState('rayhan.pratama@rsamanah.co.id');
-  const [bio, setBio] = React.useState('Dokter Spesialis Anak di RS Amanah Sehat, melayani konsultasi rawat jalan & rawat inap anak.');
+  const [draftName, setDraftName] = React.useState(profile.name);
+  const [draftPhone, setDraftPhone] = React.useState(profile.phone);
+  const [draftEmail, setDraftEmail] = React.useState(profile.email);
+  const [draftBio, setDraftBio] = React.useState(profile.bio);
   const [isSaved, setIsSaved] = React.useState(false);
 
-  // Draft states inside Drawer
-  const [draftPhone, setDraftPhone] = React.useState(phone);
-  const [draftEmail, setDraftEmail] = React.useState(email);
-  const [draftBio, setDraftBio] = React.useState(bio);
+  const { openModal, closeModal } = useModalStore();
+
+  // Sync drawer visibility with master modal store to hide BottomNavBar
+  React.useEffect(() => {
+    if (showEditModal) {
+      openModal();
+      return () => {
+        closeModal();
+      };
+    }
+    return undefined;
+  }, [showEditModal, openModal, closeModal]);
 
   // Edit Profile Drawer GSAP & Gesture Refs
   const editDrawerRef = React.useRef<HTMLDivElement>(null);
@@ -146,11 +155,12 @@ export function AccountTabScreen(props: {
   // Sync draft when opening Drawer
   React.useEffect(() => {
     if (showEditModal) {
-      setDraftPhone(phone);
-      setDraftEmail(email);
-      setDraftBio(bio);
+      setDraftName(profile.name);
+      setDraftPhone(profile.phone);
+      setDraftEmail(profile.email);
+      setDraftBio(profile.bio);
     }
-  }, [showEditModal, phone, email, bio]);
+  }, [showEditModal, profile.name, profile.phone, profile.email, profile.bio]);
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -233,9 +243,12 @@ export function AccountTabScreen(props: {
   };
 
   const handleSaveProfile = () => {
-    setPhone(draftPhone);
-    setEmail(draftEmail);
-    setBio(draftBio);
+    updateProfile({
+      name: draftName,
+      phone: draftPhone,
+      email: draftEmail,
+      bio: draftBio,
+    });
     setIsSaved(true);
     setTimeout(() => {
       setIsSaved(false);
@@ -311,7 +324,7 @@ export function AccountTabScreen(props: {
               />
 
               <DoctorAvatar
-                src={avatarUrl}
+                src={profile.avatarUrl}
                 alt={profile.name}
                 size={74}
                 className={cn(
@@ -357,14 +370,14 @@ export function AccountTabScreen(props: {
             </p>
 
             {/* Doctor Bio (Rendered on Front) */}
-            {bio && (
+            {profile.bio && (
               <p
                 className={cn(
                   'text-[11.5px] leading-relaxed mt-1.5 line-clamp-2',
                   isDark ? 'text-neutral-300' : 'text-slate-600',
                 )}
               >
-                {bio}
+                {profile.bio}
               </p>
             )}
 
@@ -523,18 +536,21 @@ export function AccountTabScreen(props: {
 
               {/* Detail Form Fields Body */}
               <div ref={editContentRef} className="flex w-full flex-1 flex-col px-6 pt-3.5 pb-3 overflow-y-auto no-scrollbar select-text gap-4">
-                {/* 1. Nama & Gelar Dokter (Read-only verified) */}
+                {/* 1. Nama Dokter */}
                 <div className="flex flex-col gap-1.5">
                   <span className={cn('text-xs font-semibold tracking-tight', isDark ? 'text-neutral-400' : 'text-slate-500')}>
-                    Nama Lengkap & Gelar
+                    Nama Lengkap Dokter
                   </span>
                   <input
                     type="text"
-                    value={profile.name}
-                    disabled
+                    value={draftName}
+                    onChange={(e) => setDraftName(e.target.value)}
+                    placeholder="Nama Dokter..."
                     className={cn(
-                      'w-full px-3.5 py-2.5 rounded-2xl border text-xs font-medium opacity-70 cursor-not-allowed select-none',
-                      isDark ? 'bg-white/5 border-white/10 text-neutral-300' : 'bg-slate-50 border-slate-200 text-slate-700',
+                      'w-full px-3.5 py-2.5 rounded-2xl border text-xs font-medium focus:outline-none transition-colors',
+                      isDark
+                        ? 'bg-white/5 border-white/10 text-white focus:border-cyan-400'
+                        : 'bg-white border-slate-200 text-slate-900 focus:border-blue-600',
                     )}
                   />
                   <span className="text-[10px] text-cyan-600 dark:text-cyan-400 font-medium">

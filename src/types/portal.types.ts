@@ -56,7 +56,7 @@ export type DoctorSchedule = {
 export type QuickActionItem = {
   id: string;
   label: string;
-  icon: 'history' | 'presence' | 'schedule' | 'search' | 'idCard';
+  icon: 'history' | 'presence' | 'schedule' | 'search' | 'idCard' | 'antrean';
 };
 
 export type ActivityMetric = {

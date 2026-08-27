@@ -17,7 +17,7 @@ export function ScreenHeader(props: {
   return (
     <header
       className={cn(
-        'absolute top-0 inset-x-0 z-30 w-full px-5 pt-3 pb-3 flex items-center justify-between transition-colors duration-300 select-none shrink-0 border-none outline-none',
+        'relative top-0 inset-x-0 z-30 w-full px-5 pt-3 pb-3 flex items-center justify-between transition-colors duration-300 select-none shrink-0 border-none outline-none',
         isDark
           ? 'bg-[#0a0e1a]/70 text-white shadow-xs'
           : 'bg-white/75 text-slate-900 shadow-xs',
@@ -29,7 +29,7 @@ export function ScreenHeader(props: {
       }}
     >
       {/* 1. Leading / Start (Vector-Only Back Button or Balance Spacer) */}
-      <div className="flex items-center justify-start min-w-9">
+      <div className="relative z-10 flex items-center justify-start min-w-9 shrink-0">
         {props.onBack ? (
           <button
             type="button"
@@ -49,11 +49,11 @@ export function ScreenHeader(props: {
         )}
       </div>
 
-      {/* 2. Center: Prominent Screen Title & Optional Subtitle */}
-      <div className="flex flex-col items-center justify-center truncate px-2 min-w-0">
+      {/* 2. Absolute Optical Center: Guaranteed 100% exact optical midpoint across all screens */}
+      <div className="absolute inset-x-0 inset-y-0 flex flex-col items-center justify-center pointer-events-none px-20">
         <h2
           className={cn(
-            'text-base sm:text-lg font-bold tracking-tight text-center truncate leading-tight',
+            'text-base sm:text-lg font-bold tracking-tight text-center truncate leading-tight pointer-events-auto',
             isDark ? 'text-white' : 'text-[#14103B]',
           )}
         >
@@ -62,7 +62,7 @@ export function ScreenHeader(props: {
         {props.subtitle && (
           <span
             className={cn(
-              'text-[11px] font-medium tracking-tight text-center truncate mt-0.5',
+              'text-[11px] font-medium tracking-tight text-center truncate mt-0.5 pointer-events-auto',
               isDark ? 'text-neutral-400' : 'text-slate-500',
             )}
           >
@@ -72,7 +72,7 @@ export function ScreenHeader(props: {
       </div>
 
       {/* 3. Trailing / End (Optional Action or Balance Spacer) */}
-      <div className="flex items-center justify-end min-w-9">
+      <div className="relative z-10 flex items-center justify-end min-w-9 shrink-0">
         {props.rightAction ?? <div className="w-9 h-9" />}
       </div>
     </header>

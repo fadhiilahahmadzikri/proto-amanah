@@ -38,9 +38,9 @@ export function PhoneFrame(props: {
   });
 
   const handlePointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
-    // If user clicks on an interactive button, link, or input, do NOT start edge swipe
+    // If user clicks on an interactive button, link, input, or canvas, do NOT start edge swipe
     const target = e.target as HTMLElement | null;
-    if (target?.closest('button, a, input, textarea, select, [role="button"]')) {
+    if (target?.closest('button, a, input, textarea, select, canvas, [role="button"], [data-interactive="true"]')) {
       swipeStartRef.current = { x: 0, y: 350, side: null };
       return;
     }

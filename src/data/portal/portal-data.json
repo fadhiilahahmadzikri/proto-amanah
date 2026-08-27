@@ -1,10 +1,10 @@
 {
   "profile": {
     "id": "doc_001",
-    "name": "dr. Andika Perkasa",
+    "name": "dr. Amelia Cantika",
     "role": "Dokter Spesialis Anak",
     "greeting": "Selamat Pagi",
-    "avatarUrl": "/assets/images/woman-signin-hero.png",
+    "avatarUrl": "/assets/images/doctors/woman-doctor-4.png",
     "unreadNotifications": 3
   },
   "schedules": [
@@ -57,9 +57,9 @@
       "icon": "schedule"
     },
     {
-      "id": "cari-visit",
-      "label": "Cari Visit",
-      "icon": "search"
+      "id": "antrean",
+      "label": "Antrean",
+      "icon": "antrean"
     },
     {
       "id": "kartu-id",

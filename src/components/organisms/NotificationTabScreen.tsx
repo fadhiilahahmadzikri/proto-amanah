@@ -236,9 +236,9 @@ export function NotificationTabScreen(props: {
       />
 
       {/* 2. Content Scroll Area */}
-      <div className="w-full h-full overflow-y-auto no-scrollbar flex flex-col pt-16 pb-28">
+      <div className="flex-1 min-h-0 w-full overflow-y-auto no-scrollbar flex flex-col pt-2 pb-36 sm:pb-40">
         {/* Category Filter Chips - Compact & Borderless */}
-        <div className="flex items-center gap-1.5 px-5 pt-2 pb-2 overflow-x-auto no-scrollbar shrink-0 select-none">
+        <div className="flex items-center gap-1.5 px-5 pb-2.5 overflow-x-auto no-scrollbar shrink-0 select-none">
           {[
             { id: 'all', label: 'Semua', count: notifications.length },
             { id: 'queue', label: 'Antrean', count: notifications.filter((n) => n.category === 'queue').length },

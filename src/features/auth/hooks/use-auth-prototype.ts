@@ -1,8 +1,9 @@
 'use client';
 
 import React from 'react';
-import { prototypeConfig } from '@/config/prototype.config';
+import { getEffectiveInitialConfig } from '@/config/prototype.config';
 import otpConfig from '@/data/auth/otp.json';
+import { doctorStore } from '@/features/doctor/hooks/use-doctor-store';
 import type {
   AuthFormData,
   AuthScreen,
@@ -10,9 +11,9 @@ import type {
 } from '@/types/auth.types';
 
 const INITIAL_FORM_DATA: AuthFormData = {
-  fullName: '',
-  emailOrPhone: 'sarah@lovi.id',
-  email: 'sarah@lovi.id',
+  fullName: 'dr. Amelia Cantika',
+  emailOrPhone: 'amelia.cantika@rsamanah.co.id',
+  email: 'amelia.cantika@rsamanah.co.id',
   phone: '081234567890',
   password: '',
   confirmPassword: '',
@@ -30,9 +31,9 @@ const delay = async (ms: number) => {
 };
 
 export function useAuthPrototype() {
-  const [currentScreen, setCurrentScreen] = React.useState<AuthScreen>(
-    prototypeConfig.initialScreen ?? 'dashboard',
-  );
+  const [currentScreen, setCurrentScreen] = React.useState<AuthScreen>(() => {
+    return getEffectiveInitialConfig().initialScreen;
+  });
   const [formData, setFormData] = React.useState<AuthFormData>(INITIAL_FORM_DATA);
   const [errors, setErrors] = React.useState<AuthValidationErrors>({});
   const [isLoading, setIsLoading] = React.useState(false);
@@ -104,6 +105,13 @@ export function useAuthPrototype() {
     setLoadingMessage('Sedang masuk...');
 
     await delay(800);
+
+    // Sync credentials with upstream doctorStore
+    doctorStore.updateProfile({
+      name: formData.fullName.trim() || 'dr. Amelia Cantika',
+      email: formData.email.trim() || formData.emailOrPhone.trim() || 'amelia.cantika@rsamanah.co.id',
+      phone: formData.phone.trim() || '081234567890',
+    });
 
     setIsLoading(false);
     setStatusMessage('Berhasil masuk!');

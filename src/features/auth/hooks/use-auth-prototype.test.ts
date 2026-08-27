@@ -8,7 +8,7 @@ describe('Auth Prototype Configuration and Data', () => {
   describe('Mock credentials', () => {
     it('contains valid mock users', () => {
       expect(credentialsData.users.length).toBeGreaterThan(0);
-      expect(credentialsData.users[0]?.email).toBe('sarah@lovi.id');
+      expect(credentialsData.users[0]?.email).toBe('amelia.cantika@rsamanah.co.id');
     });
   });
 
@@ -32,8 +32,8 @@ describe('Auth Prototype Configuration and Data', () => {
 
   describe('Doctor Portal Dashboard Data', () => {
     it('contains doctor profile with avatar and unread count', () => {
-      expect(portalData.profile.name).toBe('dr. Andika Perkasa');
-      expect(portalData.profile.avatarUrl).toBe('/assets/images/woman-signin-hero.png');
+      expect(portalData.profile.name).toBe('dr. Amelia Cantika');
+      expect(portalData.profile.avatarUrl).toBe('/assets/images/doctors/woman-doctor-4.png');
     });
 
     it('contains 3 distinct doctor schedule cards with room and slot details', () => {
@@ -48,7 +48,7 @@ describe('Auth Prototype Configuration and Data', () => {
       expect(portalData.quickActions.map(a => a.label)).toEqual([
         'History',
         'Jadwal Saya',
-        'Cari Visit',
+        'Antrean',
         'Kartu ID',
       ]);
     });
