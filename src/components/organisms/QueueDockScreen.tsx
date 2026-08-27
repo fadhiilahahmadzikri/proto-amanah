@@ -483,7 +483,7 @@ export function QueueDockScreen(props: {
       {/* 2. Title & Greeting with Morphing to Center */}
       <div
         className={cn(
-          'absolute top-10 sm:top-12 inset-x-0 z-20 flex flex-col items-center px-4 transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] pointer-events-none',
+          'absolute top-10 sm:top-12 inset-x-0 z-40 flex flex-col items-center px-4 transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] pointer-events-none',
           isMorphingActive
             ? 'translate-y-48 sm:translate-y-56 scale-105'
             : 'translate-y-0 scale-100',
@@ -493,14 +493,14 @@ export function QueueDockScreen(props: {
         {/* Animated 3D Paramedic Toolbox */}
         <div
           className={cn(
-            'mb-2 flex items-center justify-center transition-all duration-500',
+            'mb-2 flex items-center justify-center transition-all duration-500 relative z-50 overflow-visible',
             isMorphingActive || isNearSlot ? 'scale-110' : 'scale-100',
           )}
         >
           <ParamedicToolbox3DSvg
             isOpen={isMorphingActive || isNearSlot}
             size={76}
-            className="transition-transform duration-500"
+            className="transition-transform duration-500 overflow-visible"
           />
         </div>
 
