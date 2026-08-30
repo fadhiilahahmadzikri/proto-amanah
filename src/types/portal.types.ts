@@ -67,7 +67,7 @@ export type ActivityMetric = {
   badgeText: string;
   badgeType: 'live' | 'trend';
   icon: 'users' | 'stethoscope';
-  glowVariant: 'blue' | 'emerald';
+  glowVariant?: 'blue' | 'sky' | 'indigo' | 'emerald';
 };
 
 export type PortalData = {

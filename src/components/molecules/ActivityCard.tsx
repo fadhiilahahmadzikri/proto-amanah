@@ -29,7 +29,7 @@ export function ActivityCard(props: {
           'absolute -right-6 w-28 h-28 rounded-full blur-[20px] group-hover:scale-125 transition-transform duration-700 pointer-events-none',
           isBlue
             ? '-top-6 bg-gradient-to-br from-[#0A44FF]/20 to-[#00D4FF]/10'
-            : '-bottom-6 bg-gradient-to-tl from-[#00D4FF]/10 to-[#38c474]/20',
+            : '-bottom-6 bg-gradient-to-tl from-[#1D4ED8]/20 to-[#38BDF8]/15',
         )}
       />
 
@@ -42,10 +42,10 @@ export function ActivityCard(props: {
               isDark
                 ? isBlue
                   ? 'bg-blue-950/70 text-cyan-400'
-                  : 'bg-emerald-950/70 text-emerald-400'
+                  : 'bg-indigo-950/70 text-sky-400'
                 : isBlue
                   ? 'bg-blue-50 text-[#0A44FF]'
-                  : 'bg-emerald-50 text-[#38c474]',
+                  : 'bg-sky-50 text-[#0284C7]',
             )}
           >
             {props.item.icon === 'users' ? (

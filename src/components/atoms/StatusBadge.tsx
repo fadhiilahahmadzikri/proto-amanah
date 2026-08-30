@@ -33,8 +33,8 @@ export function StatusBadge(props: {
         className={cn(
           'px-2.5 py-1 rounded-md flex items-center gap-1 shrink-0 select-none transition-colors',
           isDark
-            ? 'bg-emerald-950/70 text-emerald-400'
-            : 'bg-emerald-50 text-emerald-600',
+            ? 'bg-blue-950/70 text-cyan-400 border border-cyan-500/20'
+            : 'bg-blue-50 text-[#0A44FF] border border-blue-100',
           props.className,
         )}
       >
@@ -49,7 +49,7 @@ export function StatusBadge(props: {
       <span
         className={cn(
           'text-white px-3 py-1 rounded-full text-[10px] font-bold tracking-wide shadow-sm shrink-0 select-none transition-colors',
-          isDark ? 'bg-blue-600 shadow-blue-900/30' : 'bg-blue-500',
+          isDark ? 'bg-blue-600 shadow-blue-900/30' : 'bg-[#0A44FF]',
           props.className,
         )}
       >
@@ -62,7 +62,7 @@ export function StatusBadge(props: {
     <span
       className={cn(
         'text-white px-3 py-1 rounded-full text-[10px] font-bold tracking-wide shadow-sm shrink-0 select-none transition-colors',
-        isDark ? 'bg-emerald-600 shadow-emerald-950/30' : 'bg-[#38c474]',
+        isDark ? 'bg-sky-600 shadow-sky-950/30' : 'bg-sky-500',
         props.className,
       )}
     >

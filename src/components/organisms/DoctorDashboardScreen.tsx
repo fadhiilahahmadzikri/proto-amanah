@@ -6,8 +6,10 @@ import { AuroraBackground } from '@/components/atoms/AuroraBackground';
 import { type BottomNavTab, BottomNavBar } from '@/components/molecules/BottomNavBar';
 import { DoctorProfileHeader } from '@/components/molecules/DoctorProfileHeader';
 import { AccountTabScreen } from '@/components/organisms/AccountTabScreen';
+import { ClinicAnalyticsSection } from '@/components/organisms/ClinicAnalyticsSection';
 import { DoctorIdCardScreen } from '@/components/organisms/DoctorIdCardScreen';
 import { LeavePermissionTabScreen } from '@/components/organisms/LeavePermissionTabScreen';
+import { MasterCarouselSection } from '@/components/organisms/MasterCarouselSection';
 import { NotificationTabScreen } from '@/components/organisms/NotificationTabScreen';
 import { PresenceHistoryScreen } from '@/components/organisms/PresenceHistoryScreen';
 import { QrScannerTabScreen } from '@/components/organisms/QrScannerTabScreen';
@@ -300,7 +302,7 @@ export function DoctorDashboardScreen(props: {
           'w-full h-full will-change-transform overflow-hidden flex flex-col min-h-0',
           activeTab === 'qr' || activeTab === 'schedule' || activeTab === 'notification' || activeTab === 'account'
             ? 'p-0 select-none'
-            : 'px-5 pt-2 justify-start overflow-y-auto no-scrollbar pb-24 overscroll-none touch-auto select-none',
+            : 'px-5 pt-2 justify-start overflow-y-auto no-scrollbar pb-36 overscroll-none touch-auto select-none',
         )}
       >
         {activeTab === 'home' && (
@@ -326,7 +328,13 @@ export function DoctorDashboardScreen(props: {
               onActionClick={handleQuickAction}
             />
 
-            {/* 4. Today's Activity Stat Cards (Synced with Schedule Bookings) */}
+            {/* 4. Master 3D Deck Carousel Section (Placed directly below Quick Access) */}
+            <MasterCarouselSection
+              theme={props.theme}
+              onSlideAction={(slideId) => showToast(`Membuka promo & program: ${slideId}`)}
+            />
+
+            {/* 5. Today's Activity Stat Cards (Synced with Schedule Bookings) */}
             <TodayActivitySection
               activities={[
                 {
@@ -347,7 +355,7 @@ export function DoctorDashboardScreen(props: {
                   badgeText: '+12%',
                   badgeType: 'trend',
                   icon: 'stethoscope',
-                  glowVariant: 'emerald',
+                  glowVariant: 'sky',
                 },
               ]}
               theme={props.theme}
@@ -359,6 +367,12 @@ export function DoctorDashboardScreen(props: {
                   showToast('Membuka rincian aktivitas');
                 }
               }}
+            />
+
+            {/* 6. Clinic Performance & Trends Analytics (Matching 1:1 Design & Theme Tokens) */}
+            <ClinicAnalyticsSection
+              theme={props.theme}
+              onViewDetails={() => showToast('Membuka analitik data klinis')}
             />
           </div>
         )}
