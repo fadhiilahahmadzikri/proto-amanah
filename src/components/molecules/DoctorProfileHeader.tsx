@@ -40,7 +40,6 @@ export function DoctorProfileHeader(props: {
 
       {/* Action Button: Notification Bell */}
       <div className="flex items-center gap-2 shrink-0">
-        {/* Notification Bell Button */}
         <button
           type="button"
           aria-label="Notifikasi"
@@ -49,7 +48,7 @@ export function DoctorProfileHeader(props: {
         >
           <Bell className="h-4.5 w-4.5 stroke-[2.2]" />
           {props.profile.unreadNotifications > 0 && (
-            <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-red-500 ring-2 ring-white" />
+            <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-red-500 ring-2 ring-white animate-pulse" />
           )}
         </button>
       </div>

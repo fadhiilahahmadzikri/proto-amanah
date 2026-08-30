@@ -7,6 +7,7 @@ import { type BottomNavTab, BottomNavBar } from '@/components/molecules/BottomNa
 import { DoctorProfileHeader } from '@/components/molecules/DoctorProfileHeader';
 import { AccountTabScreen } from '@/components/organisms/AccountTabScreen';
 import { DoctorIdCardScreen } from '@/components/organisms/DoctorIdCardScreen';
+import { LeavePermissionTabScreen } from '@/components/organisms/LeavePermissionTabScreen';
 import { NotificationTabScreen } from '@/components/organisms/NotificationTabScreen';
 import { PresenceHistoryScreen } from '@/components/organisms/PresenceHistoryScreen';
 import { QrScannerTabScreen } from '@/components/organisms/QrScannerTabScreen';
@@ -50,6 +51,10 @@ export function DoctorDashboardScreen(props: {
   const [showPresenceHistory, setShowPresenceHistory] = React.useState(false);
   const presenceScreenRef = React.useRef<HTMLDivElement>(null);
 
+  // Sub-screen Notification state & animation refs (triggered from top right header Bell)
+  const [showNotification, setShowNotification] = React.useState(false);
+  const notificationScreenRef = React.useRef<HTMLDivElement>(null);
+
   // Sub-screen 3D Doctor ID Card state & animation refs
   const [showIdCard, setShowIdCard] = React.useState(false);
   const idCardScreenRef = React.useRef<HTMLDivElement>(null);
@@ -69,7 +74,7 @@ export function DoctorDashboardScreen(props: {
   };
 
   const handleTabChange = (newTab: BottomNavTab) => {
-    if (newTab === activeTab && !showPresenceHistory && !showIdCard && !showQueueDock) return;
+    if (newTab === activeTab && !showPresenceHistory && !showNotification && !showIdCard && !showQueueDock) return;
 
     const currentIndex = TAB_ORDER.indexOf(activeTab);
     const nextIndex = TAB_ORDER.indexOf(newTab);
@@ -80,6 +85,11 @@ export function DoctorDashboardScreen(props: {
 
     if (showPresenceHistory) {
       handleBackFromPresenceHistory(() => {
+        setInternalTab(newTab);
+        props.onTabChange?.(newTab);
+      });
+    } else if (showNotification) {
+      handleBackFromNotification(() => {
         setInternalTab(newTab);
         props.onTabChange?.(newTab);
       });
@@ -98,6 +108,41 @@ export function DoctorDashboardScreen(props: {
       props.onTabChange?.(newTab);
     }
   };
+
+  // Android Native Activity Push/Pop Animation for Notification Sub-Screen
+  const handleOpenNotification = () => {
+    setShowNotification(true);
+  };
+
+  const handleBackFromNotification = (onDone?: () => void) => {
+    if (!notificationScreenRef.current) {
+      setShowNotification(false);
+      onDone?.();
+      return;
+    }
+
+    gsap.to(notificationScreenRef.current, {
+      x: '100%',
+      opacity: 0.9,
+      duration: 0.28,
+      ease: 'power3.in',
+      onComplete: () => {
+        setShowNotification(false);
+        onDone?.();
+      },
+    });
+  };
+
+  // Entrance slide for Notification Sub-Screen
+  React.useEffect(() => {
+    if (showNotification && notificationScreenRef.current) {
+      gsap.fromTo(
+        notificationScreenRef.current,
+        { x: '100%', opacity: 0.95 },
+        { x: '0%', opacity: 1, duration: 0.3, ease: 'power3.out' },
+      );
+    }
+  }, [showNotification]);
 
   // Android Native Activity Push/Pop Animation for Presence History
   const handleOpenPresenceHistory = () => {
@@ -263,7 +308,7 @@ export function DoctorDashboardScreen(props: {
             {/* 1. Doctor Profile Header */}
             <DoctorProfileHeader
               profile={liveDoctorProfile}
-              onNotificationClick={() => handleTabChange('notification')}
+              onNotificationClick={handleOpenNotification}
               onProfileClick={() => handleTabChange('account')}
             />
 
@@ -333,7 +378,7 @@ export function DoctorDashboardScreen(props: {
         )}
 
         {activeTab === 'notification' && (
-          <NotificationTabScreen
+          <LeavePermissionTabScreen
             theme={props.theme}
             onBack={() => handleTabChange('home')}
           />
@@ -355,11 +400,27 @@ export function DoctorDashboardScreen(props: {
         theme={props.theme}
         className={cn(
           'transition-all duration-300',
-          isModalOpen || showPresenceHistory || showIdCard || showQueueDock
+          isModalOpen || showPresenceHistory || showNotification || showIdCard || showQueueDock
             ? 'opacity-0 pointer-events-none translate-y-12 z-0'
             : 'opacity-100 translate-y-0 z-20',
         )}
       />
+
+      {/* Notification Sub-Screen (Android Activity Push Overlay - Z-40) */}
+      {showNotification && (
+        <div
+          ref={notificationScreenRef}
+          className={cn(
+            'absolute inset-0 z-40 w-full h-full shadow-[-12px_0_30px_rgba(0,0,0,0.3)] will-change-transform',
+            isDark ? 'bg-[#0a0e1a]' : 'bg-white',
+          )}
+        >
+          <NotificationTabScreen
+            theme={props.theme}
+            onBack={() => handleBackFromNotification()}
+          />
+        </div>
+      )}
 
       {/* Presence History Sub-Screen (Android Activity Push Overlay - Z-40) */}
       {showPresenceHistory && (

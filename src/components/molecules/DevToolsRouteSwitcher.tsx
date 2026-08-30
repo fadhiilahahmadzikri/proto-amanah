@@ -2,7 +2,6 @@
 
 import {
   AppWindow,
-  Bell,
   Calendar,
   Check,
   CheckCircle2,
@@ -17,6 +16,7 @@ import {
   KeyRound,
   Lock,
   Mail,
+  Mails,
   Moon,
   QrCode,
   RotateCcw,
@@ -119,10 +119,10 @@ export function DevToolsRouteSwitcher(props: {
     },
     {
       id: 'dash-notif',
-      label: 'Notifikasi',
+      label: 'Perizinan Dokter',
       screen: 'dashboard',
       tab: 'notification',
-      icon: Bell,
+      icon: Mails,
       category: 'Dashboard',
     },
     {
@@ -191,7 +191,7 @@ export function DevToolsRouteSwitcher(props: {
         : props.activeTab === 'qr'
           ? 'Presensi QR'
           : props.activeTab === 'notification'
-            ? 'Notifikasi'
+            ? 'Perizinan Dokter'
             : props.activeTab === 'account'
               ? 'Profil Dokter'
               : 'Home Dashboard'

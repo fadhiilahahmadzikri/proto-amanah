@@ -1,4 +1,4 @@
-import { Bell, Calendar, Home, QrCode, User } from 'lucide-react';
+import { Calendar, Home, Mails, QrCode, User } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export type BottomNavTab = 'home' | 'schedule' | 'qr' | 'notification' | 'account';
@@ -75,9 +75,10 @@ export function BottomNavBar(props: {
         </button>
       </div>
 
-      {/* 4. Notifikasi Tab */}
+      {/* 4. Perizinan Tab */}
       <button
         type="button"
+        aria-label="Perizinan Dokter"
         onClick={() => props.onTabChange?.('notification')}
         className={cn(
           'flex flex-col items-center gap-1 w-14 pb-1 transition-all cursor-pointer focus:outline-none',
@@ -86,8 +87,8 @@ export function BottomNavBar(props: {
             : isDark ? 'text-neutral-500 hover:text-neutral-300 font-medium' : 'text-[#9CA3AF] hover:text-slate-600 font-medium',
         )}
       >
-        <Bell className="h-6 w-6 stroke-[2.2]" />
-        <span className="text-[10px]">Notifikasi</span>
+        <Mails className="h-6 w-6 stroke-[2.2]" />
+        <span className="text-[10px]">Perizinan</span>
       </button>
 
       {/* 5. Akun Tab */}

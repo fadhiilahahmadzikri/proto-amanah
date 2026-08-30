@@ -47,6 +47,19 @@ export type DoctorCardProfile = {
   department?: string;
 };
 
+export function getAssetUrl(relativePath: string): string {
+  const clean = relativePath.replace(/^\.?\//, '');
+  if (typeof window === 'undefined') return `/${clean}`;
+  if (
+    window.location.pathname.startsWith('/id') ||
+    window.location.pathname.startsWith('/en') ||
+    window.location.pathname.startsWith('/embed')
+  ) {
+    return `/${clean}`;
+  }
+  return `./${clean}`;
+}
+
 function drawBauhausBlock(
   ctx: CanvasRenderingContext2D,
   x: number,
@@ -459,7 +472,7 @@ function BandMesh(props: {
 
   const [hovered, hover] = useState(false);
 
-  const { nodes, materials } = useGLTF('/assets/3d/card.glb') as any;
+  const { nodes, materials } = useGLTF(getAssetUrl('assets/3d/card.glb')) as any;
 
   const lanyardTexture = useMemo(() => {
     return createLanyardCanvasTexture(theme);
@@ -712,7 +725,7 @@ export function DoctorIdCard3D(props: {
     role: props.profile?.role ?? 'Dokter Spesialis Anak',
     sip: props.profile?.sip ?? '503/442.1/SIP-D/2026',
     hospital: 'RS AMANAH SEHAT',
-    avatarUrl: props.profile?.avatarUrl ?? '/assets/images/doctors/woman-doctor-4.png',
+    avatarUrl: props.profile?.avatarUrl ?? getAssetUrl('assets/images/doctors/woman-doctor-4.png'),
   };
 
   return (
