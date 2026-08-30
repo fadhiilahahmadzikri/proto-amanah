@@ -729,9 +729,6 @@ export function LeavePermissionTabScreen(props: {
                       size="md"
                       onClick={() => handleOpenEditForm(detailRecord)}
                       startIcon={<Edit3 className="w-4 h-4" />}
-                      className={cn(
-                        isDark ? 'bg-blue-600 hover:bg-blue-500' : 'bg-blue-600 hover:bg-blue-700',
-                      )}
                     >
                       Edit Izin
                     </Button>
@@ -971,10 +968,7 @@ export function LeavePermissionTabScreen(props: {
                   size="md"
                   fullWidth
                   isLoading={isSubmitting}
-                  className={cn(
-                    'rounded-2xl',
-                    isDark ? 'bg-blue-600 hover:bg-blue-500' : 'bg-blue-600 hover:bg-blue-700',
-                  )}
+                  className="rounded-2xl"
                 >
                   {editingRecordId ? 'Simpan Perubahan' : 'Kirim Pengajuan Izin'}
                 </Button>

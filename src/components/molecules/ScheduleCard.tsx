@@ -21,12 +21,13 @@ export function ScheduleCard(props: {
   return (
     <div
       className={cn(
-        'relative w-full h-[172px] select-none transition-colors duration-300 drop-shadow-[0_12px_28px_rgba(0,0,0,0.06)]',
+        'relative w-full h-[172px] select-none transition-all duration-300 drop-shadow-[0_12px_28px_rgba(0,0,0,0.06)] group',
+        isDark && 'drop-shadow-[0_14px_32px_rgba(0,0,0,0.4)]',
         props.className,
       )}
       style={props.style}
     >
-      {/* SVG Ticket Silhouette, 3D Wave Textures & Perforated Divider */}
+      {/* SVG Ticket Silhouette, 3D Crystal Texture & Seamless Liquid Glass Gradient */}
       <svg
         className="absolute inset-0 w-full h-full pointer-events-none"
         viewBox="0 0 340 172"
@@ -39,47 +40,91 @@ export function ScheduleCard(props: {
             <path d={ticketPath} />
           </clipPath>
 
-          {/* Light Theme Elegant Ice-Blue Wave Gradients */}
-          <linearGradient id={`${clipId}-wave-1-light`} x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#dbeafe" stopOpacity="0.75" />
-            <stop offset="50%" stopColor="#eff6ff" stopOpacity="0.5" />
-            <stop offset="100%" stopColor="#f8fafc" stopOpacity="0.15" />
-          </linearGradient>
-          <linearGradient id={`${clipId}-wave-2-light`} x1="100%" y1="0%" x2="0%" y2="100%">
-            <stop offset="0%" stopColor="#e0f2fe" stopOpacity="0.75" />
-            <stop offset="60%" stopColor="#f0f9ff" stopOpacity="0.45" />
-            <stop offset="100%" stopColor="#ffffff" stopOpacity="0.1" />
+          {/* Seamless Liquid Glass Gradient Mask (Light White vs Dark Obsidian) */}
+          <linearGradient id={`${clipId}-liquid-glass`} x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop
+              offset="0%"
+              stopColor={isDark ? '#060b18' : '#ffffff'}
+              stopOpacity={isDark ? 0.96 : 0.95}
+            />
+            <stop
+              offset="45%"
+              stopColor={isDark ? '#060b18' : '#ffffff'}
+              stopOpacity={isDark ? 0.92 : 0.90}
+            />
+            <stop
+              offset="64%"
+              stopColor={isDark ? '#0b1329' : '#ffffff'}
+              stopOpacity={isDark ? 0.60 : 0.45}
+            />
+            <stop
+              offset="82%"
+              stopColor={isDark ? '#0b1329' : '#ffffff'}
+              stopOpacity={isDark ? 0.15 : 0.10}
+            />
+            <stop
+              offset="100%"
+              stopColor={isDark ? '#0b1329' : '#ffffff'}
+              stopOpacity={0.0}
+            />
           </linearGradient>
 
-          {/* Dark Theme Obsidian Gradients */}
-          <linearGradient id={`${clipId}-wave-1-dark`} x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#1e293b" stopOpacity="0.6" />
-            <stop offset="100%" stopColor="#0f172a" stopOpacity="0.25" />
-          </linearGradient>
-          <linearGradient id={`${clipId}-wave-2-dark`} x1="100%" y1="0%" x2="0%" y2="100%">
-            <stop offset="0%" stopColor="#38bdf8" stopOpacity="0.18" />
-            <stop offset="100%" stopColor="#0284c7" stopOpacity="0.06" />
+          {/* Top-to-Bottom Glass Specular Sheen */}
+          <linearGradient id={`${clipId}-glass-sheen`} x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop
+              offset="0%"
+              stopColor="#ffffff"
+              stopOpacity={isDark ? 0.12 : 0.4}
+            />
+            <stop
+              offset="35%"
+              stopColor={isDark ? '#38bdf8' : '#ffffff'}
+              stopOpacity={isDark ? 0.04 : 0.15}
+            />
+            <stop
+              offset="100%"
+              stopColor={isDark ? '#000000' : '#ffffff'}
+              stopOpacity={0.0}
+            />
           </linearGradient>
         </defs>
 
-        {/* Card Background Fill */}
+        {/* Base Solid Card Fill */}
         <path
           d={ticketPath}
-          fill={isDark ? 'rgba(23, 23, 23, 0.95)' : '#ffffff'}
+          fill={isDark ? '#060b18' : '#ffffff'}
+          stroke={isDark ? 'rgba(255, 255, 255, 0.16)' : 'rgba(226, 232, 240, 0.95)'}
+          strokeWidth="1.2"
         />
 
-        {/* Clipped Wave Petal Textures & Perforated Connector Line */}
+        {/* Clipped 3D Crystal & Liquid Glass Overlays */}
         <g clipPath={`url(#${clipId})`}>
-          {/* Primary Sweeping Petal Wave */}
-          <path
-            d="M-30,190 C60,110 130,50 350,15 L350,190 Z"
-            fill={isDark ? `url(#${clipId}-wave-1-dark)` : `url(#${clipId}-wave-1-light)`}
+          {/* 3D Geometric Crystal Architecture Image Texture (Light vs Dark) */}
+          <image
+            href={isDark ? '/assets/images/schedule-card-bg-dark.png' : '/assets/images/schedule-card-bg.png'}
+            x="0"
+            y="0"
+            width="340"
+            height="172"
+            preserveAspectRatio="xMidYMid slice"
           />
 
-          {/* Intersecting Secondary Translucent Wave */}
-          <path
-            d="M40,-20 C140,40 210,120 370,95 L370,-20 Z"
-            fill={isDark ? `url(#${clipId}-wave-2-dark)` : `url(#${clipId}-wave-2-light)`}
+          {/* Seamless Liquid Glass Gradient Mask */}
+          <rect
+            x="0"
+            y="0"
+            width="340"
+            height="172"
+            fill={`url(#${clipId}-liquid-glass)`}
+          />
+
+          {/* Top Specular Glass Sheen */}
+          <rect
+            x="0"
+            y="0"
+            width="340"
+            height="172"
+            fill={`url(#${clipId}-glass-sheen)`}
           />
 
           {/* Wall-to-Wall Perforated Connector Line between the "C" Notches */}
@@ -88,35 +133,36 @@ export function ScheduleCard(props: {
             y1="114"
             x2="330"
             y2="114"
-            stroke={isDark ? 'rgba(255, 255, 255, 0.2)' : 'rgba(203, 213, 225, 0.95)'}
+            stroke={isDark ? 'rgba(255, 255, 255, 0.2)' : 'rgba(203, 213, 225, 0.9)'}
             strokeWidth="1.5"
             strokeDasharray="4 4"
           />
         </g>
       </svg>
 
-      {/* Foreground Content */}
+      {/* Foreground Content with Contextual Palette Typography */}
       <div className="relative z-10 flex flex-col justify-between h-full p-4.5">
-        {/* Top Header: Schedule Title, Date & Dismiss Icon */}
+        {/* Top Header: Schedule Title, Date & Minimalist Dismiss Icon */}
         <div className="flex justify-between items-start">
           <div className="flex flex-col">
             <span
               className={cn(
-                'text-[14px] font-bold tracking-tight',
-                isDark ? 'text-white' : 'text-[#1e293b]',
+                'text-[15.5px] font-black tracking-tight leading-tight',
+                isDark ? 'text-white drop-shadow-[0_1px_3px_rgba(0,0,0,0.7)]' : 'text-[#03045e]',
               )}
             >
               {props.schedule.title}
             </span>
             <span
               className={cn(
-                'text-[11px] font-medium mt-0.5',
-                isDark ? 'text-slate-400' : 'text-[#64748b]',
+                'text-[11.5px] font-medium mt-0.5',
+                isDark ? 'text-slate-300' : 'text-[#64748b]',
               )}
             >
               {props.schedule.date}
             </span>
           </div>
+
           {props.onDismiss && (
             <button
               type="button"
@@ -126,23 +172,23 @@ export function ScheduleCard(props: {
                 props.onDismiss?.();
               }}
               className={cn(
-                'p-1 -mr-1 transition-transform active:scale-90 cursor-pointer focus:outline-none',
+                'p-1.5 -mr-1 rounded-full transition-all active:scale-90 cursor-pointer focus:outline-none shadow-2xs',
                 isDark
-                  ? 'text-neutral-400 hover:text-white'
-                  : 'text-slate-400 hover:text-slate-700',
+                  ? 'bg-white/10 hover:bg-white/20 text-slate-300 hover:text-white backdrop-blur-md'
+                  : 'bg-slate-100/80 hover:bg-slate-200 text-slate-500 hover:text-[#03045e]',
               )}
             >
-              <X className="h-4 w-4" />
+              <X className="h-3.5 w-3.5 stroke-[2.2]" />
             </button>
           )}
         </div>
 
-        {/* Center: Time & Badge */}
-        <div className="flex justify-between items-center mb-4">
+        {/* Center: Compact Primary Time & Status Badge */}
+        <div className="flex items-center gap-2 mb-3">
           <span
             className={cn(
-              'text-[26px] font-extrabold tracking-tight leading-none drop-shadow-xs',
-              isDark ? 'text-white' : 'text-[#0f172a]',
+              'text-[19.5px] sm:text-[20.5px] font-black tracking-tight leading-none',
+              isDark ? 'text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]' : 'text-[#023e8a]',
             )}
           >
             {props.schedule.time}
@@ -154,43 +200,38 @@ export function ScheduleCard(props: {
           />
         </div>
 
-        {/* Footer: Poli & Room info + Slot info */}
-        <div className="flex justify-between items-end pt-1">
-          <div className="flex flex-col gap-0.5">
+        {/* Footer: Simplified & Clean Single-Tier Breakdown */}
+        <div className="flex items-end justify-between pt-1">
+          {/* Poli & Room info */}
+          <div className="flex flex-col min-w-0 max-w-[58%]">
             <span
               className={cn(
-                'font-bold text-[13px]',
-                isDark ? 'text-white' : 'text-[#1e293b]',
+                'font-extrabold text-[12.5px] truncate leading-tight',
+                isDark ? 'text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.6)]' : 'text-[#03045e]',
               )}
             >
               {props.schedule.poli}
             </span>
             <span
               className={cn(
-                'text-[11px] font-medium',
-                isDark ? 'text-slate-400' : 'text-[#64748b]',
+                'text-[11px] font-medium leading-tight mt-0.5',
+                isDark ? 'text-slate-300' : 'text-[#64748b]',
               )}
             >
               {props.schedule.room}
             </span>
           </div>
-          <div className="flex flex-col gap-0.5 text-right">
-            <span
-              className={cn(
-                'font-bold text-[13px] tabular-nums',
-                isDark ? 'text-white' : 'text-[#1e293b]',
-              )}
-            >
-              {props.schedule.slotCount}
-            </span>
-            <span
-              className={cn(
-                'text-[11px] font-medium',
-                isDark ? 'text-slate-400' : 'text-[#64748b]',
-              )}
-            >
-              {props.schedule.slotText}
-            </span>
+
+          {/* Clean Integrated Booking Pill in Liquid Glass Pill Style */}
+          <div
+            className={cn(
+              'px-2.5 py-1 rounded-full text-[11px] font-bold tracking-tight shadow-2xs shrink-0 flex items-center gap-1',
+              isDark
+                ? 'bg-white/10 border border-white/20 text-cyan-300 backdrop-blur-md'
+                : 'bg-sky-50 border border-sky-100 text-[#023e8a]',
+            )}
+          >
+            <span>{props.schedule.slotCount} {props.schedule.slotText}</span>
           </div>
         </div>
       </div>

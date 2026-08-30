@@ -54,3 +54,39 @@ body {
 .animate-retro-laser {
   animation: retroLaserSweep 3.2s ease-in-out infinite;
 }
+
+/* Crisp Royal Blue Button Gradient System (Zero Glow) */
+.btn-crisp-blue {
+  background-color: #0d66e9 !important;
+  background-image: linear-gradient(to bottom, rgba(255, 255, 255, 0.28), rgba(255, 255, 255, 0)) !important;
+  border: 0.8px solid #1d58ac !important;
+  box-shadow: rgba(255, 255, 255, 0.25) 0px 0px 0px 1px inset, 0px 1px 2px rgba(0, 0, 0, 0.12) !important;
+  color: #ffffff !important;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.btn-crisp-blue:hover {
+  filter: brightness(1.06);
+}
+
+.btn-crisp-blue:active {
+  transform: scale(0.98);
+  filter: brightness(0.95);
+}
+
+/* Dark Mode Theme Respecting Gradient Composition (Zero Glow) */
+.dark .btn-crisp-blue,
+[data-theme="dark"] .btn-crisp-blue,
+.btn-crisp-blue-dark {
+  background-color: #0284c7 !important;
+  background-image: linear-gradient(to bottom, rgba(255, 255, 255, 0.32) 0%, rgba(56, 189, 248, 0.18) 45%, rgba(0, 0, 0, 0.15) 100%) !important;
+  border: 0.8px solid rgba(56, 189, 248, 0.55) !important;
+  box-shadow: rgba(255, 255, 255, 0.25) 0px 0px 0px 1px inset, 0px 1px 3px rgba(0, 0, 0, 0.4) !important;
+  color: #ffffff !important;
+}
+
+.dark .btn-crisp-blue:hover,
+[data-theme="dark"] .btn-crisp-blue:hover,
+.btn-crisp-blue-dark:hover {
+  filter: brightness(1.08);
+}

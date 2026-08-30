@@ -130,36 +130,36 @@ export interface ClinicSlide {
 const CLINIC_SLIDES: ClinicSlide[] = [
   {
     id: 'slide-1',
-    eyebrow: 'Layanan Prioritas Poli Anak',
+    eyebrow: 'Poli Anak',
     title: 'Konsultasi Spesialis Anak',
-    description: 'Jadwalkan konsultasi dokter spesialis anak terpadu RS Amanah Sehat.',
+    description: 'Jadwalkan temu dokter spesialis anak responsif dan terpadu RS Amanah.',
     ctaText: 'Jadwalkan',
     ctaIcon: <Sparkles className="w-3.5 h-3.5 fill-current shrink-0" />,
     iconName: 'briefcase',
   },
   {
     id: 'slide-2',
-    eyebrow: 'Imunisasi Balita Terjadwal',
-    title: 'Vaksinasi Lengkap & Booster',
-    description: 'Paket vaksinasi primer & booster anak lengkap dengan sertifikat.',
+    eyebrow: 'Imunisasi',
+    title: 'Vaksinasi & Booster Anak',
+    description: 'Paket imunisasi balita primer lengkap dengan sertifikat medis resmi.',
     ctaText: 'Lihat Paket',
     ctaIcon: <ShieldCheck className="w-3.5 h-3.5 shrink-0" />,
     iconName: 'syringe',
   },
   {
     id: 'slide-3',
-    eyebrow: 'Pediatric Development Care',
+    eyebrow: 'Tumbuh Kembang',
     title: 'Skrining Tumbuh Kembang',
-    description: 'Evaluasi nutrisi dan stimulasi motorik buah hati bersama spesialis.',
+    description: 'Evaluasi berkala nutrisi dan motorik buah hati bersama tenaga ahli.',
     ctaText: 'Reservasi',
     ctaIcon: <CalendarCheck className="w-3.5 h-3.5 shrink-0" />,
     iconName: 'dna',
   },
   {
     id: 'slide-4',
-    eyebrow: 'Pelayanan Darurat Spesialis',
-    title: 'Instalasi Gawat Darurat 24 Jam',
-    description: 'Kesiapan dokter jaga & fasilitas darurat anak 24 jam nonstop.',
+    eyebrow: 'Layanan 24 Jam',
+    title: 'Instalasi Gawat Darurat',
+    description: 'Kesiapan dokter jaga dan fasilitas darurat anak responsif 24 jam.',
     ctaText: 'Hubungi IGD',
     ctaIcon: <PhoneCall className="w-3.5 h-3.5 shrink-0" />,
     iconName: 'shield',
@@ -167,32 +167,7 @@ const CLINIC_SLIDES: ClinicSlide[] = [
 ];
 
 // ==========================================
-// 3. GLOSSY 3D ICON CONTAINER (1:1 with Catalog Card Style)
-// ==========================================
-function Slide3DGlossyCard(props: {
-  iconName: Medical3DIconName;
-  isDark?: boolean;
-}) {
-  return (
-    <div className="relative w-20 h-20 sm:w-22 sm:h-22 flex items-center justify-center select-none shrink-0 pointer-events-none group">
-      {/* Glossy Backdrop Card */}
-      <div
-        className={cn(
-          'w-18 h-18 sm:w-20 sm:h-20 rounded-[22px] flex items-center justify-center p-2.5 transition-all duration-300',
-          'border shadow-[0_10px_30px_-10px_rgba(59,130,246,0.25)] backdrop-blur-xl',
-          props.isDark
-            ? 'bg-white/10 border-white/20 shadow-black/60'
-            : 'bg-white/70 border-white/90 shadow-blue-500/15',
-        )}
-      >
-        <Medical3DIcon name={props.iconName} className="w-full h-full" />
-      </div>
-    </div>
-  );
-}
-
-// ==========================================
-// 4. DECK CAROUSEL CARD (Matching mcp-example Paradigm)
+// 3. DECK CAROUSEL CARD (Heroic Corner 3D Icon & Clean Left Composition)
 // ==========================================
 const DeckCarouselCard = React.forwardRef<
   HTMLElement,
@@ -210,7 +185,7 @@ const DeckCarouselCard = React.forwardRef<
       ref={ref}
       onClick={props.onClick}
       className={cn(
-        'card-item absolute inset-0 w-full rounded-[28px] sm:rounded-[32px] p-4.5 sm:p-5.5 cursor-pointer select-none overflow-hidden border shadow-sm',
+        'card-item absolute inset-0 w-full rounded-[26px] sm:rounded-[30px] p-4 sm:p-4.5 px-4.5 sm:px-5 cursor-pointer select-none overflow-hidden border shadow-sm flex flex-col justify-between',
         '[backface-visibility:hidden] [transform-style:preserve-3d] [will-change:transform,opacity,filter] transition-colors duration-300',
         props.isDark
           ? 'bg-gradient-to-br from-[#0f1422] via-[#131b2e] to-[#16233d] border-white/10 text-white shadow-[0_12px_32px_rgba(0,0,0,0.4)]'
@@ -244,48 +219,42 @@ const DeckCarouselCard = React.forwardRef<
         />
       </svg>
 
-      {/* Top Section: Eyebrow, Title, Subtitle & 3D Icon */}
-      <div className="relative z-10 flex items-start justify-between gap-3 min-h-[92px]">
-        {/* Left Information */}
-        <div className="flex flex-col items-start gap-1 max-w-[65%] sm:max-w-[70%]">
-          <span
-            className={cn(
-              'card-tag px-2 py-0.5 rounded-full text-[9px] sm:text-[9.5px] font-extrabold tracking-tight border [will-change:transform,opacity,filter]',
-              props.isDark
-                ? 'bg-blue-950/70 text-cyan-400 border-cyan-500/30'
-                : 'bg-blue-50 text-[#0A44FF] border-blue-100',
-            )}
-          >
-            {props.slide.eyebrow}
-          </span>
-
-          <h3
-            className={cn(
-              'card-title font-black text-[15.5px] sm:text-[17px] leading-tight tracking-tight mt-0.5 [will-change:transform,opacity,filter]',
-              props.isDark ? 'text-white' : 'text-slate-900',
-            )}
-          >
-            {props.slide.title}
-          </h3>
-
-          <p
-            className={cn(
-              'card-desc text-[11px] sm:text-[11.5px] font-medium leading-snug line-clamp-2 [will-change:transform,opacity,filter]',
-              props.isDark ? 'text-neutral-400' : 'text-slate-500',
-            )}
-          >
-            {props.slide.description}
-          </p>
-        </div>
-
-        {/* Right 3D Medical Icon Asset */}
-        <div className="flex items-center justify-center shrink-0 pr-1">
-          <Slide3DGlossyCard iconName={props.slide.iconName} isDark={props.isDark} />
-        </div>
+      {/* Heroic 3D SVG Medical Icon - Rotated & Cropped in Bottom-Right Corner */}
+      <div
+        className={cn(
+          'absolute -right-3 -bottom-4 sm:-right-4 sm:-bottom-5 w-32 h-32 sm:w-36 sm:h-36 pointer-events-none select-none z-0 rotate-[-12deg] transition-transform duration-300 group-hover:scale-105 group-hover:rotate-[-16deg]',
+        )}
+      >
+        <Medical3DIcon
+          name={props.slide.iconName}
+          isDark={props.isDark}
+          className="w-full h-full object-contain"
+        />
       </div>
 
-      {/* Bottom Row: Action Pill */}
-      <div className="relative z-10 flex items-center justify-between pt-2.5 mt-1 border-t border-slate-100/60 dark:border-white/5">
+      {/* Top Left Information Content Hierarchy */}
+      <div className="relative z-10 flex flex-col items-start gap-0.5 max-w-[60%] sm:max-w-[64%]">
+        <h3
+          className={cn(
+            'card-title font-black text-[15px] sm:text-[16px] leading-tight tracking-tight line-clamp-1 truncate [will-change:transform,opacity,filter]',
+            props.isDark ? 'text-white' : 'text-slate-900',
+          )}
+        >
+          {props.slide.title}
+        </h3>
+
+        <p
+          className={cn(
+            'card-desc text-[11px] sm:text-[11.5px] font-medium leading-[1.38] line-clamp-2 mt-0.5 [will-change:transform,opacity,filter]',
+            props.isDark ? 'text-neutral-300' : 'text-slate-600',
+          )}
+        >
+          {props.slide.description}
+        </p>
+      </div>
+
+      {/* Bottom Row: Theme-Respecting Crisp Gradient Action Button (Zero Trailing) */}
+      <div className="relative z-10 flex items-center pt-1.5">
         <button
           type="button"
           onClick={(e) => {
@@ -293,29 +262,13 @@ const DeckCarouselCard = React.forwardRef<
             props.onActionClick();
           }}
           className={cn(
-            'px-3.5 py-1.5 rounded-xl font-bold text-xs shadow-xs transition-all active:scale-95 flex items-center gap-1.5 cursor-pointer select-none',
-            props.isDark
-              ? 'bg-[#0A44FF] hover:bg-blue-600 text-white'
-              : 'bg-[#0A44FF] hover:bg-blue-700 text-white',
+            'btn-crisp-blue inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl font-bold text-xs cursor-pointer select-none shrink-0',
+            props.isDark && 'btn-crisp-blue-dark',
           )}
         >
           {props.slide.ctaIcon}
           <span>{props.slide.ctaText}</span>
         </button>
-
-        {/* Counter Badge */}
-        <div
-          className={cn(
-            'px-2.5 py-0.5 rounded-full font-mono text-[10px] font-bold border tracking-wider',
-            props.isDark
-              ? 'bg-white/5 border-white/10 text-neutral-400'
-              : 'bg-white border-slate-200/80 text-slate-500',
-          )}
-        >
-          <span>{props.index + 1}</span>
-          <span className="px-1 opacity-50">/</span>
-          <span className="opacity-50">{props.totalSlides}</span>
-        </div>
       </div>
     </article>
   );
@@ -372,8 +325,12 @@ function DeckCarouselToolbar(props: {
                 className={cn(
                   'block h-1.5 rounded-full transition-all duration-300',
                   isActive
-                    ? 'w-4.5 bg-[#0A44FF] dark:bg-cyan-400 shadow-xs'
-                    : 'w-1.5 bg-slate-300 dark:bg-neutral-600 hover:bg-slate-400',
+                    ? props.isDark
+                      ? 'w-5 bg-[#38bdf8] shadow-[0_0_8px_rgba(56,189,248,0.4)]'
+                      : 'w-5 bg-[#0d66e9] shadow-[0_1px_3px_rgba(13,102,233,0.3)]'
+                    : props.isDark
+                      ? 'w-1.5 bg-neutral-700 hover:bg-neutral-600'
+                      : 'w-1.5 bg-slate-300 hover:bg-slate-400',
                 )}
               />
             </button>
@@ -429,13 +386,12 @@ export function MasterCarouselSection(props: {
       const activeCard = cards[index];
       if (!activeCard) return;
 
-      const tag = activeCard.querySelector('.card-tag');
       const title = activeCard.querySelector('.card-title');
       const desc = activeCard.querySelector('.card-desc');
 
-      if (tag && title && desc) {
+      if (title && desc) {
         gsap.fromTo(
-          [tag, title, desc],
+          [title, desc],
           { filter: 'blur(12px)', opacity: 0, scale: 0.98, y: -16 },
           {
             delay: 0.1,
@@ -621,7 +577,7 @@ export function MasterCarouselSection(props: {
       {/* 3D Perspective Stage Container */}
       <div
         ref={stageRef}
-        className="carousel-stage relative flex h-[168px] sm:h-[182px] w-full touch-pan-y items-center justify-center overflow-visible select-none [perspective-origin:50%_50%] [perspective:1000px]"
+        className="carousel-stage relative flex h-[154px] sm:h-[162px] w-full touch-pan-y items-center justify-center overflow-visible select-none [perspective-origin:50%_50%] [perspective:1000px]"
         onPointerCancel={handlePointerCancel}
         onPointerDown={handlePointerDown}
         onPointerEnter={handlePointerEnter}

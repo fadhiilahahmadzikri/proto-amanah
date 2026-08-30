@@ -48,8 +48,8 @@ export function StatusBadge(props: {
     return (
       <span
         className={cn(
-          'text-white px-3 py-1 rounded-full text-[10px] font-bold tracking-wide shadow-sm shrink-0 select-none transition-colors',
-          isDark ? 'bg-blue-600 shadow-blue-900/30' : 'bg-[#0A44FF]',
+          'btn-crisp-blue px-3 py-1 rounded-full text-[10.5px] font-bold tracking-wide shrink-0 select-none transition-all',
+          isDark && 'btn-crisp-blue-dark',
           props.className,
         )}
       >

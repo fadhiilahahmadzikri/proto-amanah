@@ -21,7 +21,7 @@ export function Button(props: {
 
   const variantClasses = {
     primary:
-      'bg-neutral-950 text-white hover:bg-neutral-800 active:bg-black focus-visible:ring-neutral-950 disabled:bg-neutral-300 disabled:text-neutral-500 shadow-sm',
+      'btn-crisp-blue dark:btn-crisp-blue-dark font-bold active:scale-[0.985] disabled:opacity-50',
     secondary:
       'bg-neutral-100 text-neutral-900 hover:bg-neutral-200 active:bg-neutral-300 focus-visible:ring-neutral-400 disabled:bg-neutral-100 disabled:text-neutral-400',
     outline:
