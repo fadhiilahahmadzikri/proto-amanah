@@ -167,7 +167,8 @@ const CLINIC_SLIDES: ClinicSlide[] = [
 ];
 
 // ==========================================
-// 3. DECK CAROUSEL CARD (Heroic Corner 3D Icon & Clean Left Composition)
+// ==========================================
+// 3. DECK CAROUSEL CARD (Heroic Corner 3D Icon & Inward Notched Material Clipping)
 // ==========================================
 const DeckCarouselCard = React.forwardRef<
   HTMLElement,
@@ -184,15 +185,34 @@ const DeckCarouselCard = React.forwardRef<
     <article
       ref={ref}
       onClick={props.onClick}
+      style={{
+        clipPath: 'url(#carousel-card-inward-notch)',
+        WebkitClipPath: 'url(#carousel-card-inward-notch)',
+      }}
       className={cn(
-        'card-item absolute inset-0 w-full rounded-[26px] sm:rounded-[30px] p-4 sm:p-4.5 px-4.5 sm:px-5 cursor-pointer select-none overflow-hidden border shadow-sm flex flex-col justify-between',
+        'card-item absolute inset-0 w-full p-4 sm:p-4.5 px-4.5 sm:px-5 cursor-pointer select-none overflow-hidden shadow-sm flex flex-col justify-between',
         '[backface-visibility:hidden] [transform-style:preserve-3d] [will-change:transform,opacity,filter] transition-colors duration-300',
         props.isDark
-          ? 'bg-gradient-to-br from-[#0f1422] via-[#131b2e] to-[#16233d] border-white/10 text-white shadow-[0_12px_32px_rgba(0,0,0,0.4)]'
-          : 'bg-gradient-to-br from-white via-[#f4f7ff] to-[#eaf0ff] border-blue-100/80 text-slate-900 shadow-[0_8px_28px_rgba(10,68,255,0.06)]',
+          ? 'bg-gradient-to-br from-[#0f1422] via-[#131b2e] to-[#16233d] text-white shadow-[0_12px_32px_rgba(0,0,0,0.4)]'
+          : 'bg-gradient-to-br from-white via-[#f4f7ff] to-[#eaf0ff] text-slate-900 shadow-[0_8px_28px_rgba(10,68,255,0.06)]',
       )}
       data-index={props.index}
     >
+      {/* Dynamic Pixel-Perfect Notched Rim Stroke Overlay */}
+      <svg
+        className="absolute inset-0 w-full h-full pointer-events-none z-30"
+        viewBox="0 0 1000 1000"
+        preserveAspectRatio="none"
+        fill="none"
+      >
+        <path
+          d="M 70 0 L 930 0 C 970 0 1000 70 1000 160 L 1000 840 C 1000 930 970 1000 930 1000 L 670 1000 C 635 1000 620 860 585 860 L 415 860 C 380 860 365 1000 330 1000 L 70 1000 C 30 1000 0 930 0 840 L 0 160 C 0 70 30 0 70 0 Z"
+          stroke={props.isDark ? 'rgba(255,255,255,0.15)' : 'rgba(219,234,254,0.95)'}
+          strokeWidth="2.5"
+          vectorEffect="non-scaling-stroke"
+        />
+      </svg>
+
       {/* Subtle Organic Ribbon Waves */}
       <svg
         className={cn(
@@ -273,7 +293,7 @@ const DeckCarouselCard = React.forwardRef<
       </div>
 
       {/* Bottom Row: Theme-Respecting Crisp Gradient Action Button (Zero Trailing) */}
-      <div className="relative z-10 flex items-center pt-1.5">
+      <div className="relative z-10 flex items-center pt-1 pb-1">
         <button
           type="button"
           onClick={(e) => {
@@ -281,7 +301,7 @@ const DeckCarouselCard = React.forwardRef<
             props.onActionClick();
           }}
           className={cn(
-            'btn-crisp-blue inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl font-bold text-xs cursor-pointer select-none shrink-0',
+            'btn-crisp-blue inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl font-bold text-xs cursor-pointer select-none shrink-0 shadow-xs',
             props.isDark && 'btn-crisp-blue-dark',
           )}
         >
@@ -294,83 +314,41 @@ const DeckCarouselCard = React.forwardRef<
 });
 
 // ==========================================
-// 5. CAROUSEL TOOLBAR (Matching mcp-example Paradigm)
+// 5. CAROUSEL NOTCHED CAVITY INDICATOR
 // ==========================================
-function DeckCarouselToolbar(props: {
+function DeckCarouselNotchedIndicator(props: {
   currentIndex: number;
   totalSlides: number;
   isDark?: boolean;
-  onNext: () => void;
-  onPrevious: () => void;
   onSelectSlide: (index: number) => void;
 }) {
   return (
-    <div className="flex items-center justify-between w-full px-1 pt-2">
-      {/* Prev Button */}
-      <button
-        type="button"
-        aria-label="Slide Sebelumnya"
-        onClick={props.onPrevious}
-        className={cn(
-          'w-7 h-7 rounded-full flex items-center justify-center transition-all active:scale-90 cursor-pointer border shadow-xs',
-          props.isDark
-            ? 'bg-white/5 hover:bg-white/10 border-white/10 text-neutral-300'
-            : 'bg-white hover:bg-slate-50 border-slate-200/80 text-slate-700',
-        )}
-      >
-        <ChevronLeft className="w-3.5 h-3.5 stroke-[2.5]" />
-      </button>
-
-      {/* Centered Pagination Indicator Dots */}
-      <div
-        className={cn(
-          'flex items-center gap-1.5 px-3 py-1.5 rounded-full border shadow-xs transition-colors',
-          props.isDark
-            ? 'bg-[#0f1422] border-white/10'
-            : 'bg-white border-slate-200/90',
-        )}
-      >
-        {Array.from({ length: props.totalSlides }).map((_, index) => {
-          const isActive = index === props.currentIndex;
-          return (
-            <button
-              key={index}
-              type="button"
-              aria-label={`Ke slide ${index + 1}`}
-              onClick={() => props.onSelectSlide(index)}
-              className="flex h-3 items-center justify-center focus:outline-none cursor-pointer"
-            >
-              <span
-                className={cn(
-                  'block h-1.5 rounded-full transition-all duration-300',
-                  isActive
-                    ? props.isDark
-                      ? 'w-5 bg-[#38bdf8] shadow-[0_0_8px_rgba(56,189,248,0.4)]'
-                      : 'w-5 bg-[#0d66e9] shadow-[0_1px_3px_rgba(13,102,233,0.3)]'
-                    : props.isDark
-                      ? 'w-1.5 bg-neutral-700 hover:bg-neutral-600'
-                      : 'w-1.5 bg-slate-300 hover:bg-slate-400',
-                )}
-              />
-            </button>
-          );
-        })}
-      </div>
-
-      {/* Next Button */}
-      <button
-        type="button"
-        aria-label="Slide Berikutnya"
-        onClick={props.onNext}
-        className={cn(
-          'w-7 h-7 rounded-full flex items-center justify-center transition-all active:scale-90 cursor-pointer border shadow-xs',
-          props.isDark
-            ? 'bg-white/5 hover:bg-white/10 border-white/10 text-neutral-300'
-            : 'bg-white hover:bg-slate-50 border-slate-200/80 text-slate-700',
-        )}
-      >
-        <ChevronRight className="w-3.5 h-3.5 stroke-[2.5]" />
-      </button>
+    <div className="absolute bottom-0 h-[22px] sm:h-[23px] left-1/2 -translate-x-1/2 z-40 flex items-center justify-center gap-1.5 px-3 pointer-events-auto select-none">
+      {Array.from({ length: props.totalSlides }).map((_, index) => {
+        const isActive = index === props.currentIndex;
+        return (
+          <button
+            key={index}
+            type="button"
+            aria-label={`Ke slide ${index + 1}`}
+            onClick={() => props.onSelectSlide(index)}
+            className="flex h-full items-center justify-center focus:outline-none cursor-pointer"
+          >
+            <span
+              className={cn(
+                'block h-1.5 rounded-full transition-all duration-300',
+                isActive
+                  ? props.isDark
+                    ? 'w-5 bg-[#38bdf8] shadow-[0_0_8px_rgba(56,189,248,0.4)]'
+                    : 'w-5 bg-[#0d66e9] shadow-[0_1px_3px_rgba(13,102,233,0.3)]'
+                  : props.isDark
+                    ? 'w-1.5 bg-neutral-600 hover:bg-neutral-500'
+                    : 'w-1.5 bg-slate-300 hover:bg-slate-400',
+              )}
+            />
+          </button>
+        );
+      })}
     </div>
   );
 }
@@ -589,9 +567,18 @@ export function MasterCarouselSection(props: {
   };
 
   return (
-    <div className={cn('w-full flex flex-col gap-2 mb-4 select-none', props.className)}>
+    <div className={cn('relative w-full mb-3.5 pt-0.5 select-none', props.className)}>
       {/* Shared Global 3D SVG Gradient & Filter Definitions */}
       <Medical3DSVGDefs />
+
+      {/* SVG Inward Notch Clip Path for Deck Card Material */}
+      <svg className="absolute w-0 h-0 pointer-events-none" aria-hidden="true">
+        <defs>
+          <clipPath id="carousel-card-inward-notch" clipPathUnits="objectBoundingBox">
+            <path d="M 0.07 0 L 0.93 0 C 0.97 0 1 0.07 1 0.16 L 1 0.84 C 1 0.93 0.97 1 0.93 1 L 0.67 1 C 0.635 1 0.62 0.86 0.585 0.86 L 0.415 0.86 C 0.38 0.86 0.365 1 0.33 1 L 0.07 1 C 0.03 1 0 0.93 0 0.84 L 0 0.16 C 0 0.07 0.03 0 0.07 0 Z" />
+          </clipPath>
+        </defs>
+      </svg>
 
       {/* 3D Perspective Stage Container */}
       <div
@@ -617,17 +604,50 @@ export function MasterCarouselSection(props: {
             onActionClick={() => props.onSlideAction?.(slide.id)}
           />
         ))}
-      </div>
 
-      {/* Toolbar Controls */}
-      <DeckCarouselToolbar
-        currentIndex={currentIndex}
-        isDark={isDark}
-        totalSlides={totalSlides}
-        onNext={nextSlide}
-        onPrevious={prevSlide}
-        onSelectSlide={goToSlide}
-      />
+        {/* Absolute Left & Right Compact Navigators (Hugging the Outer Walls) */}
+        <button
+          type="button"
+          aria-label="Slide Sebelumnya"
+          onClick={(e) => {
+            e.stopPropagation();
+            prevSlide();
+          }}
+          className={cn(
+            'absolute -left-2.5 sm:-left-3 top-1/2 -translate-y-1/2 z-40 w-7 h-7 sm:w-7.5 sm:h-7.5 rounded-full flex items-center justify-center backdrop-blur-md transition-all active:scale-85 cursor-pointer border shadow-md',
+            isDark
+              ? 'bg-[#0f1422]/85 hover:bg-[#0f1422] border-white/20 text-white shadow-black/50'
+              : 'bg-white/95 hover:bg-white border-blue-100/90 text-slate-700 shadow-slate-900/10',
+          )}
+        >
+          <ChevronLeft className="w-4 h-4 stroke-[2.4]" />
+        </button>
+
+        <button
+          type="button"
+          aria-label="Slide Berikutnya"
+          onClick={(e) => {
+            e.stopPropagation();
+            nextSlide();
+          }}
+          className={cn(
+            'absolute -right-2.5 sm:-right-3 top-1/2 -translate-y-1/2 z-40 w-7 h-7 sm:w-7.5 sm:h-7.5 rounded-full flex items-center justify-center backdrop-blur-md transition-all active:scale-85 cursor-pointer border shadow-md',
+            isDark
+              ? 'bg-[#0f1422]/85 hover:bg-[#0f1422] border-white/20 text-white shadow-black/50'
+              : 'bg-white/95 hover:bg-white border-blue-100/90 text-slate-700 shadow-slate-900/10',
+          )}
+        >
+          <ChevronRight className="w-4 h-4 stroke-[2.4]" />
+        </button>
+
+        {/* Docked Notch Indicator Toolbar (Bottom Center) */}
+        <DeckCarouselNotchedIndicator
+          currentIndex={currentIndex}
+          isDark={isDark}
+          totalSlides={totalSlides}
+          onSelectSlide={goToSlide}
+        />
+      </div>
     </div>
   );
 }
