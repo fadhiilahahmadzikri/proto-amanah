@@ -5,11 +5,14 @@ import React from 'react';
 import { GlassTouchCursor } from '@/components/atoms/GlassTouchCursor';
 import { cn } from '@/lib/utils';
 
+import { getDeviceFrameById } from '@/config/device-frames';
+
 export function PhoneFrame(props: {
   children: React.ReactNode;
   className?: string;
   isDarkContent?: boolean;
   onSwipeBack?: () => void;
+  deviceId?: string;
 }) {
   const isDark = props.isDarkContent ?? false;
   const screenRef = React.useRef<HTMLDivElement>(null);
@@ -87,6 +90,60 @@ export function PhoneFrame(props: {
     swipeStartRef.current = { x: 0, y: 350, side: null };
     setEdgeSwipe({ active: false, side: null, deltaX: 0, y: 350 });
   };
+
+  // Mode: Real Photorealistic Hardware PNG Mockup Frame
+  if (props.deviceId && props.deviceId !== 'native-css') {
+    const device = getDeviceFrameById(props.deviceId);
+    const aspect = device.frameWidth / device.frameHeight;
+    const containerHeight = 844;
+    const containerWidth = Math.round(containerHeight * aspect);
+
+    return (
+      <div
+        className={cn('relative mx-auto my-2 sm:my-4 select-text shrink-0 flex items-center justify-center', props.className)}
+        style={{
+          width: `${containerWidth}px`,
+          height: `${containerHeight}px`,
+        }}
+      >
+        {/* The screen application content placed inside the transparent cutout viewport */}
+        <div
+          ref={screenRef}
+          onPointerDown={handlePointerDown}
+          onPointerMove={handlePointerMove}
+          onPointerUp={handlePointerUp}
+          onPointerCancel={handlePointerUp}
+          className={cn(
+            'absolute overflow-hidden flex flex-col cursor-none transition-colors duration-300 z-10',
+            isDark ? 'bg-neutral-950 text-white' : 'bg-[#f8faff] text-slate-900',
+          )}
+          style={{
+            top: `${device.topPercent}%`,
+            left: `${device.leftPercent}%`,
+            width: `${device.widthPercent}%`,
+            height: `${device.heightPercent}%`,
+            borderRadius: '40px',
+          }}
+        >
+          {/* Authentic iOS Liquid Glass Touch Cursor */}
+          <GlassTouchCursor containerRef={screenRef} isDark={isDark} />
+
+          {/* Main Mobile Screen Viewport */}
+          <div className="relative flex w-full flex-1 flex-col overflow-x-hidden overflow-y-auto no-scrollbar">
+            {props.children}
+          </div>
+        </div>
+
+        {/* Photorealistic Hardware Device PNG Bezel Overlay */}
+        <img
+          src={device.imagePath}
+          alt={device.name}
+          className="absolute inset-0 w-full h-full object-contain pointer-events-none z-20 select-none"
+          draggable={false}
+        />
+      </div>
+    );
+  }
 
   return (
     <div className={cn('relative mx-auto my-2 sm:my-4 select-text', props.className)}>

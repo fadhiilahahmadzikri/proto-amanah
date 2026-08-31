@@ -124,12 +124,7 @@ export async function runGenieAnimation(
       cacheBust: false,
       style: {
         opacity: '1',
-        transform: 'none',
-        top: '0',
-        left: '0',
-        bottom: 'auto',
-        right: 'auto',
-        margin: '0',
+        visibility: 'visible',
       },
     });
   } catch (err) {

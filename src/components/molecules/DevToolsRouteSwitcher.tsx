@@ -43,6 +43,8 @@ import credentialsData from '@/data/auth/credentials.json';
 import otpConfig from '@/data/auth/otp.json';
 import { useDoctorStore } from '@/features/doctor/hooks/use-doctor-store';
 import { useScheduleStore } from '@/features/schedule/hooks/use-schedule-store';
+import { DEVICE_FRAMES_REGISTRY, getDeviceBrands } from '@/config/device-frames';
+import { runGenieAnimation } from '@/lib/genie-renderer';
 import { cn } from '@/lib/utils';
 import type { AuthScreen } from '@/types/auth.types';
 
@@ -83,6 +85,8 @@ export function DevToolsRouteSwitcher(props: {
   onToggleSplitting?: () => void;
   isFrameless?: boolean;
   onToggleFrameless?: () => void;
+  selectedDeviceId?: string;
+  onSelectDevice?: (deviceId: string) => void;
   zoomLevel?: number;
   onZoomIn?: () => void;
   onZoomOut?: () => void;
@@ -98,10 +102,64 @@ export function DevToolsRouteSwitcher(props: {
   className?: string;
 }) {
   const [isOpen, setIsOpen] = React.useState(false);
-  const [activeMenuTab, setActiveMenuTab] = React.useState<'routes' | 'config' | 'credentials'>('routes');
+  const [activeMenuTab, setActiveMenuTab] = React.useState<'routes' | 'config' | 'credentials' | 'devices'>('routes');
+  const [selectedBrandFilter, setSelectedBrandFilter] = React.useState<string>('All');
+  const [deviceSearchQuery, setDeviceSearchQuery] = React.useState<string>('');
   const [copiedField, setCopiedField] = React.useState<string | null>(null);
   const [initialConfigSavedFeedback, setInitialConfigSavedFeedback] = React.useState<string | null>(null);
   const isDark = props.theme === 'dark';
+
+  const notchBarRef = React.useRef<HTMLDivElement>(null);
+  const panelRef = React.useRef<HTMLDivElement>(null);
+  const isGenieAnimatingRef = React.useRef(false);
+
+  const handleOpenTab = (tab: 'routes' | 'config' | 'credentials' | 'devices') => {
+    if (isOpen && activeMenuTab === tab) {
+      handleClosePanel();
+      return;
+    }
+    setActiveMenuTab(tab);
+    if (!isOpen) {
+      setIsOpen(true);
+    }
+  };
+
+  const handleClosePanel = async () => {
+    if (isGenieAnimatingRef.current || !isOpen) return;
+    if (panelRef.current && notchBarRef.current) {
+      isGenieAnimatingRef.current = true;
+      try {
+        await runGenieAnimation(
+          'minimize',
+          panelRef.current,
+          () => notchBarRef.current!.getBoundingClientRect(),
+          'top',
+        );
+      } catch (e) {
+        console.warn('Genie minimize error:', e);
+      }
+      isGenieAnimatingRef.current = false;
+    }
+    setIsOpen(false);
+  };
+
+  React.useEffect(() => {
+    if (isOpen && panelRef.current && notchBarRef.current) {
+      isGenieAnimatingRef.current = true;
+      runGenieAnimation(
+        'open',
+        panelRef.current,
+        () => notchBarRef.current!.getBoundingClientRect(),
+        'top',
+      )
+        .catch((_e: unknown) => {
+          // Fallback handled seamlessly
+        })
+        .finally(() => {
+          isGenieAnimatingRef.current = false;
+        });
+    }
+  }, [isOpen]);
 
   const [storedInitial, setStoredInitial] = React.useState<{
     screen: AuthScreen | null;
@@ -317,8 +375,9 @@ export function DevToolsRouteSwitcher(props: {
 
   return (
     <div className={cn('relative z-50 select-none', props.className)}>
-      {/* 1. Authentic Apple MacBook Notch Island docked to top wall */}
+      {/* 1. Main Interactive Apple Notch Island Trigger Bar */}
       <div
+        ref={notchBarRef}
         onClick={props.isCollapsed ? props.onExpand : undefined}
         className={cn(
           'relative group/notch flex items-center justify-center pt-0.5 pb-1 px-5 sm:px-6 transition-all duration-300',
@@ -339,10 +398,7 @@ export function DevToolsRouteSwitcher(props: {
           {/* Route Trigger */}
           <button
           type="button"
-          onClick={() => {
-            setActiveMenuTab('routes');
-            setIsOpen(prev => !prev);
-          }}
+          onClick={() => handleOpenTab('routes')}
           className={cn(
             'flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all cursor-pointer select-none active:scale-95',
             isDark
@@ -368,10 +424,7 @@ export function DevToolsRouteSwitcher(props: {
           type="button"
           aria-label="Pengaturan Prototype & Initial Page"
           title="Pengaturan Prototype & Initial Page"
-          onClick={() => {
-            setActiveMenuTab('config');
-            setIsOpen(true);
-          }}
+          onClick={() => handleOpenTab('config')}
           className={cn(
             'p-1.5 rounded-full transition-colors cursor-pointer',
             isDark
@@ -388,10 +441,7 @@ export function DevToolsRouteSwitcher(props: {
           type="button"
           aria-label="Kredensial Demo"
           title="Kredensial Demo"
-          onClick={() => {
-            setActiveMenuTab('credentials');
-            setIsOpen(true);
-          }}
+          onClick={() => handleOpenTab('credentials')}
           className={cn(
             'p-1.5 rounded-full transition-colors cursor-pointer',
             isDark
@@ -401,6 +451,26 @@ export function DevToolsRouteSwitcher(props: {
           )}
         >
           <KeyRound className="h-3.5 w-3.5" />
+        </button>
+
+        {/* Quick Frame HP Device Picker Trigger */}
+        <button
+          type="button"
+          aria-label="Pilih Frame Mockup HP (73 Varian)"
+          title="Pilih Frame Mockup HP (73 Varian)"
+          onClick={() => handleOpenTab('devices')}
+          className={cn(
+            'p-1.5 rounded-full transition-colors cursor-pointer relative',
+            props.selectedDeviceId && props.selectedDeviceId !== 'native-css'
+              ? (isDark ? 'bg-indigo-500/25 text-indigo-300 ring-1 ring-indigo-400/50 font-bold' : 'bg-indigo-50 text-indigo-600 ring-1 ring-indigo-500/50 font-bold')
+              : (isDark ? 'hover:bg-white/10 text-neutral-300' : 'hover:bg-slate-100 text-slate-600'),
+            isOpen && activeMenuTab === 'devices' && (isDark ? 'bg-white/15 text-white' : 'bg-slate-200 text-slate-900'),
+          )}
+        >
+          <Smartphone className="h-3.5 w-3.5" />
+          {props.selectedDeviceId && props.selectedDeviceId !== 'native-css' && (
+            <span className="absolute -top-0.5 -right-0.5 w-1.5 h-1.5 rounded-full bg-indigo-500 animate-pulse" />
+          )}
         </button>
 
         {/* Theme Toggle */}
@@ -524,23 +594,34 @@ export function DevToolsRouteSwitcher(props: {
         </div>
       </div>
 
-      {/* 2. Minimalist Modal Panel */}
+      {/* 2. Genie Downward Expanding Panel Directly Attached to Bottom Mouth of Top Notch */}
       {isOpen && (
-        <div
-          className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-150"
-          onClick={() => setIsOpen(false)}
-        >
+        <>
+          {/* Subtle click-outside backdrop */}
           <div
+            className="fixed inset-0 z-40 bg-black/35 backdrop-blur-[2px] transition-opacity duration-200"
+            onClick={handleClosePanel}
+          />
+
+          {/* Liquid Genie Expansion Panel anchored directly underneath the notch */}
+          <div
+            ref={panelRef}
             onClick={e => e.stopPropagation()}
             className={cn(
-              'relative w-full max-w-md overflow-hidden rounded-2xl border shadow-xl p-5 transition-colors select-text',
-              isDark
-                ? 'bg-neutral-900 border-neutral-800 text-neutral-100'
-                : 'bg-white border-slate-200 text-slate-900',
+              'absolute top-full left-1/2 -translate-x-1/2 mt-1.5 z-50 w-[450px] max-w-[94vw] select-text',
             )}
           >
-            {/* Header */}
-            <div className={cn('flex items-center justify-between pb-3 border-b', isDark ? 'border-neutral-800' : 'border-slate-100')}>
+            {/* Glassmorphic Panel with Notch Seam Glow */}
+            <div
+              className={cn(
+                'relative w-full overflow-hidden rounded-2xl border shadow-2xl p-5 backdrop-blur-2xl transition-colors',
+                isDark
+                  ? 'bg-neutral-900/95 border-white/10 text-neutral-100 shadow-[0_20px_50px_rgba(0,0,0,0.8),0_0_30px_rgba(13,102,233,0.15)] ring-1 ring-white/5'
+                  : 'bg-white/95 border-slate-200/90 text-slate-900 shadow-[0_20px_50px_rgba(0,0,0,0.18)] ring-1 ring-black/5',
+              )}
+            >
+              {/* Header */}
+              <div className={cn('flex items-center justify-between pb-3 border-b', isDark ? 'border-neutral-800' : 'border-slate-100')}>
               <div>
                 <h3 className="font-semibold text-sm tracking-tight">
                   Navigasi & Konfigurasi
@@ -552,7 +633,7 @@ export function DevToolsRouteSwitcher(props: {
               <button
                 type="button"
                 aria-label="Tutup"
-                onClick={() => setIsOpen(false)}
+                onClick={handleClosePanel}
                 className={cn(
                   'p-1 rounded-lg transition-colors cursor-pointer',
                   isDark ? 'hover:bg-neutral-800 text-neutral-400' : 'hover:bg-slate-100 text-slate-400',
@@ -604,6 +685,18 @@ export function DevToolsRouteSwitcher(props: {
                 )}
               >
                 Kredensial
+              </button>
+              <button
+                type="button"
+                onClick={() => setActiveMenuTab('devices')}
+                className={cn(
+                  'flex-1 py-1.5 rounded-lg transition-all cursor-pointer text-center',
+                  activeMenuTab === 'devices'
+                    ? (isDark ? 'bg-neutral-800 text-white font-semibold shadow-xs' : 'bg-white text-slate-900 font-semibold shadow-xs')
+                    : (isDark ? 'text-neutral-400 hover:text-white' : 'text-slate-600 hover:text-slate-900'),
+                )}
+              >
+                Frame HP
               </button>
             </div>
 
@@ -901,9 +994,121 @@ export function DevToolsRouteSwitcher(props: {
                 </div>
               </div>
             )}
+
+            {/* TAB 4: Device Mockup Frames (All 73 Hardware Devices) */}
+            {activeMenuTab === 'devices' && (
+              <div className="flex flex-col gap-3 py-3 max-h-[55vh] overflow-y-auto no-scrollbar">
+                {/* Search & Filter Header */}
+                <div className="flex flex-col gap-2">
+                  <input
+                    type="text"
+                    value={deviceSearchQuery}
+                    onChange={e => setDeviceSearchQuery(e.target.value)}
+                    placeholder="Cari frame HP (iPhone, Samsung, Pixel, Razr...)"
+                    className={cn(
+                      'w-full px-3 py-2 rounded-xl text-xs border transition-colors outline-none focus:ring-1',
+                      isDark
+                        ? 'bg-neutral-950 border-neutral-800 text-white placeholder:text-neutral-500 focus:ring-white/30'
+                        : 'bg-slate-50 border-slate-200 text-slate-900 placeholder:text-slate-400 focus:ring-slate-400',
+                    )}
+                  />
+
+                  {/* Brand Filter Pills */}
+                  <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-1">
+                    {['All', ...getDeviceBrands()].map((brand) => (
+                      <button
+                        key={brand}
+                        type="button"
+                        onClick={() => setSelectedBrandFilter(brand)}
+                        className={cn(
+                          'px-2.5 py-1 rounded-lg text-[10.5px] font-semibold tracking-tight shrink-0 transition-all cursor-pointer',
+                          selectedBrandFilter === brand
+                            ? (isDark ? 'bg-white text-neutral-950' : 'bg-slate-900 text-white')
+                            : (isDark ? 'bg-neutral-800 text-neutral-400 hover:text-white' : 'bg-slate-100 text-slate-600 hover:text-slate-900'),
+                        )}
+                      >
+                        {brand}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Default Native CSS Option */}
+                <div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      props.onSelectDevice?.('native-css');
+                      setIsOpen(false);
+                    }}
+                    className={cn(
+                      'w-full flex items-center justify-between p-3 rounded-xl border text-left transition-all cursor-pointer text-xs mb-2',
+                      props.selectedDeviceId === 'native-css' || !props.selectedDeviceId
+                        ? (isDark ? 'bg-white text-neutral-950 font-bold border-white' : 'bg-slate-900 text-white font-bold border-slate-900')
+                        : (isDark ? 'bg-neutral-950/60 border-neutral-800 text-neutral-300 hover:bg-neutral-800' : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100'),
+                    )}
+                  >
+                    <div className="flex items-center gap-2.5">
+                      <Smartphone className="h-4 w-4 shrink-0" />
+                      <div>
+                        <span className="font-bold block">Native CSS Titanium Frame</span>
+                        <span className={cn('text-[10px] font-normal block', props.selectedDeviceId === 'native-css' || !props.selectedDeviceId ? (isDark ? 'text-neutral-700' : 'text-slate-300') : (isDark ? 'text-neutral-400' : 'text-slate-500'))}>
+                          Frame bawaan murni CSS tanpa gambar eksternal
+                        </span>
+                      </div>
+                    </div>
+                    {(props.selectedDeviceId === 'native-css' || !props.selectedDeviceId) && (
+                      <Check className="h-4 w-4 shrink-0" />
+                    )}
+                  </button>
+                </div>
+
+                {/* Device Mockups Grid */}
+                <div className="grid grid-cols-2 gap-1.5">
+                  {DEVICE_FRAMES_REGISTRY
+                    .filter((dev) => {
+                      const matchesBrand = selectedBrandFilter === 'All' || dev.brand === selectedBrandFilter;
+                      const matchesSearch = dev.name.toLowerCase().includes(deviceSearchQuery.toLowerCase()) || dev.id.toLowerCase().includes(deviceSearchQuery.toLowerCase());
+                      return matchesBrand && matchesSearch;
+                    })
+                    .map((dev) => {
+                      const isSelected = props.selectedDeviceId === dev.id;
+
+                      return (
+                        <button
+                          key={dev.id}
+                          type="button"
+                          onClick={() => {
+                            props.onSelectDevice?.(dev.id);
+                            setIsOpen(false);
+                          }}
+                          className={cn(
+                            'flex items-center gap-2 p-2.5 rounded-xl border text-left transition-all cursor-pointer text-xs',
+                            isSelected
+                              ? (isDark ? 'bg-white text-neutral-950 font-bold border-white' : 'bg-slate-900 text-white font-bold border-slate-900')
+                              : (isDark
+                                  ? 'bg-neutral-950/60 border-neutral-800 text-neutral-300 hover:bg-neutral-800'
+                                  : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100'),
+                          )}
+                        >
+                          <Smartphone className="h-3.5 w-3.5 shrink-0 opacity-70" />
+                          <div className="min-w-0 flex-1">
+                            <span className="truncate block font-medium">{dev.name}</span>
+                            <span className={cn('text-[9.5px] block truncate', isSelected ? (isDark ? 'text-neutral-600' : 'text-slate-300') : (isDark ? 'text-neutral-500' : 'text-slate-400'))}>
+                              {dev.screenWidth} × {dev.screenHeight} px
+                            </span>
+                          </div>
+                          {isSelected && <Check className="h-3.5 w-3.5 shrink-0" />}
+                        </button>
+                      );
+                    })}
+                </div>
+              </div>
+            )}
           </div>
         </div>
-      )}
-    </div>
-  );
+      </>
+    )}
+  </div>
+);
 }

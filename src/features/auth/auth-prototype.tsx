@@ -24,6 +24,7 @@ export function AuthPrototype() {
   const [dashboardTab, setDashboardTab] = React.useState<BottomNavTab>(prototypeConfig.initialDashboardTab);
   const [isSplitting, setIsSplitting] = React.useState(false);
   const [isFrameless, setIsFrameless] = React.useState(false);
+  const [selectedDeviceId, setSelectedDeviceId] = React.useState<string>('native-css');
   const [zoomLevel, setZoomLevel] = React.useState<number>(0.5);
 
   const ZOOM_PRESETS = [0.33, 0.5, 0.67, 0.75, 1.0, 1.25];
@@ -247,17 +248,12 @@ export function AuthPrototype() {
         )
       )}
 
-      {/* Apple MacBook Notch DevTools (Docked Flush to Top Edge with Scroll Slide-Collapse Animation) */}
+      {/* Apple MacBook Notch DevTools (Docked Flush to Top Edge) */}
       {prototypeConfig.enableDevTools && (
         <div
-          onMouseEnter={() => setIsHoveredTop(true)}
-          onMouseLeave={() => setIsHoveredTop(false)}
           className={cn(
             'fixed top-0 left-1/2 -translate-x-1/2 z-50 flex items-center justify-center pointer-events-auto',
-            'transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] will-change-transform',
-            isNotchCollapsed && !isHoveredTop
-              ? '-translate-y-full opacity-0 pointer-events-none shadow-none'
-              : 'translate-y-0 opacity-100 pointer-events-auto',
+            'transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)]',
             isEmulatorMode && 'scale-90',
           )}
         >
@@ -272,6 +268,8 @@ export function AuthPrototype() {
             onToggleSplitting={toggleSplitting}
             isFrameless={isFrameless}
             onToggleFrameless={toggleFrameless}
+            selectedDeviceId={selectedDeviceId}
+            onSelectDevice={setSelectedDeviceId}
             zoomLevel={zoomLevel}
             onZoomIn={handleZoomIn}
             onZoomOut={handleZoomOut}
@@ -288,6 +286,7 @@ export function AuthPrototype() {
         <SplittingCanvasWorkspace
           theme={theme}
           isFrameless={isFrameless}
+          deviceId={selectedDeviceId}
           zoomLevel={zoomLevel}
           onNavigateToSingle={(route) => {
             navigateTo(route.screen);
@@ -300,6 +299,7 @@ export function AuthPrototype() {
         <main className="relative z-20 flex flex-col items-center justify-center w-full my-auto pt-8 sm:pt-6">
           <PhoneFrame
             isDarkContent={isDarkScreen}
+            deviceId={selectedDeviceId}
             onSwipeBack={handleSwipeBack}
             className={isEmulatorMode ? 'my-0 sm:my-0' : undefined}
           >

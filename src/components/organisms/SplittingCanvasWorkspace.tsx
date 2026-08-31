@@ -27,6 +27,7 @@ const SplittingSingleFrameInstance = React.memo(function SplittingSingleFrameIns
   index: number;
   theme: 'dark' | 'light';
   isFrameless?: boolean;
+  deviceId?: string;
   onNavigateToSingle?: (route: PrototypeRouteDefinition) => void;
 }) {
   const { artboard, theme } = props;
@@ -217,7 +218,7 @@ const SplittingSingleFrameInstance = React.memo(function SplittingSingleFrameIns
           </div>
         </div>
       ) : (
-        <PhoneFrame isDarkContent={isDarkScreen} className="my-0">
+        <PhoneFrame isDarkContent={isDarkScreen} deviceId={props.deviceId} className="my-0">
           {renderScreenContent()}
         </PhoneFrame>
       )}
@@ -228,6 +229,7 @@ const SplittingSingleFrameInstance = React.memo(function SplittingSingleFrameIns
 export const SplittingCanvasWorkspace = React.memo(function SplittingCanvasWorkspace(props: {
   theme: 'dark' | 'light';
   isFrameless?: boolean;
+  deviceId?: string;
   zoomLevel?: number;
   onNavigateToSingle?: (route: PrototypeRouteDefinition) => void;
   className?: string;
@@ -271,6 +273,7 @@ export const SplittingCanvasWorkspace = React.memo(function SplittingCanvasWorks
                 index={index}
                 theme={props.theme}
                 isFrameless={props.isFrameless}
+                deviceId={props.deviceId}
                 onNavigateToSingle={props.onNavigateToSingle}
               />
             </div>
