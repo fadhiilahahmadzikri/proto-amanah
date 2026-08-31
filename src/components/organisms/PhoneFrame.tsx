@@ -7,6 +7,143 @@ import { cn } from '@/lib/utils';
 
 import { getDeviceFrameById } from '@/config/device-frames';
 
+function PhoneStatusBar(props: { isDark: boolean }) {
+  const { isDark } = props;
+  return (
+    <header
+      className={cn(
+        'relative z-40 flex items-center justify-between px-7 pt-3.5 pb-2.5 text-xs font-semibold tracking-tight transition-all duration-300 shrink-0 select-none border-b',
+        isDark
+          ? 'bg-neutral-950/40 text-white border-white/10 shadow-[0_4px_30px_rgba(0,0,0,0.25)]'
+          : 'bg-[#f8faff]/90 text-neutral-900 border-slate-200/60 shadow-[0_2px_12px_rgba(0,0,0,0.03)]',
+      )}
+      style={{
+        backdropFilter: 'blur(24px) saturate(180%)',
+        WebkitBackdropFilter: 'blur(24px) saturate(180%)',
+      }}
+    >
+      {/* Specular Liquid Glass Top Sheen */}
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-[1px] bg-gradient-to-r from-transparent via-white/35 to-transparent" />
+
+      {/* iOS Time with Precision Typography */}
+      <span className="text-[13px] font-bold tracking-tight pl-0.5">
+        09:41
+      </span>
+
+      {/* Liquid Glass Dynamic Island */}
+      <div className="absolute top-2.5 left-1/2 flex h-[28px] w-[114px] -translate-x-1/2 items-center justify-between rounded-full bg-black/95 px-3 shadow-[0_2px_12px_rgba(0,0,0,0.6),inset_0_1px_1px_rgba(255,255,255,0.15)] ring-1 ring-white/10 transition-all">
+        {/* Camera Lens */}
+        <div className="relative flex h-3 w-3 items-center justify-center rounded-full bg-neutral-900 ring-1 ring-neutral-800">
+          <div className="h-1.5 w-1.5 rounded-full bg-blue-950 shadow-[inset_0_0_2px_rgba(59,130,246,0.6)]" />
+        </div>
+        {/* FaceID / Mic Indicator Dot */}
+        <div className="h-2 w-2 rounded-full bg-neutral-900 ring-1 ring-neutral-800" />
+      </div>
+
+      {/* Native iOS Status Metrics */}
+      <div className="flex items-center gap-1.5 text-[11px] pr-0.5 font-medium">
+        {/* Cellular 4-bars */}
+        <svg
+          width="15"
+          height="11"
+          viewBox="0 0 17 11"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+          className="shrink-0"
+        >
+          <rect x="0" y="8" width="2.5" height="3" rx="0.75" fill="currentColor" />
+          <rect x="4.5" y="5.5" width="2.5" height="5.5" rx="0.75" fill="currentColor" />
+          <rect x="9" y="3" width="2.5" height="8" rx="0.75" fill="currentColor" />
+          <rect x="13.5" y="0" width="2.5" height="11" rx="0.75" fill="currentColor" />
+        </svg>
+
+        {/* Wi-Fi Signal */}
+        <svg
+          width="14"
+          height="11"
+          viewBox="0 0 15 11"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+          className="shrink-0"
+        >
+          <path
+            d="M7.5 10.5C8.05228 10.5 8.5 10.0523 8.5 9.5C8.5 8.94772 8.05228 8.5 7.5 8.5C6.94772 8.5 6.5 8.94772 6.5 9.5C6.5 10.0523 6.94772 10.5 7.5 10.5Z"
+            fill="currentColor"
+          />
+          <path
+            d="M4.32 6.32C6.08 4.56 8.92 4.56 10.68 6.32"
+            stroke="currentColor"
+            strokeWidth="1.4"
+            strokeLinecap="round"
+          />
+          <path
+            d="M1.5 3.5C4.81 0.19 10.19 0.19 13.5 3.5"
+            stroke="currentColor"
+            strokeWidth="1.4"
+            strokeLinecap="round"
+          />
+        </svg>
+
+        {/* Battery Pill with Terminal */}
+        <div className="relative flex items-center">
+          <div
+            className={cn(
+              'h-[11px] w-[21px] rounded-[3.5px] border p-[1px] flex items-center',
+              isDark ? 'border-white/80' : 'border-neutral-900',
+            )}
+          >
+            <div
+              className={cn(
+                'h-full w-[85%] rounded-[1.5px] transition-all',
+                isDark ? 'bg-white' : 'bg-neutral-900',
+              )}
+            />
+          </div>
+          {/* Battery Cap */}
+          <div
+            className={cn(
+              'h-[4px] w-[1.5px] rounded-r-[1px] ml-[1px]',
+              isDark ? 'bg-white/80' : 'bg-neutral-900',
+            )}
+          />
+        </div>
+      </div>
+    </header>
+  );
+}
+
+function PhoneHomeIndicator(props: { isDark: boolean }) {
+  const { isDark } = props;
+  return (
+    <footer
+      className={cn(
+        'relative z-40 flex w-full shrink-0 flex-col items-center justify-center pt-2 pb-2.5 transition-all duration-300 select-none border-t',
+        'backdrop-blur-2xl',
+        isDark
+          ? 'bg-neutral-950/45 border-white/10 shadow-[0_-4px_24px_rgba(0,0,0,0.3)]'
+          : 'bg-[#f8faff]/90 border-slate-200/60 shadow-[0_-2px_12px_rgba(0,0,0,0.03)]',
+      )}
+      style={{
+        backdropFilter: 'blur(24px) saturate(180%)',
+        WebkitBackdropFilter: 'blur(24px) saturate(180%)',
+      }}
+    >
+      {/* Liquid Glass Bottom Sheen Line */}
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-[1px] bg-gradient-to-r from-transparent via-white/35 to-transparent" />
+
+      {/* Native Home Indicator Pill */}
+      <div
+        className={cn(
+          'h-[4.5px] w-36 rounded-full transition-all duration-200 shadow-xs',
+          isDark
+            ? 'bg-white/80 shadow-[0_1px_4px_rgba(0,0,0,0.5)]'
+            : 'bg-neutral-800/80 shadow-[0_1px_2px_rgba(0,0,0,0.1)]',
+        )}
+      />
+    </footer>
+  );
+}
+
 export function PhoneFrame(props: {
   children: React.ReactNode;
   className?: string;
@@ -128,10 +265,16 @@ export function PhoneFrame(props: {
           {/* Authentic iOS Liquid Glass Touch Cursor */}
           <GlassTouchCursor containerRef={screenRef} isDark={isDark} />
 
+          {/* Authentic iOS Status Bar */}
+          <PhoneStatusBar isDark={isDark} />
+
           {/* Main Mobile Screen Viewport */}
           <div className="relative flex w-full flex-1 flex-col overflow-x-hidden overflow-y-auto no-scrollbar">
             {props.children}
           </div>
+
+          {/* Authentic iOS Home Indicator Footer */}
+          <PhoneHomeIndicator isDark={isDark} />
         </div>
 
         {/* Photorealistic Hardware Device PNG Bezel Overlay */}
@@ -250,105 +393,7 @@ export function PhoneFrame(props: {
           )}
 
           {/* Native Liquid Glass iOS Status Bar */}
-          <header
-            className={cn(
-              'relative z-40 flex items-center justify-between px-7 pt-3.5 pb-2.5 text-xs font-semibold tracking-tight transition-all duration-300 shrink-0 select-none border-b',
-              isDark
-                ? 'bg-neutral-950/40 text-white border-white/10 shadow-[0_4px_30px_rgba(0,0,0,0.25)]'
-                : 'bg-[#f8faff]/90 text-neutral-900 border-slate-200/60 shadow-[0_2px_12px_rgba(0,0,0,0.03)]',
-            )}
-            style={{
-              backdropFilter: 'blur(24px) saturate(180%)',
-              WebkitBackdropFilter: 'blur(24px) saturate(180%)',
-            }}
-          >
-            {/* Specular Liquid Glass Top Sheen */}
-            <div className="pointer-events-none absolute inset-x-0 top-0 h-[1px] bg-gradient-to-r from-transparent via-white/35 to-transparent" />
-
-            {/* iOS Time with Precision Typography */}
-            <span className="text-[13px] font-bold tracking-tight pl-0.5">
-              09:41
-            </span>
-
-            {/* Liquid Glass Dynamic Island */}
-            <div className="absolute top-2.5 left-1/2 flex h-[28px] w-[114px] -translate-x-1/2 items-center justify-between rounded-full bg-black/95 px-3 shadow-[0_2px_12px_rgba(0,0,0,0.6),inset_0_1px_1px_rgba(255,255,255,0.15)] ring-1 ring-white/10 transition-all">
-              {/* Camera Lens */}
-              <div className="relative flex h-3 w-3 items-center justify-center rounded-full bg-neutral-900 ring-1 ring-neutral-800">
-                <div className="h-1.5 w-1.5 rounded-full bg-blue-950 shadow-[inset_0_0_2px_rgba(59,130,246,0.6)]" />
-              </div>
-              {/* FaceID / Mic Indicator Dot */}
-              <div className="h-2 w-2 rounded-full bg-neutral-900 ring-1 ring-neutral-800" />
-            </div>
-
-            {/* Native iOS Status Metrics */}
-            <div className="flex items-center gap-1.5 text-[11px] pr-0.5 font-medium">
-              {/* Cellular 4-bars */}
-              <svg
-                width="15"
-                height="11"
-                viewBox="0 0 17 11"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-                className="shrink-0"
-              >
-                <rect x="0" y="8" width="2.5" height="3" rx="0.75" fill="currentColor" />
-                <rect x="4.5" y="5.5" width="2.5" height="5.5" rx="0.75" fill="currentColor" />
-                <rect x="9" y="3" width="2.5" height="8" rx="0.75" fill="currentColor" />
-                <rect x="13.5" y="0" width="2.5" height="11" rx="0.75" fill="currentColor" />
-              </svg>
-
-              {/* Wi-Fi Signal */}
-              <svg
-                width="14"
-                height="11"
-                viewBox="0 0 15 11"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-                className="shrink-0"
-              >
-                <path
-                  d="M7.5 10.5C8.05228 10.5 8.5 10.0523 8.5 9.5C8.5 8.94772 8.05228 8.5 7.5 8.5C6.94772 8.5 6.5 8.94772 6.5 9.5C6.5 10.0523 6.94772 10.5 7.5 10.5Z"
-                  fill="currentColor"
-                />
-                <path
-                  d="M4.32 6.32C6.08 4.56 8.92 4.56 10.68 6.32"
-                  stroke="currentColor"
-                  strokeWidth="1.4"
-                  strokeLinecap="round"
-                />
-                <path
-                  d="M1.5 3.5C4.81 0.19 10.19 0.19 13.5 3.5"
-                  stroke="currentColor"
-                  strokeWidth="1.4"
-                  strokeLinecap="round"
-                />
-              </svg>
-
-              {/* Battery Pill with Terminal */}
-              <div className="relative flex items-center">
-                <div
-                  className={cn(
-                    'h-[11px] w-[21px] rounded-[3.5px] border p-[1px] flex items-center',
-                    isDark ? 'border-white/80' : 'border-neutral-900',
-                  )}
-                >
-                  <div
-                    className={cn(
-                      'h-full w-[85%] rounded-[1.5px] transition-all',
-                      isDark ? 'bg-white' : 'bg-neutral-900',
-                    )}
-                  />
-                </div>
-                {/* Battery Cap */}
-                <div
-                  className={cn(
-                    'h-[4px] w-[1.5px] rounded-r-[1px] ml-[1px]',
-                    isDark ? 'bg-white/80' : 'bg-neutral-900',
-                  )}
-                />
-              </div>
-            </div>
-          </header>
+          <PhoneStatusBar isDark={isDark} />
 
           {/* Main Mobile Screen Viewport */}
           <div className="relative flex w-full flex-1 flex-col overflow-x-hidden overflow-y-auto no-scrollbar">
@@ -356,32 +401,7 @@ export function PhoneFrame(props: {
           </div>
 
           {/* Native Liquid Glass iOS Bottom Navigation / Home Indicator Bar */}
-          <footer
-            className={cn(
-              'relative z-40 flex w-full shrink-0 flex-col items-center justify-center pt-2 pb-2.5 transition-all duration-300 select-none border-t',
-              'backdrop-blur-2xl',
-              isDark
-                ? 'bg-neutral-950/45 border-white/10 shadow-[0_-4px_24px_rgba(0,0,0,0.3)]'
-                : 'bg-[#f8faff]/90 border-slate-200/60 shadow-[0_-2px_12px_rgba(0,0,0,0.03)]',
-            )}
-            style={{
-              backdropFilter: 'blur(24px) saturate(180%)',
-              WebkitBackdropFilter: 'blur(24px) saturate(180%)',
-            }}
-          >
-            {/* Liquid Glass Bottom Sheen Line */}
-            <div className="pointer-events-none absolute inset-x-0 top-0 h-[1px] bg-gradient-to-r from-transparent via-white/35 to-transparent" />
-
-            {/* Native Home Indicator Pill */}
-            <div
-              className={cn(
-                'h-[4.5px] w-36 rounded-full transition-all duration-200 shadow-xs',
-                isDark
-                  ? 'bg-white/80 shadow-[0_1px_4px_rgba(0,0,0,0.5)]'
-                  : 'bg-neutral-800/80 shadow-[0_1px_2px_rgba(0,0,0,0.1)]',
-              )}
-            />
-          </footer>
+          <PhoneHomeIndicator isDark={isDark} />
         </div>
       </div>
     </div>

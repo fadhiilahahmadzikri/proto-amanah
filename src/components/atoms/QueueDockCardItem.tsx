@@ -85,14 +85,14 @@ export function QueueDockCardItem(props: {
       rotateY = 35;
       opacity = 0;
     } else {
-      // Center card plunged or emerging from slot
+      // Center card plunged completely down into the bottom slot until it vanishes
       x = 0;
-      y = props.ejectionStage === 'atm_plunge' ? 110 : 650;
+      y = 650;
       z = 20;
       zIndex = 50;
       rotateY = 0;
       rotateZ = 0;
-      opacity = props.showSuccess ? 0 : 1;
+      opacity = 0;
     }
   } else if (ejectionStage === 'rail_converge') {
     // Stage: "Temen-temen nya dulu yang masuk!"

@@ -4,6 +4,7 @@ import React from 'react';
 import { PatientDetailDrawer } from '@/components/molecules/PatientDetailDrawer';
 import { QueueCardMaster } from '@/components/atoms/QueueCardMaster';
 import { cn } from '@/lib/utils';
+import { renderGenieFrame } from '@/lib/genie-renderer';
 import type { QueueDockCardData } from '@/types/queue-dock.types';
 
 export function QueueActivationOverlay(props: {
@@ -16,12 +17,109 @@ export function QueueActivationOverlay(props: {
   onRedraw?: () => void;
   onActionClick?: () => void;
   onRevealApex?: () => void;
+  onGenieSettled?: () => void;
   initialDetailOpen?: boolean;
   theme?: 'dark' | 'light';
   className?: string;
 }) {
   const [showDetail, setShowDetail] = React.useState(Boolean(props.initialDetailOpen));
+  const [isEmergenceComplete, setIsEmergenceComplete] = React.useState(props.isGenieSettled);
+  const canvasRef = React.useRef<HTMLCanvasElement>(null);
   const isDark = (props.theme ?? 'dark') === 'dark';
+
+  React.useEffect(() => {
+    if (props.isGenieSettled) {
+      setIsEmergenceComplete(true);
+      return;
+    }
+
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    const dpr = typeof window !== 'undefined' ? Math.min(window.devicePixelRatio || 1, 2) : 1;
+    const width = 375;
+    const height = 812;
+    canvas.width = width * dpr;
+    canvas.height = height * dpr;
+    ctx.scale(dpr, dpr);
+
+    // Render offscreen card cover
+    const offscreen = document.createElement('canvas');
+    const cardW = 270;
+    const cardH = 375;
+    offscreen.width = cardW * dpr;
+    offscreen.height = cardH * dpr;
+    const oCtx = offscreen.getContext('2d');
+    if (oCtx) {
+      oCtx.scale(dpr, dpr);
+      oCtx.fillStyle = isDark ? '#121624' : '#ffffff';
+      if ('roundRect' in oCtx && typeof (oCtx as any).roundRect === 'function') {
+        (oCtx as any).roundRect(0, 0, cardW, cardH, 22);
+      } else {
+        oCtx.rect(0, 0, cardW, cardH);
+      }
+      oCtx.fill();
+      oCtx.strokeStyle = isDark ? 'rgba(56, 189, 248, 0.4)' : 'rgba(13, 102, 233, 0.3)';
+      oCtx.lineWidth = 1.5;
+      oCtx.stroke();
+
+      // Card Cover Emblem & Queue Number
+      oCtx.fillStyle = isDark ? '#38bdf8' : '#0d66e9';
+      oCtx.font = 'bold 28px sans-serif';
+      oCtx.textAlign = 'center';
+      oCtx.fillText(props.activeCard?.queueNumber || '#02', cardW / 2, 70);
+
+      // Watermark circle
+      oCtx.fillStyle = isDark ? 'rgba(56, 189, 248, 0.15)' : 'rgba(13, 102, 233, 0.1)';
+      oCtx.beginPath();
+      oCtx.arc(cardW / 2, 190, 65, 0, Math.PI * 2);
+      oCtx.fill();
+    }
+
+    const dockPoint = { x: width / 2, y: height - 60 };
+    const windowPoint = { x: (width - cardW) / 2, y: 110 };
+
+    let startTime: number | null = null;
+    let animId: number;
+    const duration = 580;
+
+    const animateEmergence = (ts: number) => {
+      if (!startTime) startTime = ts;
+      const elapsed = ts - startTime;
+      const progress = Math.min(1, elapsed / duration);
+
+      ctx.clearRect(0, 0, width, height);
+
+      renderGenieFrame(
+        ctx,
+        offscreen,
+        width,
+        height,
+        progress,
+        'open',
+        dockPoint,
+        windowPoint,
+        cardW,
+        cardH,
+        'bottom',
+        dpr,
+      );
+
+      if (progress < 1) {
+        animId = requestAnimationFrame(animateEmergence);
+      } else {
+        setIsEmergenceComplete(true);
+        props.onGenieSettled?.();
+      }
+    };
+
+    animId = requestAnimationFrame(animateEmergence);
+    return () => {
+      if (animId) cancelAnimationFrame(animId);
+    };
+  }, [props.showSuccess, props.isGenieSettled, props.activeCard, isDark]);
 
   if (!props.showSuccess) {
     return null;
@@ -70,11 +168,20 @@ export function QueueActivationOverlay(props: {
         props.className,
       )}
     >
+      {/* Interactive Mathematical Genie Emergence Canvas */}
+      {!isEmergenceComplete && (
+        <canvas
+          ref={canvasRef}
+          className="absolute inset-0 w-full h-full pointer-events-none z-20"
+          style={{ width: '100%', height: '100%' }}
+        />
+      )}
+
       {/* Top Header - Unified standard styling with optical centering */}
       <header
         className={cn(
           'relative z-10 flex w-full items-center justify-between transition-all duration-500 shrink-0 pt-2',
-          props.isGenieSettled ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-3 pointer-events-none',
+          isEmergenceComplete ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-3 pointer-events-none',
         )}
       >
         <button
@@ -109,14 +216,14 @@ export function QueueActivationOverlay(props: {
           ref={props.cardRef}
           className={cn(
             'w-full max-w-[320px] flex justify-center shrink-0 will-change-transform',
-            props.isGenieSettled ? 'opacity-100' : 'opacity-0',
+            isEmergenceComplete ? 'opacity-100' : 'opacity-0',
           )}
         >
           {props.activeCard && (
             <QueueCardMaster
               card={props.activeCard}
               isRevealed={true}
-              isSpinReady={props.isGenieSettled}
+              isSpinReady={isEmergenceComplete}
               badgeText="ANTREAN AKTIF"
               theme={props.theme}
               onRevealApex={props.onRevealApex}
@@ -129,7 +236,7 @@ export function QueueActivationOverlay(props: {
         <div
           className={cn(
             'mb-6 mt-auto w-full flex flex-col gap-2.5 transition-all duration-500 delay-150',
-            props.isGenieSettled ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6 pointer-events-none',
+            isEmergenceComplete ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6 pointer-events-none',
           )}
         >
           {/* Primary Action: Panggil & Proses Pasien */}

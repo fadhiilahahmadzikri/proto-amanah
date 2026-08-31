@@ -52,15 +52,35 @@ function AppleNotchBackground(props: { isDark: boolean }) {
   const { isDark } = props;
   return (
     <svg
-      className="absolute inset-0 w-full h-full pointer-events-none transition-colors duration-300"
+      className="absolute inset-0 w-full h-full pointer-events-none transition-colors duration-300 overflow-visible"
       viewBox="0 0 100 38"
       preserveAspectRatio="none"
       fill="none"
     >
+      <defs>
+        <filter id="notch-drop-shadow" x="-20%" y="-10%" width="140%" height="160%">
+          <feDropShadow
+            dx="0"
+            dy="3"
+            stdDeviation="3"
+            floodColor={isDark ? '#000000' : '#0f172a'}
+            floodOpacity={isDark ? '0.5' : '0.08'}
+          />
+          <feDropShadow
+            dx="0"
+            dy="1"
+            stdDeviation="1"
+            floodColor={isDark ? '#000000' : '#0f172a'}
+            floodOpacity={isDark ? '0.3' : '0.04'}
+          />
+        </filter>
+      </defs>
+
       {/* S-Curve Filleted Notch Body matching the user's diagram */}
       <path
         d="M 0 0 C 2.2 0, 4.2 3.5, 4.8 11 L 4.8 26 C 4.8 33.5, 6.8 38, 9.5 38 L 90.5 38 C 93.2 38, 95.2 33.5, 95.2 26 L 95.2 11 C 95.8 3.5, 97.8 0, 100 0 Z"
-        fill={isDark ? 'rgba(10, 10, 10, 0.96)' : 'rgba(255, 255, 255, 0.97)'}
+        fill={isDark ? 'rgba(10, 10, 10, 0.96)' : 'rgba(255, 255, 255, 0.98)'}
+        filter="url(#notch-drop-shadow)"
       />
 
       {/* Sub-pixel Rim Stroke along the bottom & curved ears */}
@@ -379,12 +399,7 @@ export function DevToolsRouteSwitcher(props: {
       <div
         ref={notchBarRef}
         onClick={props.isCollapsed ? props.onExpand : undefined}
-        className={cn(
-          'relative group/notch flex items-center justify-center pt-0.5 pb-1 px-5 sm:px-6 transition-all duration-300',
-          isDark
-            ? 'drop-shadow-[0_4px_14px_rgba(0,0,0,0.55)] drop-shadow-[0_1px_2px_rgba(0,0,0,0.35)]'
-            : 'drop-shadow-[0_4px_12px_rgba(0,0,0,0.06)] drop-shadow-[0_1px_2px_rgba(0,0,0,0.04)]',
-        )}
+        className="relative group/notch flex items-center justify-center pt-0.5 pb-1 px-5 sm:px-6 transition-all duration-300"
       >
         {/* Organic S-Curve Notch SVG Backdrop */}
         <AppleNotchBackground isDark={isDark} />
@@ -597,9 +612,9 @@ export function DevToolsRouteSwitcher(props: {
       {/* 2. Genie Downward Expanding Panel Directly Attached to Bottom Mouth of Top Notch */}
       {isOpen && (
         <>
-          {/* Subtle click-outside backdrop */}
+          {/* 100% Transparent click-outside dismiss overlay */}
           <div
-            className="fixed inset-0 z-40 bg-black/35 backdrop-blur-[2px] transition-opacity duration-200"
+            className="fixed inset-0 z-40 bg-transparent"
             onClick={handleClosePanel}
           />
 
@@ -607,6 +622,7 @@ export function DevToolsRouteSwitcher(props: {
           <div
             ref={panelRef}
             onClick={e => e.stopPropagation()}
+            style={{ opacity: 0 }}
             className={cn(
               'absolute top-full left-1/2 -translate-x-1/2 mt-1.5 z-50 w-[450px] max-w-[94vw] select-text',
             )}

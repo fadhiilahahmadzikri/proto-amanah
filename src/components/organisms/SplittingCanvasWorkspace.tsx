@@ -251,7 +251,7 @@ export const SplittingCanvasWorkspace = React.memo(function SplittingCanvasWorks
     <div
       ref={containerRef}
       className={cn(
-        'w-max min-w-full min-h-screen pt-16 pb-20 px-8 flex justify-center',
+        'w-max min-w-full min-h-screen pt-28 sm:pt-32 pb-24 px-8 flex justify-center',
         props.className,
       )}
       style={{
@@ -259,7 +259,7 @@ export const SplittingCanvasWorkspace = React.memo(function SplittingCanvasWorks
       }}
     >
       {/* 5-Column Horizontal Record Grid System (100% Native Scale Canvas) */}
-      <div className="grid grid-cols-5 gap-7 sm:gap-8 min-w-[2050px] w-max justify-items-center items-start shrink-0">
+      <div className="grid grid-cols-5 gap-x-3.5 sm:gap-x-4 gap-y-6 w-max justify-items-center items-start shrink-0">
         {artboards.map((artboard, index) => (
           <ModalProvider key={artboard.id}>
             <div

@@ -8,7 +8,7 @@ export interface Point {
   y: number;
 }
 
-const DUR = 600;
+const DUR = 580;
 
 const clamp = (v: number, lo: number, hi: number) => Math.max(lo, Math.min(hi, v));
 const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
@@ -104,14 +104,13 @@ export async function runGenieAnimation(
   dockPosition: DockPosition = 'bottom',
 ): Promise<void> {
   const popRect = popoverElement.getBoundingClientRect();
-  let windowWidth = Math.round(popRect.width);
-  let windowHeight = Math.round(popRect.height);
+  const windowWidth = popRect.width > 0 ? popRect.width : (typeof window !== 'undefined' ? Math.min(340, window.innerWidth - 48) : 340);
+  const windowHeight = popRect.height > 0 ? popRect.height : Math.round(windowWidth / 0.718);
 
-  if (windowWidth <= 0 || windowHeight <= 0) {
-    const screenWidth = typeof window !== 'undefined' ? window.innerWidth : 375;
-    windowWidth = Math.min(340, screenWidth - 48);
-    windowHeight = Math.round(windowWidth / 0.718);
-  }
+  // Immediately hide DOM element with transition none to prevent any initial flash or layout flicker
+  popoverElement.style.transition = 'none';
+  popoverElement.style.opacity = '0';
+  popoverElement.style.pointerEvents = 'none';
 
   // Always capture fresh snapshot on both open and minimize
   cachedSnapshot = null;
@@ -206,6 +205,13 @@ export async function runGenieAnimation(
       if (!start) start = ts;
       const rawT = clamp((ts - start) / DUR, 0, 1);
 
+      // Track live DOM position to ensure canvas destination matches real DOM with 100% precision
+      const currentPopRect = popoverElement.getBoundingClientRect();
+      const currentWindowPoint: Point = {
+        x: currentPopRect.width > 0 ? currentPopRect.left : windowPoint.x,
+        y: currentPopRect.height > 0 ? currentPopRect.top : windowPoint.y,
+      };
+
       const btnRect = getTargetRect();
       const dockPoint: Point = {
         x: btnRect.left + btnRect.width / 2,
@@ -220,7 +226,7 @@ export async function runGenieAnimation(
         rawT,
         direction,
         dockPoint,
-        windowPoint,
+        currentWindowPoint,
         windowWidth,
         windowHeight,
         dockPosition,
@@ -233,6 +239,12 @@ export async function runGenieAnimation(
           popoverElement.style.opacity = '0';
           popoverElement.style.pointerEvents = 'none';
         }
+      }
+
+      // Smooth cross-fade handover in final 10% of animation to eliminate any hard snap
+      if (direction === 'open' && rawT >= 0.90) {
+        const blend = (rawT - 0.90) / 0.10;
+        popoverElement.style.opacity = `${blend}`;
       }
 
       if (rawT < 1) {

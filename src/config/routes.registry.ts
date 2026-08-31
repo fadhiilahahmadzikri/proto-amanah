@@ -333,10 +333,10 @@ export const SCREEN_MODAL_REGISTRY: Record<string, ScreenModalVariant[]> = {
     {
       id: 'home-queue-dock-genie-minimize',
       label: 'Pilih Antrean Lain (Genie Masuk)',
-      badgeLabel: 'Genie: Suction Minimalkan',
+      badgeLabel: 'Genie: Suction Masuk',
       modalKey: 'queue-dock-genie-minimize',
       triggerType: 'action',
-      description: 'State kartu disedot masuk ke slot bawah dengan efek Genie Minimize saat tombol ditekan.',
+      description: 'Snapshot kartu disedot masuk ke slot bawah dengan efek Genie Minimize saat tombol Pilih Antrean Lain ditekan.',
     },
     {
       id: 'home-queue-dock-eject',

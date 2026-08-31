@@ -1,7 +1,7 @@
 'use client';
 
 import gsap from 'gsap';
-import { History, Info, MoreVertical, X } from 'lucide-react';
+import { ArrowLeft, History, Info, MoreVertical, X } from 'lucide-react';
 import React from 'react';
 import { BottomNotchedDock } from '@/components/atoms/BottomNotchedDock';
 import { type EjectionStage } from '@/components/atoms/QueueDockCardItem';
@@ -116,20 +116,42 @@ function GenieSuctionView(props: {
     const dockPoint = { x: width / 2, y: height - 60 };
     const windowPoint = { x: (width - cardW) / 2, y: 110 };
 
-    renderGenieFrame(
-      ctx,
-      offscreen,
-      width,
-      height,
-      0.54,
-      'minimize',
-      dockPoint,
-      windowPoint,
-      cardW,
-      cardH,
-      'bottom',
-      dpr,
-    );
+    let animationFrameId: number;
+    let startTime: number | null = null;
+    const loopDuration = 2000; // 2.0s loop
+
+    const animate = (timestamp: number) => {
+      if (!startTime) startTime = timestamp;
+      const elapsed = (timestamp - startTime) % loopDuration;
+
+      // Card smoothly suctions into the slot over 1.3s, then rests briefly before looping
+      const activePhase = Math.min(1, elapsed / 1300);
+
+      ctx.clearRect(0, 0, width, height);
+
+      renderGenieFrame(
+        ctx,
+        offscreen,
+        width,
+        height,
+        activePhase,
+        'minimize',
+        dockPoint,
+        windowPoint,
+        cardW,
+        cardH,
+        'bottom',
+        dpr,
+      );
+
+      animationFrameId = requestAnimationFrame(animate);
+    };
+
+    animationFrameId = requestAnimationFrame(animate);
+
+    return () => {
+      if (animationFrameId) cancelAnimationFrame(animationFrameId);
+    };
   }, [activeCard, isDark]);
 
   return (
@@ -137,17 +159,37 @@ function GenieSuctionView(props: {
       ref={containerRef}
       className={cn(
         'relative h-full w-full flex flex-col justify-between overflow-hidden select-none font-sans',
-        isDark ? 'bg-[#0a0e1a] text-white' : 'bg-[#f4f7ff] text-slate-900',
+        isDark ? 'bg-[#0a0e1a] text-white' : 'bg-[#f8faff] text-slate-900',
         props.className,
       )}
     >
       {/* Top Header */}
-      <div className="relative z-30 flex items-center justify-between px-5 pt-4 pb-2">
-        <span className="text-sm font-bold tracking-tight">Antrean Terpilih</span>
-        <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-cyan-500/15 border border-cyan-500/30 text-cyan-300 text-[10px] font-bold">
-          <span>Genie Suction</span>
-        </div>
-      </div>
+      <header className="relative z-30 flex w-full items-center justify-between px-5 pt-4 pb-2 shrink-0">
+        <button
+          type="button"
+          aria-label="Kembali"
+          className={cn(
+            'p-1.5 -ml-1.5 rounded-full transition-all cursor-pointer flex items-center justify-center',
+            isDark
+              ? 'text-neutral-200 hover:text-white hover:bg-white/10'
+              : 'text-slate-700 hover:text-slate-950 hover:bg-slate-100',
+          )}
+          onClick={props.onBack}
+        >
+          <ArrowLeft className="h-6 w-6 stroke-[2]" />
+        </button>
+
+        <span
+          className={cn(
+            'text-base font-bold tracking-tight text-center truncate',
+            isDark ? 'text-white' : 'text-[#14103B]',
+          )}
+        >
+          Antrean terpilih
+        </span>
+
+        <div className="w-9 h-9" />
+      </header>
 
       {/* Interactive Mathematical Genie Mesh Canvas */}
       <canvas
@@ -185,15 +227,11 @@ export function QueueDockScreen(props: {
     props.initialVariant === 'queue-dock-collection' ? cards.slice(0, 3) : [],
   );
   const [currentIndex, setCurrentIndex] = React.useState(1);
-  const [activationStage, setActivationStage] = React.useState<'idle' | 'plunging' | 'activating'>(
-    props.initialVariant === 'queue-dock-morphing' ? 'activating' : 'idle',
-  );
+  const [activationStage, setActivationStage] = React.useState<'idle' | 'plunging' | 'activating'>('idle');
   const [ejectionStage, setEjectionStage] = React.useState<EjectionStage>(
     props.initialVariant === 'queue-dock-eject'
       ? 'atm_peek'
-      : props.initialVariant === 'queue-dock-morphing'
-        ? 'atm_plunge'
-        : 'idle',
+      : 'idle',
   );
   const [showSuccess, setShowSuccess] = React.useState(
     props.initialVariant === 'queue-dock-activation' ||
@@ -201,16 +239,12 @@ export function QueueDockScreen(props: {
     props.initialVariant === 'queue-dock-genie-minimize',
   );
   const [isGenieSettled, setIsGenieSettled] = React.useState(
-    props.initialVariant === 'queue-dock-activation' ||
-    props.initialVariant === 'queue-dock-patient-detail' ||
-    props.initialVariant === 'queue-dock-genie-minimize',
+    props.initialVariant === 'queue-dock-patient-detail',
   );
   const [dragProgress, setDragProgress] = React.useState(
     props.initialVariant === 'queue-dock-sliding'
       ? 0.88
-      : props.initialVariant === 'queue-dock-morphing'
-        ? 1
-        : 0,
+      : 0,
   );
   const [isLongPressing, setIsLongPressing] = React.useState(false);
   const [dotCount, setDotCount] = React.useState(
@@ -365,47 +399,7 @@ export function QueueDockScreen(props: {
     });
   }, [headlineText]);
 
-  // Automated Genie Open Emergence Sequence: Genie Emergence -> Settle -> Blur -> 3D Flip Rotation
-  React.useEffect(() => {
-    if (!showSuccess) return;
 
-    let isMounted = true;
-    const runOpenSequence = async () => {
-      // Ensure DOM has mounted and laid out heroCardRef
-      await new Promise((r) => requestAnimationFrame(r));
-
-      if (!isMounted) return;
-
-      const getTargetRect = (): DOMRect => {
-        const screenRect = screenContainerRef.current?.getBoundingClientRect();
-        const defaultX = screenRect ? screenRect.left + screenRect.width / 2 : window.innerWidth / 2;
-        const defaultY = screenRect ? screenRect.top + screenRect.height - 50 : window.innerHeight - 50;
-        return new DOMRect(defaultX - 20, defaultY - 10, 40, 20);
-      };
-
-      if (heroCardRef.current) {
-        try {
-          // 1. Genie effect emerges with card in 100% card-back mode
-          await runGenieAnimation('open', heroCardRef.current, getTargetRect, 'bottom');
-
-          if (!isMounted) return;
-
-          // 2. Card has fully landed & settled at center -> trigger 3D spin reveal
-          setIsGenieSettled(true);
-        } catch {
-          if (isMounted) setIsGenieSettled(true);
-        }
-      } else {
-        setIsGenieSettled(true);
-      }
-    };
-
-    void runOpenSequence();
-
-    return () => {
-      isMounted = false;
-    };
-  }, [showSuccess]);
 
   const handleActivate = () => {
     if (isPlungingOrActive) return;
@@ -536,6 +530,21 @@ export function QueueDockScreen(props: {
 
     ejectionTimersRef.current.push(t1, t2, t3, t4);
   }, [clearEjectionTimers]);
+
+  // Automated entry plunge animation for the morphing frame variant
+  React.useEffect(() => {
+    if (props.initialVariant === 'queue-dock-morphing') {
+      const timer = setTimeout(() => {
+        setActivationStage('activating');
+        setEjectionStage('atm_plunge');
+        setDragProgress(1);
+      }, 120);
+      return () => clearTimeout(timer);
+    }
+    return undefined;
+  }, [props.initialVariant]);
+
+
 
   // Automated Genie Minimize trigger for the dedicated suction transition frame
   React.useEffect(() => {
@@ -765,6 +774,7 @@ export function QueueDockScreen(props: {
         cardRef={heroCardRef}
         theme={props.theme}
         onClose={handleCloseOverlay}
+        onGenieSettled={() => setIsGenieSettled(true)}
         onRedraw={() => {
           handleCloseOverlay();
         }}
