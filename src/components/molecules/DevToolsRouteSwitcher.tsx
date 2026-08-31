@@ -66,7 +66,11 @@ export function DevToolsRouteSwitcher(props: {
   const [storedInitial, setStoredInitial] = React.useState<{
     screen: AuthScreen | null;
     tab: BottomNavTab | null;
-  }>(() => getStoredUserInitialConfig());
+  }>({ screen: null, tab: null });
+
+  React.useEffect(() => {
+    setStoredInitial(getStoredUserInitialConfig());
+  }, []);
 
   const { reset: resetDoctor } = useDoctorStore();
   const { reset: resetSchedules } = useScheduleStore();

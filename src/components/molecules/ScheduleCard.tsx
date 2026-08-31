@@ -99,9 +99,9 @@ export function ScheduleCard(props: {
 
         {/* Clipped 3D Crystal & Liquid Glass Overlays */}
         <g clipPath={`url(#${clipId})`}>
-          {/* 3D Geometric Crystal Architecture Image Texture (Light vs Dark) */}
+          {/* 3D Geometric Crystal Architecture Image Texture (Home Schedule Card: Light vs Dark) */}
           <image
-            href={isDark ? '/assets/images/schedule-card-bg-dark.png' : '/assets/images/schedule-card-bg.png'}
+            href={isDark ? '/assets/images/home-schedule-card-bg-dark.png' : '/assets/images/home-schedule-card-bg-light.png'}
             x="0"
             y="0"
             width="340"
@@ -148,7 +148,7 @@ export function ScheduleCard(props: {
             <span
               className={cn(
                 'text-[15.5px] font-black tracking-tight leading-tight',
-                isDark ? 'text-white drop-shadow-[0_1px_3px_rgba(0,0,0,0.7)]' : 'text-[#03045e]',
+                isDark ? 'text-white drop-shadow-[0_1px_3px_rgba(0,0,0,0.7)]' : 'text-slate-900',
               )}
             >
               {props.schedule.title}
@@ -175,7 +175,7 @@ export function ScheduleCard(props: {
                 'p-1.5 -mr-1 rounded-full transition-all active:scale-90 cursor-pointer focus:outline-none shadow-2xs',
                 isDark
                   ? 'bg-white/10 hover:bg-white/20 text-slate-300 hover:text-white backdrop-blur-md'
-                  : 'bg-slate-100/80 hover:bg-slate-200 text-slate-500 hover:text-[#03045e]',
+                  : 'bg-slate-100/80 hover:bg-slate-200 text-slate-500 hover:text-slate-900',
               )}
             >
               <X className="h-3.5 w-3.5 stroke-[2.2]" />
@@ -188,7 +188,7 @@ export function ScheduleCard(props: {
           <span
             className={cn(
               'text-[19.5px] sm:text-[20.5px] font-black tracking-tight leading-none',
-              isDark ? 'text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]' : 'text-[#023e8a]',
+              isDark ? 'text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]' : 'text-slate-900',
             )}
           >
             {props.schedule.time}
@@ -207,7 +207,7 @@ export function ScheduleCard(props: {
             <span
               className={cn(
                 'font-extrabold text-[12.5px] truncate leading-tight',
-                isDark ? 'text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.6)]' : 'text-[#03045e]',
+                isDark ? 'text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.6)]' : 'text-slate-900',
               )}
             >
               {props.schedule.poli}

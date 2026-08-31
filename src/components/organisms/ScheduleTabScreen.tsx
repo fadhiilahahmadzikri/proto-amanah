@@ -33,6 +33,7 @@ import {
   X,
 } from 'lucide-react';
 import React from 'react';
+import { QueueBadge } from '@/components/atoms/QueueBadge';
 import { DateCarouselStrip } from '@/components/molecules/DateCarouselStrip';
 import { M3Banner } from '@/components/molecules/M3Banner';
 import { PatientDetailDrawer } from '@/components/molecules/PatientDetailDrawer';
@@ -551,15 +552,10 @@ export function ScheduleTabScreen(props: {
     ? Math.min(100, Math.round((totalBookedPatientsToday / targetDailyQuota) * 100))
     : 0;
 
-  // Nature background pool
-  const NATURE_IMAGES_POOL = [
-    'https://images.unsplash.com/photo-1571896349842-33c89424de2d?q=80&w=800&auto=format&fit=crop',
-    'https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?q=80&w=800&auto=format&fit=crop',
-    'https://images.unsplash.com/photo-1566073771259-6a8506099945?q=80&w=800&auto=format&fit=crop',
-    'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?q=80&w=800&auto=format&fit=crop',
-    'https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?q=80&w=800&auto=format&fit=crop',
-    'https://images.unsplash.com/photo-1506744038136-46273834b3fb?q=80&w=800&auto=format&fit=crop',
-  ];
+  // Theme-aware booking card background texture
+  const bookingCardBg = isDark
+    ? '/assets/images/booking-card-bg-dark.png'
+    : '/assets/images/booking-card-bg-light.png';
 
   // Open Detail Drawer
   const handleOpenDetailDrawer = (sch: DoctorSchedule) => {
@@ -1219,9 +1215,11 @@ export function ScheduleTabScreen(props: {
 
               {allBookedPatientsForDay.length > 0 ? (
                 allBookedPatientsForDay.map((item, pIndex) => {
-                  const patientNatureBg = NATURE_IMAGES_POOL[pIndex % NATURE_IMAGES_POOL.length];
                   const patient = item.patient;
                   const schedule = item.schedule;
+                  const rawSlot = patient.timeSlot || '08:00 - 09:30 WIB';
+                  const startPatientTime = rawSlot.split(' - ')[0]?.trim() || '08:00';
+                  const endPatientTime = rawSlot.split(' - ')[1]?.split(' ')[0]?.trim() || '09:30';
 
                   return (
                     <div
@@ -1233,7 +1231,10 @@ export function ScheduleTabScreen(props: {
                         setIsPatientDetailModalOpen(true);
                       }}
                       className={cn(
-                        'relative w-full h-[320px] rounded-[32px] overflow-hidden shadow-2xl bg-slate-900 select-none border border-black/10 transition-all duration-300 active:scale-[0.99] cursor-pointer isolate [transform:translateZ(0)]',
+                        'relative w-full h-[335px] rounded-[32px] overflow-hidden select-none border transition-all duration-300 active:scale-[0.99] cursor-pointer isolate [transform:translateZ(0)]',
+                        isDark
+                          ? 'bg-[#060b18] border-white/10 shadow-[0_16px_36px_rgba(0,0,0,0.5)]'
+                          : 'bg-white border-slate-200/80 shadow-[0_16px_36px_rgba(3,4,94,0.08)]',
                         isDayCuti && 'opacity-85 grayscale-20',
                       )}
                       style={{
@@ -1241,40 +1242,42 @@ export function ScheduleTabScreen(props: {
                         WebkitClipPath: 'inset(0 round 32px)',
                       }}
                     >
-                      {/* Layer 1: Crisp Nature Background */}
+                      {/* Layer 1: Theme-Respected 3D Architecture Texture */}
                       <img
-                        src={patientNatureBg}
+                        src={bookingCardBg}
                         alt={patient.patientName}
                         className="absolute inset-0 w-full h-full object-cover object-center rounded-[32px]"
                       />
 
-                      {/* Layer 2: Real-time GPU Liquid Glass (Progressive Backdrop Blur + Vibrance Boost) */}
+                      {/* Layer 2: Real-time GPU Liquid Glass (Progressive Backdrop Blur) */}
                       <div
                         className="absolute inset-0 pointer-events-none z-10 rounded-[32px]"
                         style={{
-                          backdropFilter: 'blur(20px) saturate(160%)',
-                          WebkitBackdropFilter: 'blur(20px) saturate(160%)',
-                          maskImage: 'linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,0.95) 35%, rgba(0,0,0,0.3) 55%, rgba(0,0,0,0) 75%)',
-                          WebkitMaskImage: 'linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,0.95) 35%, rgba(0,0,0,0.3) 55%, rgba(0,0,0,0) 75%)',
+                          backdropFilter: isDark ? 'blur(16px) saturate(160%)' : 'blur(16px) saturate(140%)',
+                          WebkitBackdropFilter: isDark ? 'blur(16px) saturate(160%)' : 'blur(16px) saturate(140%)',
+                          maskImage: 'linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,0.92) 40%, rgba(0,0,0,0.2) 60%, rgba(0,0,0,0) 80%)',
+                          WebkitMaskImage: 'linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,0.92) 40%, rgba(0,0,0,0.2) 60%, rgba(0,0,0,0) 80%)',
                         }}
                       />
 
-                      {/* Layer 3: High-Contrast Ambient Gradient (Crystal clear text contrast without milky haze) */}
+                      {/* Layer 3: High-Contrast Ambient Gradient */}
                       <div
                         className="absolute inset-0 pointer-events-none z-15 rounded-[32px]"
                         style={{
-                          background: 'linear-gradient(to top, rgba(12, 20, 15, 0.82) 0%, rgba(12, 20, 15, 0.4) 40%, rgba(12, 20, 15, 0) 70%)',
+                          background: isDark
+                            ? 'linear-gradient(to top, rgba(6, 11, 24, 0.95) 0%, rgba(6, 11, 24, 0.6) 45%, rgba(6, 11, 24, 0) 75%)'
+                            : 'linear-gradient(to top, rgba(255, 255, 255, 0.98) 0%, rgba(255, 255, 255, 0.75) 45%, rgba(255, 255, 255, 0) 75%)',
                         }}
                       />
 
-                      {/* Top-Left: Status Badge (Theme-Responsive Liquid Glass without stroke) */}
+                      {/* Top-Left: Status Badge */}
                       <div className="absolute top-4 left-4 z-30">
                         <div
                           className={cn(
-                            'flex items-center gap-1.5 backdrop-blur-md px-3 py-1.5 rounded-full shadow-md transition-colors',
+                            'flex items-center gap-1.5 backdrop-blur-md px-3 py-1.5 rounded-full shadow-md transition-colors border',
                             isDark
-                              ? 'bg-[#0a0e1a]/65 text-white shadow-black/40'
-                              : 'bg-white/85 text-slate-900 shadow-slate-900/10',
+                              ? 'bg-[#0a0e1a]/70 border-white/10 text-white shadow-black/40'
+                              : 'bg-white/90 border-slate-200/80 text-slate-900 shadow-slate-900/5',
                           )}
                         >
                           <span
@@ -1293,59 +1296,120 @@ export function ScheduleTabScreen(props: {
                         </div>
                       </div>
 
-                      {/* Top-Right: Queue Badge (Theme-Responsive Liquid Glass without stroke) */}
-                      <div className="absolute top-4 right-4 z-30">
-                        <div
-                          className={cn(
-                            'flex items-center gap-1 backdrop-blur-md px-3 py-1.5 rounded-full shadow-md transition-colors',
-                            isDark
-                              ? 'bg-[#0a0e1a]/65 text-white shadow-black/40'
-                              : 'bg-white/85 text-slate-900 shadow-slate-900/10',
-                          )}
-                        >
-                          <span className="text-xs font-bold tracking-tight">
-                            Antrean {patient.queueNumber}
-                          </span>
-                        </div>
+                      {/* Top-Right: Standalone Large Medal Queue Badge */}
+                      <div className="absolute top-2.5 right-2.5 z-30">
+                        <QueueBadge
+                          queueNumber={patient.queueNumber || `#${String(pIndex + 1).padStart(2, '0')}`}
+                          theme={props.theme}
+                          size={68}
+                        />
                       </div>
 
                       {/* Card Content Overlay Layer */}
-                      <div className="absolute bottom-0 inset-x-0 z-20 p-5 pt-6 text-white">
+                      <div className={cn('absolute bottom-0 inset-x-0 z-20 p-5 pt-6', isDark ? 'text-white' : 'text-slate-900')}>
                         {/* Avatar, Name, Age Row */}
                         <div className="flex items-center gap-3.5 mb-2.5">
                           <img
                             src={patient.avatarUrl || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=200&auto=format&fit=crop'}
                             alt={patient.patientName}
-                            className="h-12 w-12 rounded-full object-cover border-2 border-white/95 shadow-md shrink-0"
+                            className={cn(
+                              'h-12 w-12 rounded-full object-cover border-2 shadow-md shrink-0',
+                              isDark ? 'border-white/90 ring-1 ring-black/40' : 'border-white ring-1 ring-black/10',
+                            )}
                           />
                           <div className="flex-1 min-w-0">
-                            <h4 className="text-white text-[20px] font-bold tracking-tight leading-tight truncate">
+                            <h4
+                              className={cn(
+                                'text-[20px] font-black tracking-tight leading-tight truncate',
+                                isDark ? 'text-white' : 'text-slate-900',
+                              )}
+                            >
                               {patient.patientName}
                             </h4>
-                            <p className="text-white/80 text-[12.5px] font-medium leading-snug">
-                              {patient.patientRm} • Usia {patient.patientAge}
+                            <p
+                              className={cn(
+                                'text-[12.5px] font-medium leading-snug',
+                                isDark ? 'text-slate-400' : 'text-[#64748b]',
+                              )}
+                            >
+                              {patient.patientRm}
                             </p>
                           </div>
                         </div>
 
-                        {/* Session, Poli, Room Info */}
-                        <div className="flex items-center justify-between gap-2 text-white/80 text-[12px] font-medium mb-2.5">
-                          <span className="truncate">
-                            {schedule.title} • {schedule.poli}
-                          </span>
-                          <span className="shrink-0 text-white font-semibold">
-                            {schedule.room}
-                          </span>
-                        </div>
+                        {/* Specifications Row: Exactly 3 Slots (Slot 1: Poli & Room | Slot 2: Jam Mulai | Slot 3: Jam Selesai) */}
+                        <div className="flex items-center justify-between gap-2 mb-2.5">
+                          {/* Slot 1: Atas Poli, Bawah Room */}
+                          <div className="flex flex-col items-start min-w-0 max-w-[42%]">
+                            <span
+                              className={cn(
+                                'font-bold text-[13px] leading-tight truncate w-full',
+                                isDark ? 'text-slate-200' : 'text-slate-900',
+                              )}
+                            >
+                              {schedule.poli}
+                            </span>
+                            <span
+                              className={cn(
+                                'text-[11px] font-medium leading-tight truncate w-full mt-0.5',
+                                isDark ? 'text-slate-400' : 'text-slate-400',
+                              )}
+                            >
+                              {schedule.room}
+                            </span>
+                          </div>
 
-                        {/* Time Slot Row */}
-                        <div className="flex items-center gap-1.5 text-white text-[12.5px] font-semibold mb-3">
-                          <Clock className="w-3.5 h-3.5 text-white" />
-                          <span>{patient.timeSlot}</span>
+                          {/* Separator Line 1 */}
+                          <div className={cn('w-[1px] h-7 self-center shrink-0', isDark ? 'bg-white/20' : 'bg-slate-200')} />
+
+                          {/* Slot 2: Jam Mulai (Monochrome Trailing matching font) */}
+                          <div className="flex flex-col items-center shrink-0">
+                            <div
+                              className={cn(
+                                'flex items-center gap-1 font-bold text-[13px]',
+                                isDark ? 'text-slate-200' : 'text-slate-900',
+                              )}
+                            >
+                              <Clock className="w-3.5 h-3.5 opacity-70 text-current" />
+                              <span>{startPatientTime}</span>
+                            </div>
+                            <span
+                              className={cn(
+                                'text-[11px] font-medium mt-0.5',
+                                isDark ? 'text-slate-400' : 'text-slate-400',
+                              )}
+                            >
+                              Mulai
+                            </span>
+                          </div>
+
+                          {/* Separator Line 2 */}
+                          <div className={cn('w-[1px] h-7 self-center shrink-0', isDark ? 'bg-white/20' : 'bg-slate-200')} />
+
+                          {/* Slot 3: Jam Selesai (Monochrome Trailing matching font) */}
+                          <div className="flex flex-col items-center shrink-0">
+                            <div
+                              className={cn(
+                                'flex items-center gap-1 font-bold text-[13px]',
+                                isDark ? 'text-slate-200' : 'text-slate-900',
+                              )}
+                            >
+                              <Clock className="w-3.5 h-3.5 opacity-70 text-current" />
+                              <span>{endPatientTime}</span>
+                            </div>
+                            <span
+                              className={cn(
+                                'text-[11px] font-medium mt-0.5',
+                                isDark ? 'text-slate-400' : 'text-slate-400',
+                              )}
+                            >
+                              Selesai
+                            </span>
+                          </div>
                         </div>
 
                         {/* Glass Line Separator */}
-                        <div className="w-full h-[1px] bg-white/20 mb-3" />
+                        <div className={cn('w-full h-[1px] mb-3', isDark ? 'bg-white/15' : 'bg-slate-200')} />
 
                         {/* Detail Pasien Button */}
                         <button
@@ -1356,7 +1420,12 @@ export function ScheduleTabScreen(props: {
                             setDetailSchedule(schedule);
                             setIsPatientDetailModalOpen(true);
                           }}
-                          className="w-full py-2.5 rounded-2xl bg-white hover:bg-white/90 text-slate-950 font-bold text-xs shadow-lg transition-all text-center cursor-pointer active:scale-[0.98]"
+                          className={cn(
+                            'w-full py-2.5 rounded-2xl font-bold text-xs shadow-md transition-all text-center cursor-pointer active:scale-[0.98]',
+                            isDark
+                              ? 'bg-white hover:bg-white/90 text-slate-950 shadow-black/30'
+                              : 'bg-[#0a44ff] hover:bg-[#0038ff] text-white shadow-blue-500/25',
+                          )}
                         >
                           Detail Pasien
                         </button>
@@ -1467,8 +1536,7 @@ export function ScheduleTabScreen(props: {
             {/* Doctor Practice Session Cards */}
             <div className="flex flex-col gap-3">
               {currentSchedules.length > 0 ? (
-                currentSchedules.map((sch, index) => {
-                  const natureImage = NATURE_IMAGES_POOL[index % NATURE_IMAGES_POOL.length];
+                currentSchedules.map((sch) => {
                   const sessionTitle = sch.title;
                   const displayStartTime = sch.startTime ?? (sch.time.split(' ')[0] ?? '08:00');
                   const displayEndTime = sch.endTime ?? (sch.time.split(' - ')[1]?.split(' ')[0] ?? '11:00');
@@ -1482,7 +1550,10 @@ export function ScheduleTabScreen(props: {
                         handleOpenDetailDrawer(sch);
                       }}
                       className={cn(
-                        'relative w-full h-[360px] rounded-[32px] overflow-hidden shadow-2xl bg-slate-900 select-none border border-black/10 transition-all duration-300 active:scale-[0.99] cursor-pointer isolate [transform:translateZ(0)]',
+                        'relative w-full h-[360px] rounded-[32px] overflow-hidden select-none border transition-all duration-300 active:scale-[0.99] cursor-pointer isolate [transform:translateZ(0)]',
+                        isDark
+                          ? 'bg-[#060b18] border-white/10 shadow-[0_16px_36px_rgba(0,0,0,0.5)]'
+                          : 'bg-white border-slate-200/80 shadow-[0_16px_36px_rgba(3,4,94,0.08)]',
                         isDayCuti && 'opacity-85 grayscale-20',
                       )}
                       style={{
@@ -1490,40 +1561,42 @@ export function ScheduleTabScreen(props: {
                         WebkitClipPath: 'inset(0 round 32px)',
                       }}
                     >
-                      {/* Layer 1: Single 100% Crisp Background Photo */}
+                      {/* Layer 1: Theme-Respected 3D Architecture Texture */}
                       <img
-                        src={natureImage}
+                        src={bookingCardBg}
                         alt={sessionTitle}
                         className="absolute inset-0 w-full h-full object-cover object-center rounded-[32px]"
                       />
 
-                      {/* Layer 2: Real-time GPU Liquid Glass (Progressive Backdrop Blur + Vibrance Boost) */}
+                      {/* Layer 2: Real-time GPU Liquid Glass (Progressive Backdrop Blur) */}
                       <div
                         className="absolute inset-0 pointer-events-none z-10 rounded-[32px]"
                         style={{
-                          backdropFilter: 'blur(20px) saturate(160%)',
-                          WebkitBackdropFilter: 'blur(20px) saturate(160%)',
-                          maskImage: 'linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,0.95) 35%, rgba(0,0,0,0.3) 55%, rgba(0,0,0,0) 75%)',
-                          WebkitMaskImage: 'linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,0.95) 35%, rgba(0,0,0,0.3) 55%, rgba(0,0,0,0) 75%)',
+                          backdropFilter: isDark ? 'blur(16px) saturate(160%)' : 'blur(16px) saturate(140%)',
+                          WebkitBackdropFilter: isDark ? 'blur(16px) saturate(160%)' : 'blur(16px) saturate(140%)',
+                          maskImage: 'linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,0.92) 40%, rgba(0,0,0,0.2) 60%, rgba(0,0,0,0) 80%)',
+                          WebkitMaskImage: 'linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,0.92) 40%, rgba(0,0,0,0.2) 60%, rgba(0,0,0,0) 80%)',
                         }}
                       />
 
-                      {/* Layer 3: High-Contrast Ambient Gradient (Crystal clear text contrast without milky haze) */}
+                      {/* Layer 3: High-Contrast Ambient Gradient */}
                       <div
                         className="absolute inset-0 pointer-events-none z-15 rounded-[32px]"
                         style={{
-                          background: 'linear-gradient(to top, rgba(12, 20, 15, 0.82) 0%, rgba(12, 20, 15, 0.4) 40%, rgba(12, 20, 15, 0) 70%)',
+                          background: isDark
+                            ? 'linear-gradient(to top, rgba(6, 11, 24, 0.95) 0%, rgba(6, 11, 24, 0.6) 45%, rgba(6, 11, 24, 0) 75%)'
+                            : 'linear-gradient(to top, rgba(255, 255, 255, 0.98) 0%, rgba(255, 255, 255, 0.75) 45%, rgba(255, 255, 255, 0) 75%)',
                         }}
                       />
 
-                      {/* Top Badge: Status Badge (Theme-Responsive Liquid Glass without stroke) */}
+                      {/* Top Badge: Status Badge */}
                       <div className="absolute top-4 left-4 z-30">
                         <div
                           className={cn(
-                            'flex items-center gap-1.5 backdrop-blur-md px-3 py-1.5 rounded-full shadow-md transition-colors',
+                            'flex items-center gap-1.5 backdrop-blur-md px-3 py-1.5 rounded-full shadow-md transition-colors border',
                             isDark
-                              ? 'bg-[#0a0e1a]/65 text-white shadow-black/40'
-                              : 'bg-white/85 text-slate-900 shadow-slate-900/10',
+                              ? 'bg-[#0a0e1a]/70 border-white/10 text-white shadow-black/40'
+                              : 'bg-white/90 border-slate-200/80 text-slate-900 shadow-slate-900/5',
                           )}
                         >
                           <span
@@ -1538,33 +1611,38 @@ export function ScheduleTabScreen(props: {
                                     : 'bg-cyan-500',
                             )}
                           />
-                          <span className="text-xs font-semibold tracking-tight">
+                          <span className="text-xs font-bold tracking-tight">
                             {isDayCuti ? 'Cuti' : sch.badge}
                           </span>
                         </div>
                       </div>
 
-                      {/* Top Badge: Booked Patients Count (Theme-Responsive Liquid Glass without stroke) */}
+                      {/* Top Badge: Booked Patients Count */}
                       <div className="absolute top-4 right-4 z-30">
                         <div
                           className={cn(
-                            'flex items-center gap-1.5 backdrop-blur-md px-3 py-1.5 rounded-full shadow-md transition-colors',
+                            'flex items-center gap-1.5 backdrop-blur-md px-3 py-1.5 rounded-full shadow-md transition-colors border',
                             isDark
-                              ? 'bg-[#0a0e1a]/65 text-white shadow-black/40'
-                              : 'bg-white/85 text-slate-900 shadow-slate-900/10',
+                              ? 'bg-[#0a0e1a]/70 border-white/10 text-cyan-400 shadow-black/40'
+                              : 'bg-white/90 border-slate-200/80 text-[#023e8a] shadow-slate-900/5',
                           )}
                         >
                           <Users className="w-3.5 h-3.5 opacity-80" />
-                          <span className="text-xs font-semibold tracking-tight">
+                          <span className="text-xs font-bold tracking-tight">
                             {bookedCount} Pasien Booking
                           </span>
                         </div>
                       </div>
 
                       {/* Card Content Overlay Layer */}
-                      <div className="absolute bottom-0 inset-x-0 z-20 p-5 pt-6 text-white">
+                      <div className={cn('absolute bottom-0 inset-x-0 z-20 p-5 pt-6', isDark ? 'text-white' : 'text-slate-900')}>
                         {/* Session Name Heading */}
-                        <h1 className="text-white text-[24px] font-semibold tracking-tight leading-none mb-3">
+                        <h1
+                          className={cn(
+                            'text-[24px] font-black tracking-tight leading-none mb-3 truncate',
+                            isDark ? 'text-white' : 'text-slate-900',
+                          )}
+                        >
                           {sessionTitle}
                         </h1>
 
@@ -1572,10 +1650,20 @@ export function ScheduleTabScreen(props: {
                         <div className="flex items-end justify-between gap-2">
                           {/* Room & Poli */}
                           <div className="flex flex-col justify-end text-left space-y-0.5 max-w-[55%]">
-                            <p className="text-white/70 text-[13px] font-normal leading-snug tracking-tight truncate">
+                            <p
+                              className={cn(
+                                'text-[13px] font-medium leading-snug tracking-tight truncate',
+                                isDark ? 'text-slate-300' : 'text-[#64748b]',
+                              )}
+                            >
                               {sch.poli} • {sch.room}
                             </p>
-                            <p className="text-white/95 text-[13.5px] font-medium leading-snug tracking-tight">
+                            <p
+                              className={cn(
+                                'text-[13.5px] font-bold leading-snug tracking-tight',
+                                isDark ? 'text-white' : 'text-slate-900',
+                              )}
+                            >
                               {sch.date}
                             </p>
                           </div>
@@ -1584,29 +1672,53 @@ export function ScheduleTabScreen(props: {
                           <div className="flex items-center gap-3 shrink-0">
                             {/* Jam Mulai */}
                             <div className="flex flex-col items-center">
-                              <div className="flex items-center gap-1 text-white font-medium text-[13.5px]">
-                                <Clock className="w-3.5 h-3.5 text-white" />
+                              <div
+                                className={cn(
+                                  'flex items-center gap-1 font-bold text-[13.5px]',
+                                  isDark ? 'text-white' : 'text-slate-900',
+                                )}
+                              >
+                                <Clock className={cn('w-3.5 h-3.5', isDark ? 'text-cyan-400' : 'text-blue-600')} />
                                 <span>{displayStartTime}</span>
                               </div>
-                              <span className="text-[11px] text-white/70 font-normal mt-0.5">Mulai</span>
+                              <span
+                                className={cn(
+                                  'text-[11px] font-medium mt-0.5',
+                                  isDark ? 'text-slate-300' : 'text-[#64748b]',
+                                )}
+                              >
+                                Mulai
+                              </span>
                             </div>
 
                             {/* Separator Line */}
-                            <div className="w-[1px] h-7 bg-white/20 self-center" />
+                            <div className={cn('w-[1px] h-7 self-center', isDark ? 'bg-white/20' : 'bg-slate-200')} />
 
                             {/* Jam Selesai */}
                             <div className="flex flex-col items-center">
-                              <div className="flex items-center gap-1 text-white font-medium text-[13.5px]">
-                                <Clock className="w-3.5 h-3.5 text-white" />
+                              <div
+                                className={cn(
+                                  'flex items-center gap-1 font-bold text-[13.5px]',
+                                  isDark ? 'text-white' : 'text-slate-900',
+                                )}
+                              >
+                                <Clock className={cn('w-3.5 h-3.5', isDark ? 'text-cyan-400' : 'text-blue-600')} />
                                 <span>{displayEndTime}</span>
                               </div>
-                              <span className="text-[11px] text-white/70 font-normal mt-0.5">Selesai</span>
+                              <span
+                                className={cn(
+                                  'text-[11px] font-medium mt-0.5',
+                                  isDark ? 'text-slate-300' : 'text-[#64748b]',
+                                )}
+                              >
+                                Selesai
+                              </span>
                             </div>
                           </div>
                         </div>
 
                         {/* Glass Line Separator */}
-                        <div className="w-full h-[1px] bg-white/20 my-3.5" />
+                        <div className={cn('w-full h-[1px] my-3.5', isDark ? 'bg-white/15' : 'bg-slate-200')} />
 
                         {/* Footer Actions: Detail + Edit + Delete */}
                         <div className="flex items-center gap-2">
@@ -1616,7 +1728,12 @@ export function ScheduleTabScreen(props: {
                               e.stopPropagation();
                               handleOpenDetailDrawer(sch);
                             }}
-                            className="flex-1 py-2.5 rounded-2xl bg-white hover:bg-white/90 text-slate-950 font-bold text-xs shadow-lg transition-all text-center cursor-pointer active:scale-[0.98]"
+                            className={cn(
+                              'flex-1 py-2.5 rounded-2xl font-bold text-xs shadow-md transition-all text-center cursor-pointer active:scale-[0.98]',
+                              isDark
+                                ? 'bg-white hover:bg-white/90 text-slate-950 shadow-black/30'
+                                : 'bg-[#0a44ff] hover:bg-[#0038ff] text-white shadow-blue-500/25',
+                            )}
                           >
                             Detail Sesi
                           </button>
@@ -1629,7 +1746,12 @@ export function ScheduleTabScreen(props: {
                               e.stopPropagation();
                               handleOpenEditDrawer(sch);
                             }}
-                            className="h-10 w-10 rounded-2xl flex items-center justify-center transition-all cursor-pointer shrink-0 active:scale-95 bg-white/15 hover:bg-white/25 text-white border border-white/20 shadow-sm"
+                            className={cn(
+                              'h-10 w-10 rounded-2xl flex items-center justify-center transition-all cursor-pointer shrink-0 active:scale-95 border shadow-xs',
+                              isDark
+                                ? 'bg-white/15 hover:bg-white/25 text-white border-white/20'
+                                : 'bg-slate-100 hover:bg-slate-200 text-slate-700 border-slate-200',
+                            )}
                           >
                             <Edit3 className="h-4 w-4" />
                           </button>
@@ -1642,7 +1764,12 @@ export function ScheduleTabScreen(props: {
                               e.stopPropagation();
                               handleDeleteSchedule(sch.id);
                             }}
-                            className="h-10 w-10 rounded-2xl flex items-center justify-center transition-all cursor-pointer shrink-0 active:scale-95 bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 border border-rose-500/30 shadow-sm"
+                            className={cn(
+                              'h-10 w-10 rounded-2xl flex items-center justify-center transition-all cursor-pointer shrink-0 active:scale-95 border shadow-xs',
+                              isDark
+                                ? 'bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 border-rose-500/30'
+                                : 'bg-rose-50 hover:bg-rose-100 text-rose-600 border-rose-200',
+                            )}
                           >
                             <Trash2 className="h-4 w-4" />
                           </button>
@@ -1731,7 +1858,10 @@ export function ScheduleTabScreen(props: {
             <div className="flex flex-col gap-3">
               {detailSchedule?.bookedPatients && detailSchedule.bookedPatients.length > 0 ? (
                 detailSchedule.bookedPatients.map((patient: BookedPatient, pIdx) => {
-                  const patientNatureBg = NATURE_IMAGES_POOL[pIdx % NATURE_IMAGES_POOL.length];
+                  const rawSlot = patient.timeSlot || '08:00 - 09:30 WIB';
+                  const startPatientTime = rawSlot.split(' - ')[0]?.trim() || '08:00';
+                  const endPatientTime = rawSlot.split(' - ')[1]?.split(' ')[0]?.trim() || '09:30';
+
                   return (
                     <div
                       key={patient.id || pIdx}
@@ -1741,7 +1871,10 @@ export function ScheduleTabScreen(props: {
                         setIsPatientDetailModalOpen(true);
                       }}
                       className={cn(
-                        'relative w-full h-[320px] rounded-[32px] overflow-hidden shadow-2xl bg-slate-900 select-none border border-black/10 transition-all duration-300 active:scale-[0.99] cursor-pointer isolate [transform:translateZ(0)]',
+                        'relative w-full h-[335px] rounded-[32px] overflow-hidden select-none border transition-all duration-300 active:scale-[0.99] cursor-pointer isolate [transform:translateZ(0)]',
+                        isDark
+                          ? 'bg-[#060b18] border-white/10 shadow-[0_16px_36px_rgba(0,0,0,0.5)]'
+                          : 'bg-white border-slate-200/80 shadow-[0_16px_36px_rgba(3,4,94,0.08)]',
                         isDayCuti && 'opacity-85 grayscale-20',
                       )}
                       style={{
@@ -1749,40 +1882,42 @@ export function ScheduleTabScreen(props: {
                         WebkitClipPath: 'inset(0 round 32px)',
                       }}
                     >
-                      {/* Layer 1: Crisp Nature Background */}
+                      {/* Layer 1: Theme-Respected 3D Architecture Texture */}
                       <img
-                        src={patientNatureBg}
+                        src={bookingCardBg}
                         alt={patient.patientName}
                         className="absolute inset-0 w-full h-full object-cover object-center rounded-[32px]"
                       />
 
-                      {/* Layer 2: Real-time GPU Liquid Glass (Progressive Backdrop Blur + Vibrance Boost) */}
+                      {/* Layer 2: Real-time GPU Liquid Glass (Progressive Backdrop Blur) */}
                       <div
                         className="absolute inset-0 pointer-events-none z-10 rounded-[32px]"
                         style={{
-                          backdropFilter: 'blur(20px) saturate(160%)',
-                          WebkitBackdropFilter: 'blur(20px) saturate(160%)',
-                          maskImage: 'linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,0.95) 35%, rgba(0,0,0,0.3) 55%, rgba(0,0,0,0) 75%)',
-                          WebkitMaskImage: 'linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,0.95) 35%, rgba(0,0,0,0.3) 55%, rgba(0,0,0,0) 75%)',
+                          backdropFilter: isDark ? 'blur(16px) saturate(160%)' : 'blur(16px) saturate(140%)',
+                          WebkitBackdropFilter: isDark ? 'blur(16px) saturate(160%)' : 'blur(16px) saturate(140%)',
+                          maskImage: 'linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,0.92) 40%, rgba(0,0,0,0.2) 60%, rgba(0,0,0,0) 80%)',
+                          WebkitMaskImage: 'linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,0.92) 40%, rgba(0,0,0,0.2) 60%, rgba(0,0,0,0) 80%)',
                         }}
                       />
 
-                      {/* Layer 3: High-Contrast Ambient Gradient (Crystal clear text contrast without milky haze) */}
+                      {/* Layer 3: High-Contrast Ambient Gradient */}
                       <div
                         className="absolute inset-0 pointer-events-none z-15 rounded-[32px]"
                         style={{
-                          background: 'linear-gradient(to top, rgba(12, 20, 15, 0.82) 0%, rgba(12, 20, 15, 0.4) 40%, rgba(12, 20, 15, 0) 70%)',
+                          background: isDark
+                            ? 'linear-gradient(to top, rgba(6, 11, 24, 0.95) 0%, rgba(6, 11, 24, 0.6) 45%, rgba(6, 11, 24, 0) 75%)'
+                            : 'linear-gradient(to top, rgba(255, 255, 255, 0.98) 0%, rgba(255, 255, 255, 0.75) 45%, rgba(255, 255, 255, 0) 75%)',
                         }}
                       />
 
-                      {/* Top-Left: Status Badge (Theme-Responsive Liquid Glass without stroke) */}
+                      {/* Top-Left: Status Badge */}
                       <div className="absolute top-4 left-4 z-30">
                         <div
                           className={cn(
-                            'flex items-center gap-1.5 backdrop-blur-md px-3 py-1.5 rounded-full shadow-md transition-colors',
+                            'flex items-center gap-1.5 backdrop-blur-md px-3 py-1.5 rounded-full shadow-md transition-colors border',
                             isDark
-                              ? 'bg-[#0a0e1a]/65 text-white shadow-black/40'
-                              : 'bg-white/85 text-slate-900 shadow-slate-900/10',
+                              ? 'bg-[#0a0e1a]/70 border-white/10 text-white shadow-black/40'
+                              : 'bg-white/90 border-slate-200/80 text-slate-900 shadow-slate-900/5',
                           )}
                         >
                           <span
@@ -1801,49 +1936,120 @@ export function ScheduleTabScreen(props: {
                         </div>
                       </div>
 
-                      {/* Top-Right: Queue Badge (Theme-Responsive Liquid Glass without stroke) */}
-                      <div className="absolute top-4 right-4 z-30">
-                        <div
-                          className={cn(
-                            'flex items-center gap-1 backdrop-blur-md px-3 py-1.5 rounded-full shadow-md transition-colors',
-                            isDark
-                              ? 'bg-[#0a0e1a]/65 text-white shadow-black/40'
-                              : 'bg-white/85 text-slate-900 shadow-slate-900/10',
-                          )}
-                        >
-                          <span className="text-xs font-bold tracking-tight">
-                            Antrean {patient.queueNumber}
-                          </span>
-                        </div>
+                      {/* Top-Right: Standalone Large Medal Queue Badge */}
+                      <div className="absolute top-2.5 right-2.5 z-30">
+                        <QueueBadge
+                          queueNumber={patient.queueNumber || `#${String(pIdx + 1).padStart(2, '0')}`}
+                          theme={props.theme}
+                          size={68}
+                        />
                       </div>
 
                       {/* Card Content Overlay Layer */}
-                      <div className="absolute bottom-0 inset-x-0 z-20 p-5 pt-6 text-white">
+                      <div className={cn('absolute bottom-0 inset-x-0 z-20 p-5 pt-6', isDark ? 'text-white' : 'text-slate-900')}>
                         {/* Avatar, Name, Age Row */}
                         <div className="flex items-center gap-3.5 mb-2.5">
                           <img
                             src={patient.avatarUrl || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=200&auto=format&fit=crop'}
                             alt={patient.patientName}
-                            className="h-12 w-12 rounded-full object-cover border-2 border-white/95 shadow-md shrink-0"
+                            className={cn(
+                              'h-12 w-12 rounded-full object-cover border-2 shadow-md shrink-0',
+                              isDark ? 'border-white/90 ring-1 ring-black/40' : 'border-white ring-1 ring-black/10',
+                            )}
                           />
                           <div className="flex-1 min-w-0">
-                            <h4 className="text-white text-[20px] font-bold tracking-tight leading-tight truncate">
+                            <h4
+                              className={cn(
+                                'text-[20px] font-black tracking-tight leading-tight truncate',
+                                isDark ? 'text-white' : 'text-slate-900',
+                              )}
+                            >
                               {patient.patientName}
                             </h4>
-                            <p className="text-white/80 text-[12.5px] font-medium leading-snug">
-                              {patient.patientRm} • Usia {patient.patientAge}
+                            <p
+                              className={cn(
+                                'text-[12.5px] font-medium leading-snug',
+                                isDark ? 'text-slate-400' : 'text-[#64748b]',
+                              )}
+                            >
+                              {patient.patientRm}
                             </p>
                           </div>
                         </div>
 
-                        {/* Time Slot Row */}
-                        <div className="flex items-center gap-1.5 text-white text-[12.5px] font-semibold mb-3">
-                          <Clock className="w-3.5 h-3.5 text-white" />
-                          <span>{patient.timeSlot}</span>
+                        {/* Specifications Row: Exactly 3 Slots (Slot 1: Poli & Room | Slot 2: Jam Mulai | Slot 3: Jam Selesai) */}
+                        <div className="flex items-center justify-between gap-2 mb-2.5">
+                          {/* Slot 1: Atas Poli, Bawah Room */}
+                          <div className="flex flex-col items-start min-w-0 max-w-[42%]">
+                            <span
+                              className={cn(
+                                'font-bold text-[13px] leading-tight truncate w-full',
+                                isDark ? 'text-slate-200' : 'text-slate-900',
+                              )}
+                            >
+                              {detailSchedule?.poli}
+                            </span>
+                            <span
+                              className={cn(
+                                'text-[11px] font-medium leading-tight truncate w-full mt-0.5',
+                                isDark ? 'text-slate-400' : 'text-slate-400',
+                              )}
+                            >
+                              {detailSchedule?.room}
+                            </span>
+                          </div>
+
+                          {/* Separator Line 1 */}
+                          <div className={cn('w-[1px] h-7 self-center shrink-0', isDark ? 'bg-white/20' : 'bg-slate-200')} />
+
+                          {/* Slot 2: Jam Mulai (Monochrome Trailing matching font) */}
+                          <div className="flex flex-col items-center shrink-0">
+                            <div
+                              className={cn(
+                                'flex items-center gap-1 font-bold text-[13px]',
+                                isDark ? 'text-slate-200' : 'text-slate-900',
+                              )}
+                            >
+                              <Clock className="w-3.5 h-3.5 opacity-70 text-current" />
+                              <span>{startPatientTime}</span>
+                            </div>
+                            <span
+                              className={cn(
+                                'text-[11px] font-medium mt-0.5',
+                                isDark ? 'text-slate-400' : 'text-slate-400',
+                              )}
+                            >
+                              Mulai
+                            </span>
+                          </div>
+
+                          {/* Separator Line 2 */}
+                          <div className={cn('w-[1px] h-7 self-center shrink-0', isDark ? 'bg-white/20' : 'bg-slate-200')} />
+
+                          {/* Slot 3: Jam Selesai (Monochrome Trailing matching font) */}
+                          <div className="flex flex-col items-center shrink-0">
+                            <div
+                              className={cn(
+                                'flex items-center gap-1 font-bold text-[13px]',
+                                isDark ? 'text-slate-200' : 'text-slate-900',
+                              )}
+                            >
+                              <Clock className="w-3.5 h-3.5 opacity-70 text-current" />
+                              <span>{endPatientTime}</span>
+                            </div>
+                            <span
+                              className={cn(
+                                'text-[11px] font-medium mt-0.5',
+                                isDark ? 'text-slate-400' : 'text-slate-400',
+                              )}
+                            >
+                              Selesai
+                            </span>
+                          </div>
                         </div>
 
                         {/* Glass Line Separator */}
-                        <div className="w-full h-[1px] bg-white/20 mb-3" />
+                        <div className={cn('w-full h-[1px] mb-3', isDark ? 'bg-white/15' : 'bg-slate-200')} />
 
                         {/* Detail Pasien Button */}
                         <button
@@ -1853,7 +2059,12 @@ export function ScheduleTabScreen(props: {
                             setDetailPatient(patient);
                             setIsPatientDetailModalOpen(true);
                           }}
-                          className="w-full py-2.5 rounded-2xl bg-white hover:bg-white/90 text-slate-950 font-bold text-xs shadow-lg transition-all text-center cursor-pointer active:scale-[0.98]"
+                          className={cn(
+                            'w-full py-2.5 rounded-2xl font-bold text-xs shadow-md transition-all text-center cursor-pointer active:scale-[0.98]',
+                            isDark
+                              ? 'bg-white hover:bg-white/90 text-slate-950 shadow-black/30'
+                              : 'bg-[#0a44ff] hover:bg-[#0038ff] text-white shadow-blue-500/25',
+                          )}
                         >
                           Detail Pasien
                         </button>

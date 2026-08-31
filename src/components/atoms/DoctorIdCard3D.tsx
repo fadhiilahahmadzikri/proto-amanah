@@ -1,5 +1,4 @@
 'use client';
-useGLTF.preload('/assets/3d/card.glb');
 
 import {
   Environment,
@@ -17,7 +16,7 @@ import {
   useSphericalJoint,
 } from '@react-three/rapier';
 import { MeshLineGeometry, MeshLineMaterial } from 'meshline';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import * as THREE from 'three';
 
 extend({ MeshLineGeometry, MeshLineMaterial });
@@ -26,6 +25,16 @@ declare module '@react-three/fiber' {
   interface ThreeElements {
     meshLineGeometry: any;
     meshLineMaterial: any;
+  }
+}
+
+const CARD_GLB_PATH = '/assets/3d/card.glb';
+
+if (typeof window !== 'undefined') {
+  try {
+    useGLTF.preload(CARD_GLB_PATH);
+  } catch {
+    // Ignore preload failure in constrained environments
   }
 }
 
@@ -49,15 +58,7 @@ export type DoctorCardProfile = {
 
 export function getAssetUrl(relativePath: string): string {
   const clean = relativePath.replace(/^\.?\//, '');
-  if (typeof window === 'undefined') return `/${clean}`;
-  if (
-    window.location.pathname.startsWith('/id') ||
-    window.location.pathname.startsWith('/en') ||
-    window.location.pathname.startsWith('/embed')
-  ) {
-    return `/${clean}`;
-  }
-  return `./${clean}`;
+  return `/${clean}`;
 }
 
 function drawBauhausBlock(
@@ -472,7 +473,7 @@ function BandMesh(props: {
 
   const [hovered, hover] = useState(false);
 
-  const { nodes, materials } = useGLTF(getAssetUrl('assets/3d/card.glb')) as any;
+  const { nodes, materials } = useGLTF(CARD_GLB_PATH) as any;
 
   const lanyardTexture = useMemo(() => {
     return createLanyardCanvasTexture(theme);
@@ -715,6 +716,39 @@ function BandMesh(props: {
   );
 }
 
+class ThreeErrorBoundary extends React.Component<
+  { children: React.ReactNode; fallback?: React.ReactNode },
+  { hasError: boolean }
+> {
+  constructor(props: { children: React.ReactNode; fallback?: React.ReactNode }) {
+    super(props);
+    this.state = { hasError: false };
+  }
+
+  static getDerivedStateFromError() {
+    return { hasError: true };
+  }
+
+  override componentDidCatch(error: any) {
+    console.warn('[DoctorIdCard3D] WebGL/Asset load notice:', error);
+  }
+
+  override render() {
+    if (this.state.hasError) {
+      return (
+        this.props.fallback || (
+          <div className="flex flex-col items-center justify-center w-full h-full p-6 text-center">
+            <span className="text-xs font-semibold opacity-60">
+              Memuat visualisasi 3D ID Card...
+            </span>
+          </div>
+        )
+      );
+    }
+    return this.props.children;
+  }
+}
+
 export function DoctorIdCard3D(props: {
   profile?: Partial<DoctorCardProfile>;
   theme?: 'light' | 'dark';
@@ -729,37 +763,37 @@ export function DoctorIdCard3D(props: {
   };
 
   return (
-    <div className="relative w-full h-full select-none cursor-grab active:cursor-grabbing" data-interactive="true">
-      <Canvas
-        dpr={[2, 3.5]}
-        gl={{
-          antialias: true,
-          alpha: true,
-          powerPreference: 'high-performance',
-          outputColorSpace: THREE.SRGBColorSpace,
-        }}
-        camera={{ position: [0, 0.05, 11.8], fov: 27.5 }}
-        style={{ backgroundColor: 'transparent' }}
-      >
-        <ambientLight intensity={1.8} />
-        <directionalLight position={[0, 6, 8]} intensity={1.2} />
-        <directionalLight position={[-6, -3, 4]} intensity={0.6} />
-        <Physics
-          debug={false}
-          interpolate
-          gravity={[0, -40, 0]}
-          timeStep={1 / 60}
+    <ThreeErrorBoundary>
+      <div className="relative w-full h-full select-none cursor-grab active:cursor-grabbing" data-interactive="true">
+        <Canvas
+          dpr={[2, 3.5]}
+          gl={{
+            antialias: true,
+            alpha: true,
+            powerPreference: 'high-performance',
+            outputColorSpace: THREE.SRGBColorSpace,
+          }}
+          camera={{ position: [0, 0.05, 11.8], fov: 27.5 }}
+          style={{ backgroundColor: 'transparent' }}
         >
-          <BandMesh profile={profile} theme={props.theme} />
-        </Physics>
-        <Environment blur={0.8}>
-          <Lightformer intensity={2} color="white" position={[-5, 4, 3]} rotation={[0, Math.PI / 4, 0]} scale={[20, 2, 1]} />
-          <Lightformer intensity={2} color="white" position={[5, 4, 3]} rotation={[0, -Math.PI / 4, 0]} scale={[20, 2, 1]} />
-          <Lightformer intensity={1.5} color="white" position={[0, -5, 2]} rotation={[Math.PI / 4, 0, 0]} scale={[20, 2, 1]} />
-        </Environment>
-      </Canvas>
-    </div>
+          <ambientLight intensity={1.8} />
+          <directionalLight position={[0, 6, 8]} intensity={1.2} />
+          <directionalLight position={[-6, -3, 4]} intensity={0.6} />
+          <Physics
+            debug={false}
+            interpolate
+            gravity={[0, -40, 0]}
+            timeStep={1 / 60}
+          >
+            <BandMesh profile={profile} theme={props.theme} />
+          </Physics>
+          <Environment blur={0.8}>
+            <Lightformer intensity={2} color="white" position={[-5, 4, 3]} rotation={[0, Math.PI / 4, 0]} scale={[20, 2, 1]} />
+            <Lightformer intensity={2} color="white" position={[5, 4, 3]} rotation={[0, -Math.PI / 4, 0]} scale={[20, 2, 1]} />
+            <Lightformer intensity={1.5} color="white" position={[0, -5, 2]} rotation={[Math.PI / 4, 0, 0]} scale={[20, 2, 1]} />
+          </Environment>
+        </Canvas>
+      </div>
+    </ThreeErrorBoundary>
   );
 }
-
-

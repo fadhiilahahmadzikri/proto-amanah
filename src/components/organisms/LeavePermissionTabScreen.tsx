@@ -3,69 +3,60 @@
 import { gsap } from 'gsap';
 import {
   Calendar,
-  Check,
-  ChevronRight,
-  Clock,
+  Download,
   Edit3,
   FileCheck,
-  Info,
   Plus,
-  Stethoscope,
   Trash2,
-  UserCheck,
   X,
 } from 'lucide-react';
 import React from 'react';
 import { Button } from '@/components/atoms/Button';
-import { ClayIcon } from '@/components/atoms/ClayIcon';
 import { DoctorAvatar } from '@/components/atoms/DoctorAvatar';
+import { DatePicker } from '@/components/molecules/DatePicker';
 import { ScreenHeader } from '@/components/molecules/ScreenHeader';
-import { useDoctorStore } from '@/features/doctor/hooks/use-doctor-store';
 import { usePermissionStore } from '@/features/doctor/hooks/use-permission-store';
 import { useModalStore } from '@/features/portal/hooks/use-modal-store';
 import { cn } from '@/lib/utils';
 import type { PermissionRecord, PermissionStatus, PermissionType } from '@/types/permission.types';
 
-const PERMISSION_TYPES: PermissionType[] = [
-  'Cuti Tahunan',
-  'Izin Sakit',
-  'Seminar / Simposium',
-  'Urusan Keluarga',
-  'Tugas Luar RS',
-];
-
-const TYPE_THEMES: Record<
-  PermissionType,
+const STATUS_STACK_THEMES: Record<
+  PermissionStatus,
   {
-    primary: string;
-    light: string;
-    dark: string;
+    bgLight: string;
+    bgDark: string;
+    textLight: string;
+    textDark: string;
+    label: string;
   }
 > = {
-  'Cuti Tahunan': {
-    primary: '#2563EB',
-    light: '#60A5FA',
-    dark: '#1D4ED8',
+  menunggu: {
+    bgLight: 'bg-[#93c5fd]',
+    bgDark: 'bg-[#0c2a4d]',
+    textLight: 'text-[#1e40af]',
+    textDark: 'text-[#38bdf8]',
+    label: 'Menunggu',
   },
-  'Izin Sakit': {
-    primary: '#EF4444',
-    light: '#FCA5A5',
-    dark: '#DC2626',
+  disetujui: {
+    bgLight: 'bg-[#86efac]',
+    bgDark: 'bg-[#063b22]',
+    textLight: 'text-[#166534]',
+    textDark: 'text-[#4ade80]',
+    label: 'Disetujui',
   },
-  'Seminar / Simposium': {
-    primary: '#8B5CF6',
-    light: '#C4B5FD',
-    dark: '#6D28D9',
+  ditolak: {
+    bgLight: 'bg-[#fda4af]',
+    bgDark: 'bg-[#4c0d17]',
+    textLight: 'text-[#9f1239]',
+    textDark: 'text-[#fb7185]',
+    label: 'Ditolak',
   },
-  'Urusan Keluarga': {
-    primary: '#F59E0B',
-    light: '#FCD34D',
-    dark: '#D97706',
-  },
-  'Tugas Luar RS': {
-    primary: '#06B6D4',
-    light: '#67E8F9',
-    dark: '#0891B2',
+  dibatalkan: {
+    bgLight: 'bg-[#cbd5e1]',
+    bgDark: 'bg-[#1e293b]',
+    textLight: 'text-[#334155]',
+    textDark: 'text-[#94a3b8]',
+    label: 'Dibatalkan',
   },
 };
 
@@ -89,7 +80,6 @@ export function LeavePermissionTabScreen(props: {
   className?: string;
 }) {
   const isDark = props.theme === 'dark';
-  const { profile } = useDoctorStore();
   const {
     records,
     pendingCount,
@@ -220,10 +210,265 @@ export function LeavePermissionTabScreen(props: {
     setIsDetailDrawerOpen(true);
   };
 
+  const handleDownloadPdf = (record: PermissionRecord) => {
+    showToast('Membuka dokumen PDF perizinan...');
+    const printWindow = window.open('', '_blank');
+    if (!printWindow) {
+      showToast('Gagal membuka jendela unduh. Izinkan pop-up pada browser.');
+      return;
+    }
+
+    const htmlContent = `
+      <!DOCTYPE html>
+      <html lang="id">
+        <head>
+          <meta charset="UTF-8" />
+          <title>Surat_Perizinan_${record.id}.pdf</title>
+          <style>
+            @page { size: A4; margin: 18mm; }
+            body {
+              font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+              color: #1e293b;
+              line-height: 1.5;
+              padding: 24px;
+              margin: 0;
+            }
+            .header {
+              border-bottom: 2.5px solid #0a44ff;
+              padding-bottom: 12px;
+              margin-bottom: 20px;
+              display: flex;
+              align-items: center;
+              justify-content: space-between;
+            }
+            .hospital-title {
+              font-size: 20px;
+              font-weight: 800;
+              color: #0a44ff;
+              margin: 0;
+              text-transform: uppercase;
+              letter-spacing: 0.5px;
+            }
+            .hospital-sub {
+              font-size: 11px;
+              color: #64748b;
+              margin-top: 2px;
+            }
+            .doc-type {
+              font-size: 12px;
+              font-weight: 700;
+              color: #0284c7;
+              background: #f0f9ff;
+              padding: 4px 10px;
+              border-radius: 6px;
+              border: 1px solid #bae6fd;
+            }
+            .title-box {
+              text-align: center;
+              margin-bottom: 20px;
+            }
+            .title-box h1 {
+              font-size: 16px;
+              font-weight: 800;
+              text-transform: uppercase;
+              margin: 0;
+              color: #0f172a;
+            }
+            .title-box p {
+              font-size: 11px;
+              color: #64748b;
+              margin-top: 4px;
+            }
+            .section-title {
+              font-size: 12px;
+              font-weight: 700;
+              color: #0f172a;
+              margin-top: 16px;
+              margin-bottom: 6px;
+              border-bottom: 1px solid #e2e8f0;
+              padding-bottom: 4px;
+              text-transform: uppercase;
+              letter-spacing: 0.5px;
+            }
+            table {
+              width: 100%;
+              border-collapse: collapse;
+              margin-bottom: 10px;
+            }
+            td {
+              padding: 5px 4px;
+              font-size: 12px;
+              vertical-align: top;
+            }
+            td.label {
+              width: 170px;
+              color: #64748b;
+              font-weight: 600;
+            }
+            td.value {
+              color: #0f172a;
+              font-weight: 700;
+            }
+            .status-badge {
+              display: inline-block;
+              padding: 3px 8px;
+              border-radius: 4px;
+              font-size: 11px;
+              font-weight: 700;
+              text-transform: uppercase;
+            }
+            .status-menunggu { background: #fef3c7; color: #b45309; border: 1px solid #fde68a; }
+            .status-disetujui { background: #dcfce7; color: #15803d; border: 1px solid #bbf7d0; }
+            .status-ditolak { background: #ffe4e6; color: #be123c; border: 1px solid #fecdd3; }
+            .status-dibatalkan { background: #f1f5f9; color: #475569; border: 1px solid #e2e8f0; }
+            .reason-box {
+              background: #f8fafc;
+              border: 1px solid #e2e8f0;
+              border-radius: 8px;
+              padding: 10px 14px;
+              font-size: 12px;
+              color: #334155;
+              line-height: 1.6;
+              margin-top: 4px;
+            }
+            .signatures {
+              margin-top: 36px;
+              display: flex;
+              justify-content: space-between;
+              page-break-inside: avoid;
+            }
+            .sign-box {
+              width: 200px;
+              text-align: center;
+            }
+            .sign-box .role {
+              font-size: 11px;
+              color: #64748b;
+              margin-bottom: 45px;
+            }
+            .sign-box .name {
+              font-size: 12px;
+              font-weight: 700;
+              color: #0f172a;
+              border-top: 1px solid #94a3b8;
+              padding-top: 4px;
+            }
+            .footer-note {
+              margin-top: 24px;
+              font-size: 9px;
+              color: #94a3b8;
+              text-align: center;
+              border-top: 1px dashed #e2e8f0;
+              padding-top: 8px;
+            }
+          </style>
+        </head>
+        <body>
+          <div class="header">
+            <div>
+              <div class="hospital-title">RS AMANAH SEHAT</div>
+              <div class="hospital-sub">Jl. Medika Husada No. 88, Jakarta Selatan • Telp: (021) 7890123</div>
+            </div>
+            <div class="doc-type">SIMRS E-PERIZINAN</div>
+          </div>
+
+          <div class="title-box">
+            <h1>Surat Keterangan Pengajuan Perizinan</h1>
+            <p>Nomor Registrasi: ${record.id.toUpperCase()}</p>
+          </div>
+
+          <div class="section-title">Data Pengaju</div>
+          <table>
+            <tr>
+              <td class="label">Nama Pemohon</td>
+              <td class="value">${record.userName}</td>
+            </tr>
+            <tr>
+              <td class="label">Jabatan / Spesialisasi</td>
+              <td class="value">${record.userRole}</td>
+            </tr>
+            <tr>
+              <td class="label">ID Pemohon</td>
+              <td class="value">${record.userId}</td>
+            </tr>
+          </table>
+
+          <div class="section-title">Detail Perizinan</div>
+          <table>
+            <tr>
+              <td class="label">Subjek Perizinan</td>
+              <td class="value">${record.type}</td>
+            </tr>
+            <tr>
+              <td class="label">Periode Izin</td>
+              <td class="value">${formatDateIndo(record.startDate)} s/d ${formatDateIndo(record.endDate)}</td>
+            </tr>
+            <tr>
+              <td class="label">Durasi Hari Kerja</td>
+              <td class="value">${record.durationDays} Hari</td>
+            </tr>
+            <tr>
+              <td class="label">Status Pengajuan</td>
+              <td class="value">
+                <span class="status-badge status-${record.status}">
+                  ● ${record.status.toUpperCase()}
+                </span>
+              </td>
+            </tr>
+            ${record.substituteDoctor ? `
+            <tr>
+              <td class="label">Dokter Pengganti</td>
+              <td class="value">${record.substituteDoctor}</td>
+            </tr>
+            ` : ''}
+          </table>
+
+          <div class="section-title">Keterangan / Alasan</div>
+          <div class="reason-box">${record.reason}</div>
+
+          ${record.reviewerNotes ? `
+          <div class="section-title">Catatan Verifikator Medis / HRD</div>
+          <div class="reason-box">
+            ${record.reviewerNotes}
+            ${record.reviewerName ? `<div style="margin-top: 6px; font-weight: 700; font-size: 11px; color: #0f172a;">Oleh: ${record.reviewerName}</div>` : ''}
+          </div>
+          ` : ''}
+
+          <div class="signatures">
+            <div class="sign-box">
+              <div class="role">Pemohon,</div>
+              <div class="name">${record.userName}</div>
+            </div>
+            <div class="sign-box">
+              <div class="role">Komite Medik / Direksi,</div>
+              <div class="name">${record.reviewerName || 'dr. H. Hendra, Sp.JP'}</div>
+            </div>
+          </div>
+
+          <div class="footer-note">
+            Dokumen ini diterbitkan secara elektronik melalui Portal Dokter RS Amanah Sehat dan sah tanpa tanda tangan basah. Dicetak pada: ${new Date().toLocaleString('id-ID')}
+          </div>
+
+          <script>
+            window.onload = function() {
+              setTimeout(function() {
+                window.print();
+              }, 250);
+            };
+          </script>
+        </body>
+      </html>
+    `;
+
+    printWindow.document.open();
+    printWindow.document.write(htmlContent);
+    printWindow.document.close();
+  };
+
   const handleOpenCreateForm = () => {
     setEditingRecordId(null);
     setFormData({
-      type: 'Cuti Tahunan',
+      type: '',
       startDate: '2026-09-05',
       endDate: '2026-09-07',
       reason: '',
@@ -253,6 +498,9 @@ export function LeavePermissionTabScreen(props: {
 
   const validateForm = () => {
     const errors: Record<string, string> = {};
+    if (!formData.type.trim()) {
+      errors.type = 'Subjek perizinan wajib diisi';
+    }
     if (!formData.startDate) {
       errors.startDate = 'Tanggal mulai wajib dipilih';
     }
@@ -415,7 +663,7 @@ export function LeavePermissionTabScreen(props: {
       </div>
 
       {/* 3. Cards List Viewport (Identical Paradigm & Card Layout with Schedule Cards) */}
-      <div className="flex-1 min-h-0 w-full overflow-y-auto no-scrollbar px-5 pt-1 pb-36 sm:pb-40 flex flex-col gap-3">
+      <div className="flex-1 min-h-0 w-full overflow-y-auto no-scrollbar px-5 pt-1 pb-36 sm:pb-40 flex flex-col gap-3.5 sm:gap-4">
         {filteredRecords.length === 0 ? (
           <div
             className={cn(
@@ -433,145 +681,110 @@ export function LeavePermissionTabScreen(props: {
           </div>
         ) : (
           filteredRecords.map((item) => {
-            const typeTheme = TYPE_THEMES[item.type] || TYPE_THEMES['Cuti Tahunan'];
-            const isPending = item.status === 'menunggu';
-            const isApproved = item.status === 'disetujui';
-            const isRejected = item.status === 'ditolak';
+            const stackTheme = STATUS_STACK_THEMES[item.status] || STATUS_STACK_THEMES.menunggu;
 
             return (
-              <div
+              <article
                 key={item.id}
                 role="button"
                 tabIndex={0}
                 onClick={() => handleOpenDetail(item)}
                 className={cn(
-                  'relative w-full rounded-3xl p-4.5 select-none transition-all duration-200 active:scale-[0.99] cursor-pointer border flex flex-col justify-between shadow-sm hover:shadow-md',
-                  isDark
-                    ? 'bg-[#111624]/90 border-white/10 text-white hover:border-white/20'
-                    : 'bg-white border-slate-100 text-slate-900 hover:border-slate-200',
+                  'group relative w-full shrink-0 rounded-[24px] sm:rounded-[26px] select-none transition-all duration-200 active:scale-[0.99] cursor-pointer overflow-hidden shadow-xs hover:shadow-md flex flex-col',
+                  isDark ? stackTheme.bgDark : stackTheme.bgLight,
                 )}
               >
-                {/* Card Header: Type with ClayIcon + Status Badge */}
-                <div className="flex items-center justify-between gap-2 mb-3">
-                  <div className="flex items-center gap-2.5 min-w-0">
-                    <ClayIcon
-                      size={28}
-                      colorPrimary={typeTheme.primary}
-                      colorLight={typeTheme.light}
-                      colorDark={typeTheme.dark}
-                    >
-                      <Calendar className="w-3.5 h-3.5 stroke-[2.2]" />
-                    </ClayIcon>
-                    <span className="text-sm font-bold tracking-tight truncate">
-                      {item.type}
-                    </span>
-                  </div>
-
-                  {/* Status Badge */}
-                  {isPending && (
-                    <div
-                      className={cn(
-                        'px-2.5 py-1 rounded-full flex items-center gap-1.5 shrink-0 border',
-                        isDark
-                          ? 'bg-amber-950/60 border-amber-500/30 text-amber-400'
-                          : 'bg-amber-50 border-amber-200 text-amber-800',
-                      )}
-                    >
-                      <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse shrink-0" />
-                      <span className="text-[10px] font-bold tracking-tight">Menunggu</span>
-                    </div>
-                  )}
-
-                  {isApproved && (
-                    <div
-                      className={cn(
-                        'px-2.5 py-1 rounded-full flex items-center gap-1 shrink-0 border',
-                        isDark
-                          ? 'bg-emerald-950/60 border-emerald-500/30 text-emerald-400'
-                          : 'bg-emerald-50 border-emerald-200 text-emerald-800',
-                      )}
-                    >
-                      <Check className="w-3 h-3 stroke-[3]" />
-                      <span className="text-[10px] font-bold tracking-tight">Disetujui</span>
-                    </div>
-                  )}
-
-                  {isRejected && (
-                    <div
-                      className={cn(
-                        'px-2.5 py-1 rounded-full flex items-center gap-1 shrink-0 border',
-                        isDark
-                          ? 'bg-rose-950/60 border-rose-500/30 text-rose-400'
-                          : 'bg-rose-50 border-rose-200 text-rose-800',
-                      )}
-                    >
-                      <X className="w-3 h-3 stroke-[3]" />
-                      <span className="text-[10px] font-bold tracking-tight">Ditolak</span>
-                    </div>
-                  )}
-
-                  {item.status === 'dibatalkan' && (
-                    <div
-                      className={cn(
-                        'px-2.5 py-1 rounded-full flex items-center gap-1 shrink-0 border',
-                        isDark
-                          ? 'bg-white/5 border-white/10 text-neutral-400'
-                          : 'bg-slate-100 border-slate-200 text-slate-600',
-                      )}
-                    >
-                      <span className="text-[10px] font-bold tracking-tight">Dibatalkan</span>
-                    </div>
-                  )}
-                </div>
-
-                {/* Card Center / Hero: Date Range & Duration (Exposing Key Info Only) */}
-                <div className="flex items-center justify-between mb-3.5 pt-0.5">
-                  <div className="flex flex-col">
-                    <span
-                      className={cn(
-                        'text-[17px] font-extrabold tracking-tight leading-tight',
-                        isDark ? 'text-white' : 'text-slate-900',
-                      )}
-                    >
-                      {formatDateIndo(item.startDate)} — {formatDateIndo(item.endDate)}
-                    </span>
-                    <span className="text-[11px] font-medium text-slate-400 dark:text-neutral-400 mt-0.5">
-                      Durasi izin praktik
-                    </span>
-                  </div>
-
+                {/* 1. Top Stacking Layer Status Header */}
+                <div className="w-full flex items-center justify-center pt-2 pb-1.5 px-4 text-center shrink-0">
                   <span
                     className={cn(
-                      'text-xs font-black px-2.5 py-1 rounded-xl tabular-nums shadow-2xs',
-                      isDark ? 'bg-white/10 text-white' : 'bg-slate-100 text-slate-800',
+                      'text-[12px] font-extrabold tracking-wide capitalize',
+                      isDark ? stackTheme.textDark : stackTheme.textLight,
                     )}
                   >
-                    {item.durationDays} Hari
+                    {stackTheme.label}
                   </span>
                 </div>
 
-                {/* Card Footer: Applicant User Info & Chevron (Clean and Identical Hierarchy) */}
-                <div className="flex items-center justify-between pt-2.5 border-t border-slate-100 dark:border-white/5">
-                  <div className="flex items-center gap-2.5 min-w-0">
-                    <DoctorAvatar
-                      src={item.userAvatarUrl}
-                      alt={item.userName}
-                      size={28}
-                      className="shrink-0"
-                    />
-                    <div className="flex flex-col min-w-0">
-                      <span className="text-xs font-bold truncate leading-tight">
-                        {item.userName}
-                      </span>
-                      <span className="text-[10px] text-slate-400 dark:text-neutral-400 truncate">
-                        {item.userRole}
-                      </span>
+                {/* 2. Main Stacked White Card Wrapper */}
+                <div
+                  className={cn(
+                    'w-full rounded-[20px] sm:rounded-[22px] p-[2px] flex flex-col transition-colors border shadow-xs shrink-0',
+                    isDark
+                      ? 'bg-[#0f1524] border-white/5 text-white'
+                      : 'bg-white border-slate-100 text-slate-900',
+                  )}
+                >
+                  {/* 3. Inner Dashed Stitched Content Layer (Motif Jahitan Dalam with 2px Inset Gap) */}
+                  <div
+                    className={cn(
+                      'w-full rounded-[18px] sm:rounded-[20px] p-4 sm:p-4.5 flex flex-col gap-2.5 border-[1.5px] border-dashed',
+                      isDark
+                        ? 'border-white/15 bg-white/[0.02]'
+                        : 'border-slate-200/90 bg-slate-50/40',
+                    )}
+                  >
+                    {/* Title (Full Width, No Pills) */}
+                    <h4
+                      className={cn(
+                        'text-[16px] sm:text-[17px] font-black tracking-tight truncate',
+                        isDark ? 'text-white' : 'text-slate-900',
+                      )}
+                    >
+                      {item.type}
+                    </h4>
+
+                    {/* Reason (Truncated with Ellipsis) */}
+                    <p
+                      className={cn(
+                        'text-[12.5px] font-medium leading-relaxed truncate text-slate-400 dark:text-neutral-400 -mt-0.5',
+                      )}
+                      title={item.reason}
+                    >
+                      {item.reason}
+                    </p>
+
+                    {/* Dates (Mulai & Selesai) */}
+                    <div className="flex items-center gap-8 pt-0.5">
+                      {/* Mulai */}
+                      <div className="flex flex-col">
+                        <div className="flex items-center gap-1.5">
+                          <Calendar className="w-4 h-4 text-slate-400 dark:text-neutral-400 stroke-[2] shrink-0" />
+                          <span
+                            className={cn(
+                              'text-[14px] sm:text-[14.5px] font-bold tracking-tight leading-none',
+                              isDark ? 'text-white' : 'text-slate-900',
+                            )}
+                          >
+                            {formatDateIndo(item.startDate)}
+                          </span>
+                        </div>
+                        <span className="text-[11px] font-medium text-slate-400 dark:text-neutral-400 mt-1 pl-5.5">
+                          Mulai
+                        </span>
+                      </div>
+
+                      {/* Selesai */}
+                      <div className="flex flex-col">
+                        <div className="flex items-center gap-1.5">
+                          <Calendar className="w-4 h-4 text-slate-400 dark:text-neutral-400 stroke-[2] shrink-0" />
+                          <span
+                            className={cn(
+                              'text-[14px] sm:text-[14.5px] font-bold tracking-tight leading-none',
+                              isDark ? 'text-white' : 'text-slate-900',
+                            )}
+                          >
+                            {formatDateIndo(item.endDate)}
+                          </span>
+                        </div>
+                        <span className="text-[11px] font-medium text-slate-400 dark:text-neutral-400 mt-1 pl-5.5">
+                          Selesai
+                        </span>
+                      </div>
                     </div>
                   </div>
-
-                  <ChevronRight className="w-4 h-4 text-slate-400 opacity-60 group-hover:opacity-100 shrink-0" />
                 </div>
-              </div>
+              </article>
             );
           })
         )}
@@ -607,122 +820,192 @@ export function LeavePermissionTabScreen(props: {
 
             {/* Header */}
             <div className="relative z-20 flex items-center justify-between px-6 pt-0.5 pb-3 shrink-0 border-b border-slate-100 dark:border-white/10">
-              <h3 className="text-base font-bold tracking-tight">
+              <h3 className={cn('text-base font-bold tracking-tight', isDark ? 'text-white' : 'text-slate-900')}>
                 Detail perizinan
               </h3>
-              <button
-                type="button"
-                aria-label="Tutup detail perizinan"
-                onClick={triggerCloseDetailDrawer}
-                className={cn(
-                  'p-1.5 -mr-2 rounded-full transition-colors cursor-pointer flex items-center justify-center shrink-0',
-                  isDark ? 'bg-white/10 text-neutral-300 hover:text-white' : 'bg-neutral-100 text-neutral-600 hover:text-neutral-900',
-                )}
-              >
-                <X className="h-4 w-4" />
-              </button>
+              <div className="flex items-center gap-1.5 -mr-2">
+                {/* Download PDF Button (Icon base) */}
+                <button
+                  type="button"
+                  aria-label="Unduh Dokumen PDF"
+                  title="Unduh PDF Surat Izin"
+                  onClick={() => handleDownloadPdf(detailRecord)}
+                  className={cn(
+                    'p-1.5 rounded-full transition-colors cursor-pointer flex items-center justify-center shrink-0',
+                    isDark ? 'bg-white/10 text-neutral-300 hover:text-white hover:bg-white/15' : 'bg-neutral-100 text-neutral-600 hover:text-neutral-900 hover:bg-neutral-200',
+                  )}
+                >
+                  <Download className="h-4 w-4" />
+                </button>
+
+                <button
+                  type="button"
+                  aria-label="Tutup detail perizinan"
+                  onClick={triggerCloseDetailDrawer}
+                  className={cn(
+                    'p-1.5 rounded-full transition-colors cursor-pointer flex items-center justify-center shrink-0',
+                    isDark ? 'bg-white/10 text-neutral-300 hover:text-white' : 'bg-neutral-100 text-neutral-600 hover:text-neutral-900',
+                  )}
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              </div>
             </div>
 
             {/* Drawer Body Content */}
-            <div className="flex w-full flex-1 flex-col px-6 pt-3 pb-6 overflow-y-auto no-scrollbar select-text gap-3.5">
-              {/* Status Banner */}
-              <div
-                className={cn(
-                  'p-3 rounded-2xl border flex items-center justify-between text-xs font-bold',
-                  detailRecord.status === 'menunggu'
-                    ? isDark ? 'bg-amber-950/40 border-amber-500/30 text-amber-300' : 'bg-amber-50 border-amber-200 text-amber-800'
-                    : detailRecord.status === 'disetujui'
-                      ? isDark ? 'bg-emerald-950/40 border-emerald-500/30 text-emerald-300' : 'bg-emerald-50 border-emerald-200 text-emerald-800'
-                      : detailRecord.status === 'ditolak'
-                        ? isDark ? 'bg-rose-950/40 border-rose-500/30 text-rose-300' : 'bg-rose-50 border-rose-200 text-rose-800'
-                        : isDark ? 'bg-white/5 border-white/10 text-neutral-400' : 'bg-slate-100 border-slate-200 text-slate-700',
+            <div className="flex w-full flex-1 flex-col px-6 pt-2 pb-6 overflow-y-auto no-scrollbar select-text divide-y divide-slate-100 dark:divide-white/10">
+              {/* 1. Header: Type Title & Status Pill Row */}
+              <div className="flex items-center justify-between gap-3 pb-4">
+                <h4
+                  className={cn(
+                    'text-lg sm:text-[19px] font-black tracking-tight truncate',
+                    isDark ? 'text-white' : 'text-slate-900',
+                  )}
+                >
+                  {detailRecord.type}
+                </h4>
+
+                {/* Status Pill Badge */}
+                {detailRecord.status === 'menunggu' && (
+                  <div
+                    className={cn(
+                      'px-3 py-1 rounded-full flex items-center gap-1.5 shrink-0 border text-xs font-bold tracking-tight',
+                      isDark
+                        ? 'bg-amber-950/50 border-amber-500/30 text-amber-300'
+                        : 'bg-[#fffbeb] border-[#fde68a] text-[#b45309]',
+                    )}
+                  >
+                    <span className="w-2 h-2 rounded-full bg-[#f59e0b] shrink-0" />
+                    <span>Menunggu</span>
+                  </div>
                 )}
-              >
-                <div className="flex items-center gap-2">
-                  {detailRecord.status === 'menunggu' && <Clock className="w-4 h-4 text-amber-500" />}
-                  {detailRecord.status === 'disetujui' && <Check className="w-4 h-4 text-emerald-500 stroke-[3]" />}
-                  {detailRecord.status === 'ditolak' && <X className="w-4 h-4 text-rose-500 stroke-[3]" />}
-                  {detailRecord.status === 'dibatalkan' && <Info className="w-4 h-4" />}
-                  <span className="capitalize">Status: {detailRecord.status}</span>
-                </div>
-                <span>{detailRecord.durationDays} Hari Izin</span>
+
+                {detailRecord.status === 'disetujui' && (
+                  <div
+                    className={cn(
+                      'px-3 py-1 rounded-full flex items-center gap-1.5 shrink-0 border text-xs font-bold tracking-tight',
+                      isDark
+                        ? 'bg-emerald-950/50 border-emerald-500/30 text-emerald-300'
+                        : 'bg-emerald-50 border-emerald-200 text-emerald-800',
+                    )}
+                  >
+                    <span className="w-2 h-2 rounded-full bg-emerald-500 shrink-0" />
+                    <span>Disetujui</span>
+                  </div>
+                )}
+
+                {detailRecord.status === 'ditolak' && (
+                  <div
+                    className={cn(
+                      'px-3 py-1 rounded-full flex items-center gap-1.5 shrink-0 border text-xs font-bold tracking-tight',
+                      isDark
+                        ? 'bg-rose-950/50 border-rose-500/30 text-rose-300'
+                        : 'bg-rose-50 border-rose-200 text-rose-800',
+                    )}
+                  >
+                    <span className="w-2 h-2 rounded-full bg-rose-500 shrink-0" />
+                    <span>Ditolak</span>
+                  </div>
+                )}
+
+                {detailRecord.status === 'dibatalkan' && (
+                  <div
+                    className={cn(
+                      'px-3 py-1 rounded-full flex items-center gap-1.5 shrink-0 border text-xs font-bold tracking-tight',
+                      isDark
+                        ? 'bg-white/5 border-white/10 text-neutral-400'
+                        : 'bg-slate-100 border-slate-200 text-slate-600',
+                    )}
+                  >
+                    <span className="w-2 h-2 rounded-full bg-slate-400 shrink-0" />
+                    <span>Dibatalkan</span>
+                  </div>
+                )}
               </div>
 
-              {/* Applicant Info */}
-              <div className="flex items-center gap-3 p-3 rounded-2xl bg-slate-50 dark:bg-white/[0.03] border border-slate-100 dark:border-white/5">
-                <DoctorAvatar
-                  src={detailRecord.userAvatarUrl}
-                  alt={detailRecord.userName}
-                  size={42}
-                />
-                <div className="flex flex-col min-w-0">
-                  <span className="text-xs font-bold truncate">{detailRecord.userName}</span>
-                  <span className="text-[11px] text-slate-500 dark:text-neutral-400 truncate">
-                    {detailRecord.userRole}
+              {/* 2. Date Interval & Duration */}
+              <div className="py-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="flex flex-col">
+                    <span className={cn('text-[11px] font-semibold block mb-1', isDark ? 'text-neutral-400' : 'text-slate-500')}>
+                      Mulai Izin
+                    </span>
+                    <span className={cn('text-sm font-bold block', isDark ? 'text-white' : 'text-slate-900')}>
+                      {formatDateIndo(detailRecord.startDate)}
+                    </span>
+                  </div>
+                  <div className="flex flex-col">
+                    <span className={cn('text-[11px] font-semibold block mb-1', isDark ? 'text-neutral-400' : 'text-slate-500')}>
+                      Selesai Izin
+                    </span>
+                    <span className={cn('text-sm font-bold block', isDark ? 'text-white' : 'text-slate-900')}>
+                      {formatDateIndo(detailRecord.endDate)}
+                    </span>
+                  </div>
+                </div>
+                <div className="mt-2.5 flex items-center gap-1.5">
+                  <span className="text-[11px] font-bold text-blue-600 dark:text-cyan-400">
+                    Durasi: {detailRecord.durationDays} Hari Kerja
                   </span>
                 </div>
               </div>
 
-              {/* Date Interval */}
-              <div className="grid grid-cols-2 gap-2 text-xs">
-                <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-white/[0.03] border border-slate-100 dark:border-white/5">
-                  <span className="text-[10px] text-slate-400 dark:text-neutral-500 block mb-0.5 font-semibold">
-                    Mulai Izin
-                  </span>
-                  <span className="font-bold">{formatDateIndo(detailRecord.startDate)}</span>
-                </div>
-                <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-white/[0.03] border border-slate-100 dark:border-white/5">
-                  <span className="text-[10px] text-slate-400 dark:text-neutral-500 block mb-0.5 font-semibold">
-                    Selesai Izin
-                  </span>
-                  <span className="font-bold">{formatDateIndo(detailRecord.endDate)}</span>
-                </div>
-              </div>
-
-              {/* Reason / Message (Detailed Explanation) */}
-              <div className="p-3 rounded-2xl bg-slate-50 dark:bg-white/[0.03] border border-slate-100 dark:border-white/5 text-xs">
-                <span className="text-[10px] text-slate-400 dark:text-neutral-500 font-bold block mb-1">
-                  Pesan / Alasan Perizinan:
+              {/* 3. Reason / Message */}
+              <div className="flex flex-col gap-1.5 py-4">
+                <span className={cn('text-[11px] font-semibold block', isDark ? 'text-neutral-400' : 'text-slate-500')}>
+                  Pesan / Alasan Perizinan
                 </span>
-                <p className="leading-relaxed text-slate-700 dark:text-neutral-300">
+                <p className={cn('text-[13.5px] leading-relaxed font-medium', isDark ? 'text-neutral-200' : 'text-slate-700')}>
                   {detailRecord.reason}
                 </p>
               </div>
 
-              {/* Substitute Doctor */}
+              {/* 4. Substitute Doctor */}
               {detailRecord.substituteDoctor && (
-                <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-white/[0.03] border border-slate-100 dark:border-white/5 text-xs flex items-center gap-2">
-                  <Stethoscope className="w-4 h-4 text-cyan-500 shrink-0" />
-                  <div>
-                    <span className="text-[10px] text-slate-400 dark:text-neutral-500 font-semibold block">
-                      Dokter Pengganti:
-                    </span>
-                    <span className="font-bold">{detailRecord.substituteDoctor}</span>
+                <div className="flex flex-col gap-2.5 py-4">
+                  <span className={cn('text-[11px] font-semibold block', isDark ? 'text-neutral-400' : 'text-slate-500')}>
+                    Dokter Pengganti
+                  </span>
+                  <div className="flex items-center gap-3">
+                    <DoctorAvatar
+                      src="https://images.unsplash.com/photo-1622253692010-333f2da6031d?w=150&auto=format&fit=crop&q=80"
+                      alt={detailRecord.substituteDoctor}
+                      size={40}
+                      className="shrink-0 ring-1 ring-black/5 dark:ring-white/10"
+                    />
+                    <div className="flex flex-col min-w-0">
+                      <span className={cn('text-sm font-bold truncate leading-tight', isDark ? 'text-white' : 'text-slate-900')}>
+                        {detailRecord.substituteDoctor}
+                      </span>
+                      <span className={cn('text-xs font-medium truncate mt-0.5', isDark ? 'text-neutral-400' : 'text-slate-500')}>
+                        Dokter Spesialis Anak / Dokter Pengganti
+                      </span>
+                    </div>
                   </div>
                 </div>
               )}
 
-              {/* Reviewer / HRD Notes */}
+              {/* 5. Reviewer Notes */}
               {detailRecord.reviewerNotes && (
-                <div className="p-3 rounded-2xl bg-slate-50 dark:bg-white/[0.03] border border-slate-100 dark:border-white/5 text-xs">
-                  <span className="text-[10px] text-slate-400 dark:text-neutral-500 font-bold block mb-1">
-                    Catatan Verifikasi:
+                <div className="flex flex-col gap-1.5 py-4">
+                  <span className={cn('text-[11px] font-semibold block', isDark ? 'text-neutral-400' : 'text-slate-500')}>
+                    Catatan Verifikasi
                   </span>
-                  <p className="leading-relaxed text-slate-700 dark:text-neutral-300">
+                  <p className={cn('text-[13.5px] leading-relaxed font-medium', isDark ? 'text-neutral-200' : 'text-slate-700')}>
                     {detailRecord.reviewerNotes}
                   </p>
                   {detailRecord.reviewerName && (
-                    <span className="text-[10px] text-slate-400 dark:text-neutral-500 mt-1 block">
+                    <span className={cn('text-xs font-semibold mt-1 block', isDark ? 'text-neutral-400' : 'text-slate-500')}>
                       Oleh: {detailRecord.reviewerName}
                     </span>
                   )}
                 </div>
               )}
 
-              {/* Actions Footer (CRUD Operations inside Drawer) */}
-              <div className="flex flex-col gap-2 pt-2 mt-auto">
+              {/* 6. Actions Footer */}
+              <div className="flex flex-col gap-2 pt-5 mt-auto border-t border-slate-100 dark:border-white/10">
                 {detailRecord.status === 'menunggu' && (
-                  <div className="grid grid-cols-2 gap-2">
+                  <div className="grid grid-cols-2 gap-2.5">
                     <Button
                       type="button"
                       variant="primary"
@@ -735,11 +1018,11 @@ export function LeavePermissionTabScreen(props: {
 
                     <Button
                       type="button"
-                      variant="outline"
+                      variant="ghost"
                       size="md"
                       onClick={() => setRecordToCancel(detailRecord)}
                       startIcon={<Trash2 className="w-4 h-4 text-rose-500" />}
-                      className="border-rose-300 text-rose-600 hover:bg-rose-50 dark:border-rose-500/30 dark:text-rose-400 dark:hover:bg-rose-950/30"
+                      className="text-rose-600 hover:text-rose-700 hover:bg-rose-50/80 dark:text-rose-400 dark:hover:bg-rose-950/40 font-bold border-0 shadow-none"
                     >
                       Batalkan
                     </Button>
@@ -749,8 +1032,8 @@ export function LeavePermissionTabScreen(props: {
                 {detailRecord.status === 'disetujui' && (
                   <div
                     className={cn(
-                      'p-2.5 rounded-xl text-center text-xs font-semibold border flex items-center justify-center gap-1.5',
-                      isDark ? 'bg-emerald-950/30 border-emerald-500/20 text-emerald-400' : 'bg-emerald-50 border-emerald-200 text-emerald-800',
+                      'p-3 rounded-2xl text-center text-xs font-bold border flex items-center justify-center gap-2',
+                      isDark ? 'bg-emerald-950/40 border-emerald-500/30 text-emerald-300' : 'bg-emerald-50 border-emerald-200 text-emerald-900',
                     )}
                   >
                     <FileCheck className="w-4 h-4" />
@@ -814,59 +1097,27 @@ export function LeavePermissionTabScreen(props: {
               onSubmit={handleFormSubmit}
               className="flex w-full flex-1 flex-col px-6 pt-3 pb-6 overflow-y-auto no-scrollbar select-text gap-4"
             >
-              {/* Applicant Header Badge */}
-              <div className="flex items-center gap-3 p-3 rounded-2xl bg-slate-50 dark:bg-white/[0.03] border border-slate-100 dark:border-white/5">
-                <DoctorAvatar
-                  src={profile.avatarUrl}
-                  alt={profile.name}
-                  size={42}
-                  className="shrink-0"
-                />
-                <div className="flex flex-col min-w-0">
-                  <div className="flex items-center gap-1.5">
-                    <span className="text-xs font-bold truncate">{profile.name}</span>
-                    <UserCheck className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
-                  </div>
-                  <span className="text-[11px] text-slate-500 dark:text-neutral-400 truncate">
-                    {profile.role || profile.title}
-                  </span>
-                </div>
-              </div>
-
-              {/* Field 1: Jenis Perizinan */}
+              {/* Field 1: Subjek Perizinan (Free text input) */}
               <div className="flex flex-col gap-1.5">
                 <label className="text-xs font-bold tracking-tight text-slate-700 dark:text-neutral-300">
-                  Jenis Perizinan <span className="text-red-500">*</span>
+                  Subjek Perizinan <span className="text-red-500">*</span>
                 </label>
-                <div className="grid grid-cols-2 gap-2">
-                  {PERMISSION_TYPES.map((type) => {
-                    const isSelected = formData.type === type;
-                    const theme = TYPE_THEMES[type];
-                    return (
-                      <button
-                        key={type}
-                        type="button"
-                        onClick={() => setFormData((prev) => ({ ...prev, type }))}
-                        className={cn(
-                          'flex items-center gap-2 p-2.5 rounded-2xl border text-xs font-bold text-left transition-all cursor-pointer active:scale-98',
-                          isSelected
-                            ? isDark
-                              ? 'bg-neutral-900 border-blue-500 text-white ring-1 ring-blue-500'
-                              : 'bg-white border-blue-600 text-blue-900 ring-1 ring-blue-600 shadow-xs'
-                            : isDark
-                              ? 'bg-white/5 border-white/10 text-neutral-400 hover:bg-white/10 hover:text-white'
-                              : 'bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100',
-                        )}
-                      >
-                        <span
-                          className="w-2.5 h-2.5 rounded-full shrink-0"
-                          style={{ backgroundColor: theme.primary }}
-                        />
-                        <span className="truncate">{type}</span>
-                      </button>
-                    );
-                  })}
-                </div>
+                <input
+                  type="text"
+                  placeholder="Contoh: Urusan Keluarga, Seminar / Simposium, Cuti Tahunan..."
+                  value={formData.type}
+                  onChange={(e) => setFormData((prev) => ({ ...prev, type: e.target.value }))}
+                  className={cn(
+                    'w-full h-11 px-3.5 rounded-2xl border text-xs font-semibold focus:outline-none transition-all',
+                    isDark
+                      ? 'bg-white/5 border-white/10 text-white placeholder:text-neutral-500 focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20'
+                      : 'bg-white border-slate-200 text-slate-900 placeholder:text-slate-400 focus:border-blue-600 focus:ring-2 focus:ring-blue-600/15 shadow-2xs',
+                    formErrors.type && 'border-red-500 ring-1 ring-red-500/30',
+                  )}
+                />
+                {formErrors.type && (
+                  <span className="text-[10px] text-red-500 pl-1">{formErrors.type}</span>
+                )}
               </div>
 
               {/* Field 2: Rentang Tanggal */}
@@ -880,42 +1131,28 @@ export function LeavePermissionTabScreen(props: {
                   </span>
                 </div>
 
-                <div className="grid grid-cols-2 gap-2.5">
-                  <div className="flex flex-col gap-1">
-                    <span className="text-[10px] text-slate-400 font-semibold pl-1">
-                      Mulai
-                    </span>
-                    <input
-                      type="date"
-                      value={formData.startDate}
-                      onChange={(e) => setFormData((prev) => ({ ...prev, startDate: e.target.value }))}
-                      className={cn(
-                        'w-full p-2.5 rounded-2xl border text-xs font-medium focus:outline-none transition-all',
-                        isDark ? 'bg-white/5 border-white/10 text-white' : 'bg-white border-slate-200 text-slate-900',
-                      )}
-                    />
-                    {formErrors.startDate && (
-                      <span className="text-[10px] text-red-500 pl-1">{formErrors.startDate}</span>
-                    )}
-                  </div>
+                <div className="flex flex-col gap-3">
+                  <DatePicker
+                    label="Mulai Izin"
+                    value={formData.startDate}
+                    onChange={(dateStr) =>
+                      setFormData((prev) => ({ ...prev, startDate: dateStr }))
+                    }
+                    error={formErrors.startDate}
+                    theme={isDark ? 'dark' : 'light'}
+                    placeholder="Pilih tanggal mulai"
+                  />
 
-                  <div className="flex flex-col gap-1">
-                    <span className="text-[10px] text-slate-400 font-semibold pl-1">
-                      Selesai
-                    </span>
-                    <input
-                      type="date"
-                      value={formData.endDate}
-                      onChange={(e) => setFormData((prev) => ({ ...prev, endDate: e.target.value }))}
-                      className={cn(
-                        'w-full p-2.5 rounded-2xl border text-xs font-medium focus:outline-none transition-all',
-                        isDark ? 'bg-white/5 border-white/10 text-white' : 'bg-white border-slate-200 text-slate-900',
-                      )}
-                    />
-                    {formErrors.endDate && (
-                      <span className="text-[10px] text-red-500 pl-1">{formErrors.endDate}</span>
-                    )}
-                  </div>
+                  <DatePicker
+                    label="Selesai Izin"
+                    value={formData.endDate}
+                    onChange={(dateStr) =>
+                      setFormData((prev) => ({ ...prev, endDate: dateStr }))
+                    }
+                    error={formErrors.endDate}
+                    theme={isDark ? 'dark' : 'light'}
+                    placeholder="Pilih tanggal selesai"
+                  />
                 </div>
               </div>
 

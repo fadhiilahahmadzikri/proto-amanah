@@ -19,12 +19,18 @@ import { useAuthPrototype } from '@/features/auth/hooks/use-auth-prototype';
 import { cn } from '@/lib/utils';
 
 export function AuthPrototype() {
-  const [theme, setTheme] = React.useState<'dark' | 'light'>(() => {
-    return getEffectiveInitialConfig().initialTheme;
-  });
-  const [dashboardTab, setDashboardTab] = React.useState<BottomNavTab>(() => {
-    return getEffectiveInitialConfig().initialDashboardTab;
-  });
+  const [theme, setTheme] = React.useState<'dark' | 'light'>(prototypeConfig.initialTheme);
+  const [dashboardTab, setDashboardTab] = React.useState<BottomNavTab>(prototypeConfig.initialDashboardTab);
+
+  React.useEffect(() => {
+    const initial = getEffectiveInitialConfig();
+    if (initial.initialTheme && initial.initialTheme !== prototypeConfig.initialTheme) {
+      setTheme(initial.initialTheme);
+    }
+    if (initial.initialDashboardTab && initial.initialDashboardTab !== prototypeConfig.initialDashboardTab) {
+      setDashboardTab(initial.initialDashboardTab);
+    }
+  }, []);
 
   const {
     currentScreen,

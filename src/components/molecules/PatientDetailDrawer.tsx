@@ -191,7 +191,8 @@ export function PatientDetailDrawer(props: PatientDetailDrawerProps) {
               />
               <QueueBadge
                 queueNumber={queueNumber}
-                size={38}
+                size={40}
+                theme={isDark ? 'dark' : 'light'}
                 className="absolute -bottom-2 -right-2.5 z-10"
               />
             </div>

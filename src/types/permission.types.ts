@@ -1,11 +1,6 @@
 export type PermissionStatus = 'menunggu' | 'disetujui' | 'ditolak' | 'dibatalkan';
 
-export type PermissionType =
-  | 'Cuti Tahunan'
-  | 'Izin Sakit'
-  | 'Seminar / Simposium'
-  | 'Urusan Keluarga'
-  | 'Tugas Luar RS';
+export type PermissionType = string;
 
 export type PermissionRecord = {
   id: string;
@@ -16,7 +11,7 @@ export type PermissionRecord = {
   startDate: string;
   endDate: string;
   durationDays: number;
-  type: PermissionType;
+  type: string; // Subjek Perizinan (e.g. Urusan Keluarga, Seminar / Simposium, Cuti Tahunan)
   reason: string;
   substituteDoctor?: string;
   status: PermissionStatus;

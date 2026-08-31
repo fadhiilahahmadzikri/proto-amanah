@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { getEffectiveInitialConfig } from '@/config/prototype.config';
+import { getEffectiveInitialConfig, prototypeConfig } from '@/config/prototype.config';
 import otpConfig from '@/data/auth/otp.json';
 import { doctorStore } from '@/features/doctor/hooks/use-doctor-store';
 import type {
@@ -31,9 +31,15 @@ const delay = async (ms: number) => {
 };
 
 export function useAuthPrototype() {
-  const [currentScreen, setCurrentScreen] = React.useState<AuthScreen>(() => {
-    return getEffectiveInitialConfig().initialScreen;
-  });
+  const [currentScreen, setCurrentScreen] = React.useState<AuthScreen>(prototypeConfig.initialScreen);
+
+  React.useEffect(() => {
+    const config = getEffectiveInitialConfig();
+    if (config.initialScreen && config.initialScreen !== prototypeConfig.initialScreen) {
+      setCurrentScreen(config.initialScreen);
+    }
+  }, []);
+
   const [formData, setFormData] = React.useState<AuthFormData>(INITIAL_FORM_DATA);
   const [errors, setErrors] = React.useState<AuthValidationErrors>({});
   const [isLoading, setIsLoading] = React.useState(false);

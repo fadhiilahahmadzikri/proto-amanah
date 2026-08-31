@@ -1,23 +1,32 @@
+import React from 'react';
 import { cn } from '@/lib/utils';
 
 /**
- * 3D Glass Rosette Ribbon Medal Badge for Patient Queue Number.
- * Matches the game/app award medallion visual style with glass orb, scalloped rosette, ribbon tails, and center queue number.
+ * 3D Game-Style Hex Shield & Ribbon Medal Badge for Patient Queue Number.
+ * Features faceted crystal core, 3D extruded rim bevels, specular glass glints,
+ * multi-layered laurel wings, and embossed 3D game typography with zero external shadow.
  *
- * @param props.queueNumber - The queue identifier (e.g. "01", "#01")
- * @param props.size - Pixel size width (defaults to 36)
+ * @param props.queueNumber - The queue identifier (e.g. "01", "#01", "A-01")
+ * @param props.size - Pixel size width (defaults to 68)
+ * @param props.theme - 'dark' | 'light'
  * @param props.className - Additional CSS class names
  * @param props.onClick - Optional click handler
  */
 export function QueueBadge(props: {
   queueNumber: string;
   size?: number;
+  theme?: 'dark' | 'light';
   className?: string;
   onClick?: () => void;
 }) {
-  const size = props.size ?? 42;
+  const isDark = props.theme === 'dark';
+  const size = props.size ?? 68;
   const rawNumber = props.queueNumber.replace(/^#/, '');
-  const displayValue = rawNumber.length > 0 ? (rawNumber.length === 1 ? `0${rawNumber}` : rawNumber) : '01';
+  const displayValue = rawNumber.length > 0
+    ? (rawNumber.length === 1 ? `0${rawNumber}` : rawNumber)
+    : '01';
+
+  const uid = React.useId().replace(/:/g, '-');
 
   return (
     <div
@@ -27,135 +36,353 @@ export function QueueBadge(props: {
         props.onClick && 'cursor-pointer',
         props.className,
       )}
-      style={{
-        width: `${size}px`,
-        height: `${Math.round(size * 1.18)}px`,
-      }}
-      title={`Antrean #${displayValue}`}
+      title={`Nomor Antrean: ${displayValue}`}
     >
       <svg
-        viewBox="0 0 48 56"
-        className="w-full h-full drop-shadow-[0_2.5px_5px_rgba(0,0,0,0.32)]"
+        viewBox="0 0 100 100"
+        className="shrink-0 select-none"
+        style={{ width: `${size}px`, height: `${size}px` }}
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
       >
         <defs>
-          {/* Outer Glass Orb Radial Gradient */}
-          <radialGradient id="qb-outer-glass" cx="35%" cy="30%" r="70%" fx="35%" fy="30%">
-            <stop offset="0%" stopColor="#60A5FA" />
-            <stop offset="45%" stopColor="#2563EB" />
-            <stop offset="85%" stopColor="#1D4ED8" />
-            <stop offset="100%" stopColor="#172554" />
-          </radialGradient>
-
-          {/* Ribbon Tails Gradient */}
-          <linearGradient id="qb-ribbon-grad" x1="14" y1="20" x2="34" y2="52" gradientUnits="userSpaceOnUse">
-            <stop offset="0%" stopColor="#7DD3FC" />
-            <stop offset="50%" stopColor="#38BDF8" />
-            <stop offset="100%" stopColor="#0284C7" />
+          {/* 1. Ribbon Gradients (3D Fold: Left Highlight / Right Shaded) */}
+          <linearGradient id={`ribbon-l-${uid}`} x1="34" y1="44" x2="50" y2="84" gradientUnits="userSpaceOnUse">
+            <stop stopColor={isDark ? '#0284c7' : '#2563eb'} />
+            <stop offset="1" stopColor={isDark ? '#0369a1' : '#1d4ed8'} />
           </linearGradient>
 
-          {/* Ribbon Center Stripe Gradient */}
-          <linearGradient id="qb-ribbon-stripe" x1="20" y1="20" x2="28" y2="52" gradientUnits="userSpaceOnUse">
-            <stop offset="0%" stopColor="#FFFFFF" />
-            <stop offset="100%" stopColor="#E0F2FE" />
+          <linearGradient id={`ribbon-r-${uid}`} x1="50" y1="44" x2="66" y2="84" gradientUnits="userSpaceOnUse">
+            <stop stopColor={isDark ? '#0369a1' : '#1d4ed8'} />
+            <stop offset="1" stopColor={isDark ? '#075985' : '#1e3a8a'} />
           </linearGradient>
 
-          {/* Rosette Flower Seal Gradient */}
-          <radialGradient id="qb-rosette-seal" cx="40%" cy="35%" r="65%">
-            <stop offset="0%" stopColor="#FFFFFF" />
-            <stop offset="70%" stopColor="#F0F9FF" />
-            <stop offset="100%" stopColor="#BAE6FD" />
-          </radialGradient>
-
-          {/* Center Inset Gradient */}
-          <linearGradient id="qb-inset-grad" x1="16" y1="12" x2="32" y2="30" gradientUnits="userSpaceOnUse">
-            <stop offset="0%" stopColor="#FFFFFF" />
-            <stop offset="100%" stopColor="#F0F9FF" />
+          {/* 2. Crystal Wings Gradients & Cyan Platinum Accent Trim */}
+          <linearGradient id={`accent-trim-${uid}`} x1="0" y1="0" x2="100" y2="50" gradientUnits="userSpaceOnUse">
+            <stop stopColor={isDark ? '#e0f2fe' : '#ffffff'} />
+            <stop offset="0.3" stopColor={isDark ? '#38bdf8' : '#7dd3fc'} />
+            <stop offset="0.7" stopColor={isDark ? '#0284c7' : '#38bdf8'} />
+            <stop offset="1" stopColor={isDark ? '#0369a1' : '#0284c7'} />
           </linearGradient>
 
-          {/* Specular Top Glass Arc Highlight */}
-          <linearGradient id="qb-highlight" x1="12" y1="5" x2="36" y2="20" gradientUnits="userSpaceOnUse">
-            <stop offset="0%" stopColor="#FFFFFF" stopOpacity="0.9" />
-            <stop offset="50%" stopColor="#FFFFFF" stopOpacity="0.4" />
-            <stop offset="100%" stopColor="#FFFFFF" stopOpacity="0" />
+          <linearGradient id={`wing-top-l-${uid}`} x1="3" y1="8" x2="34" y2="23" gradientUnits="userSpaceOnUse">
+            <stop stopColor={isDark ? '#e0f2fe' : '#ffffff'} />
+            <stop offset="0.3" stopColor={isDark ? '#a5f3fc' : '#bfdbfe'} />
+            <stop offset="0.7" stopColor={isDark ? '#38bdf8' : '#60a5fa'} />
+            <stop offset="1" stopColor={isDark ? '#0284c7' : '#2563eb'} />
+          </linearGradient>
+
+          <linearGradient id={`wing-top-r-${uid}`} x1="97" y1="8" x2="66" y2="23" gradientUnits="userSpaceOnUse">
+            <stop stopColor={isDark ? '#e0f2fe' : '#ffffff'} />
+            <stop offset="0.3" stopColor={isDark ? '#a5f3fc' : '#bfdbfe'} />
+            <stop offset="0.7" stopColor={isDark ? '#38bdf8' : '#60a5fa'} />
+            <stop offset="1" stopColor={isDark ? '#0284c7' : '#2563eb'} />
+          </linearGradient>
+
+          <linearGradient id={`wing-mid-l-${uid}`} x1="10" y1="22" x2="24" y2="29" gradientUnits="userSpaceOnUse">
+            <stop stopColor={isDark ? '#38bdf8' : '#3b82f6'} />
+            <stop offset="1" stopColor={isDark ? '#0369a1' : '#1d4ed8'} />
+          </linearGradient>
+
+          <linearGradient id={`wing-mid-r-${uid}`} x1="90" y1="22" x2="76" y2="29" gradientUnits="userSpaceOnUse">
+            <stop stopColor={isDark ? '#38bdf8' : '#3b82f6'} />
+            <stop offset="1" stopColor={isDark ? '#0369a1' : '#1d4ed8'} />
+          </linearGradient>
+
+          <linearGradient id={`wing-bot-l-${uid}`} x1="13" y1="29" x2="24" y2="38" gradientUnits="userSpaceOnUse">
+            <stop stopColor={isDark ? '#0284c7' : '#1d4ed8'} />
+            <stop offset="1" stopColor={isDark ? '#082f49' : '#1e3a8a'} />
+          </linearGradient>
+
+          <linearGradient id={`wing-bot-r-${uid}`} x1="87" y1="29" x2="76" y2="38" gradientUnits="userSpaceOnUse">
+            <stop stopColor={isDark ? '#0284c7' : '#1d4ed8'} />
+            <stop offset="1" stopColor={isDark ? '#082f49' : '#1e3a8a'} />
+          </linearGradient>
+
+          {/* 3. Outer Hex Frame 3D Metallic / Crystal Gradient */}
+          <linearGradient id={`hex-frame-${uid}`} x1="22" y1="6" x2="78" y2="70" gradientUnits="userSpaceOnUse">
+            <stop stopColor={isDark ? '#e0f2fe' : '#ffffff'} />
+            <stop offset="0.15" stopColor={isDark ? '#38bdf8' : '#93c5fd'} />
+            <stop offset="0.5" stopColor={isDark ? '#0284c7' : '#3b82f6'} />
+            <stop offset="0.85" stopColor={isDark ? '#075985' : '#1d4ed8'} />
+            <stop offset="1" stopColor={isDark ? '#082f49' : '#1e3a8a'} />
+          </linearGradient>
+
+          {/* 4. Extruded 3D Bottom Lip Bevel Gradient */}
+          <linearGradient id={`hex-bottom-bevel-${uid}`} x1="50" y1="54" x2="50" y2="74" gradientUnits="userSpaceOnUse">
+            <stop stopColor={isDark ? '#0369a1' : '#1d4ed8'} />
+            <stop offset="1" stopColor={isDark ? '#082f49' : '#0f172a'} />
+          </linearGradient>
+
+          {/* 5. Inner Inset Chamfer Ring Gradient */}
+          <linearGradient id={`hex-chamfer-${uid}`} x1="27" y1="11" x2="73" y2="65" gradientUnits="userSpaceOnUse">
+            <stop stopColor={isDark ? '#67e8f9' : '#bfdbfe'} />
+            <stop offset="0.4" stopColor={isDark ? '#22d3ee' : '#60a5fa'} />
+            <stop offset="1" stopColor={isDark ? '#0284c7' : '#1e40af'} />
+          </linearGradient>
+
+          {/* 6. Crystal Gem Core: Left Facet (Light) & Right Facet (Shade) */}
+          <linearGradient id={`gem-left-${uid}`} x1="32" y1="15" x2="50" y2="61" gradientUnits="userSpaceOnUse">
+            <stop stopColor={isDark ? '#38bdf8' : '#3b82f6'} />
+            <stop offset="0.5" stopColor={isDark ? '#0284c7' : '#2563eb'} />
+            <stop offset="1" stopColor={isDark ? '#0369a1' : '#1d4ed8'} />
+          </linearGradient>
+
+          <linearGradient id={`gem-right-${uid}`} x1="50" y1="15" x2="68" y2="61" gradientUnits="userSpaceOnUse">
+            <stop stopColor={isDark ? '#0284c7' : '#1d4ed8'} />
+            <stop offset="0.6" stopColor={isDark ? '#0369a1' : '#1e40af'} />
+            <stop offset="1" stopColor={isDark ? '#082f49' : '#1e3a8a'} />
+          </linearGradient>
+
+          {/* 7. Specular Gloss Curve */}
+          <linearGradient id={`specular-gloss-${uid}`} x1="50" y1="15" x2="50" y2="38" gradientUnits="userSpaceOnUse">
+            <stop stopColor="#ffffff" stopOpacity="0.75" />
+            <stop offset="0.65" stopColor="#ffffff" stopOpacity="0.25" />
+            <stop offset="1" stopColor="#ffffff" stopOpacity="0" />
+          </linearGradient>
+
+          {/* 8. Text Gradient */}
+          <linearGradient id={`text-grad-${uid}`} x1="50" y1="28" x2="50" y2="48" gradientUnits="userSpaceOnUse">
+            <stop stopColor="#ffffff" />
+            <stop offset="0.7" stopColor="#f0f9ff" />
+            <stop offset="1" stopColor={isDark ? '#bae6fd' : '#dbeafe'} />
           </linearGradient>
         </defs>
 
-        {/* 1. Hanging Ribbon Tails (Layer behind glass medal) */}
-        <g filter="drop-shadow(0 2px 2px rgba(0,0,0,0.22))">
-          {/* Main Ribbon Body with V-Notch */}
+        {/* ================= LAYER 1: 3D HANGING RIBBON ================= */}
+        {/* Ribbon Left Half (Light Facet) */}
+        <path
+          d="M34 46H50V74L34 85V46Z"
+          fill={`url(#ribbon-l-${uid})`}
+        />
+        {/* Ribbon Right Half (Shadow Facet) */}
+        <path
+          d="M50 46H66V85L50 74V46Z"
+          fill={`url(#ribbon-r-${uid})`}
+        />
+        {/* Ribbon V-Notch 3D Bottom Lip Stroke */}
+        <path
+          d="M34 85L50 74L66 85"
+          stroke={`url(#accent-trim-${uid})`}
+          strokeWidth="1.5"
+          strokeLinejoin="round"
+          strokeLinecap="round"
+        />
+        {/* Ribbon Center Vertical Crease */}
+        <line
+          x1="50"
+          y1="46"
+          x2="50"
+          y2="74"
+          stroke="rgba(0,0,0,0.25)"
+          strokeWidth="1"
+        />
+        {/* Under-Shield Ambient Contact Shadow */}
+        <path
+          d="M34 46H66V53L50 50L34 53V46Z"
+          fill="rgba(0,0,0,0.35)"
+        />
+
+        {/* ================= LAYER 2: 3D CRYSTAL MECHA WINGS WITH THEME ACCENT TRIM ================= */}
+        {/* Left Crystal Wing */}
+        <g>
+          {/* Main Wing Body / Base */}
           <path
-            d="M 13.5 22 L 12.5 50 L 24 43.5 L 35.5 50 L 34.5 22 Z"
-            fill="url(#qb-ribbon-grad)"
+            d="M34 16L3 8L10 22L17 38L24 38L24 23Z"
+            fill={`url(#wing-top-l-${uid})`}
           />
-          {/* Center Light Stripe on Ribbon */}
+          {/* Top Wing Blade Highlight Facet */}
           <path
-            d="M 19.5 22 L 19.5 46.2 L 24 43.5 L 28.5 46.2 L 28.5 22 Z"
-            fill="url(#qb-ribbon-stripe)"
+            d="M34 16L3 8L18 17Z"
+            fill="rgba(255, 255, 255, 0.45)"
+          />
+          {/* Mid Wing Tier Facet */}
+          <path
+            d="M10 22L13 29L24 29L24 23Z"
+            fill={`url(#wing-mid-l-${uid})`}
+          />
+          {/* Bottom Wing Tier Facet */}
+          <path
+            d="M13 29L17 38L24 38L24 29Z"
+            fill={`url(#wing-bot-l-${uid})`}
+          />
+          {/* Internal Facet Ridge Lines */}
+          <line
+            x1="10"
+            y1="22"
+            x2="24"
+            y2="23"
+            stroke="rgba(255, 255, 255, 0.6)"
+            strokeWidth="0.8"
+          />
+          <line
+            x1="13"
+            y1="29"
+            x2="24"
+            y2="29"
+            stroke="rgba(255, 255, 255, 0.4)"
+            strokeWidth="0.8"
+          />
+          {/* Outer Theme Bezel Trim */}
+          <path
+            d="M34 16L3 8L10 22L17 38L24 38"
+            stroke={`url(#accent-trim-${uid})`}
+            strokeWidth="1.6"
+            strokeLinecap="round"
+            strokeLinejoin="round"
           />
         </g>
 
-        {/* 2. Outer Glossy Glass Rosette Circle Orb */}
-        <circle
-          cx="24"
-          cy="21.5"
-          r="19"
-          fill="url(#qb-outer-glass)"
-          stroke="#93C5FD"
+        {/* Right Crystal Wing */}
+        <g>
+          {/* Main Wing Body / Base */}
+          <path
+            d="M66 16L97 8L90 22L83 38L76 38L76 23Z"
+            fill={`url(#wing-top-r-${uid})`}
+          />
+          {/* Top Wing Blade Highlight Facet */}
+          <path
+            d="M66 16L97 8L82 17Z"
+            fill="rgba(255, 255, 255, 0.35)"
+          />
+          {/* Mid Wing Tier Facet */}
+          <path
+            d="M90 22L87 29L76 29L76 23Z"
+            fill={`url(#wing-mid-r-${uid})`}
+          />
+          {/* Bottom Wing Tier Facet */}
+          <path
+            d="M87 29L83 38L76 38L76 29Z"
+            fill={`url(#wing-bot-r-${uid})`}
+          />
+          {/* Internal Facet Ridge Lines */}
+          <line
+            x1="90"
+            y1="22"
+            x2="76"
+            y2="23"
+            stroke="rgba(255, 255, 255, 0.5)"
+            strokeWidth="0.8"
+          />
+          <line
+            x1="87"
+            y1="29"
+            x2="76"
+            y2="29"
+            stroke="rgba(255, 255, 255, 0.35)"
+            strokeWidth="0.8"
+          />
+          {/* Outer Theme Bezel Trim */}
+          <path
+            d="M66 16L97 8L90 22L83 38L76 38"
+            stroke={`url(#accent-trim-${uid})`}
+            strokeWidth="1.6"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </g>
+
+        {/* ================= LAYER 3: 3D EXTRUDED SHIELD BASE ================= */}
+        {/* Bottom 3D Bevel Extrusion */}
+        <path
+          d="M22 54L50 70L78 54V58L50 74L22 58V54Z"
+          fill={`url(#hex-bottom-bevel-${uid})`}
+        />
+
+        {/* ================= LAYER 4: 3D OUTER HEXAGON FRAME ================= */}
+        <path
+          d="M50 6L78 22V54L50 70L22 54V22L50 6Z"
+          fill={`url(#hex-frame-${uid})`}
+        />
+
+        {/* 3D Frame Top-Left Highlight Edge */}
+        <path
+          d="M22 54V22L50 6L78 22"
+          stroke="rgba(255,255,255,0.7)"
           strokeWidth="1.2"
-        />
-
-        {/* Specular Highlight Arc */}
-        <path
-          d="M 9.5 16 A 16.5 16.5 0 0 1 38.5 16"
-          stroke="url(#qb-highlight)"
-          strokeWidth="1.8"
           strokeLinecap="round"
+          strokeLinejoin="round"
         />
 
-        {/* 3. Symmetrical 10-Petal Scalloped Rosette Medal Seal */}
+        {/* 3D Frame Bottom-Right Shade Edge */}
         <path
-          d="
-            M 27.65 10.28
-            A 3.8 3.8 0 0 1 33.55 14.56
-            A 3.8 3.8 0 0 1 35.8 21.5
-            A 3.8 3.8 0 0 1 33.55 28.44
-            A 3.8 3.8 0 0 1 27.65 32.72
-            A 3.8 3.8 0 0 1 20.35 32.72
-            A 3.8 3.8 0 0 1 14.45 28.44
-            A 3.8 3.8 0 0 1 12.2 21.5
-            A 3.8 3.8 0 0 1 14.45 14.56
-            A 3.8 3.8 0 0 1 20.35 10.28
-            A 3.8 3.8 0 0 1 27.65 10.28
-            Z
-          "
-          fill="url(#qb-rosette-seal)"
-          stroke="#38BDF8"
+          d="M78 22V54L50 70L22 54"
+          stroke="rgba(0,0,0,0.3)"
+          strokeWidth="1.2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+
+        {/* ================= LAYER 5: 3D INSET CHAMFER RING ================= */}
+        <path
+          d="M50 11L73 24.5V51.5L50 65L27 51.5V24.5L50 11Z"
+          fill={`url(#hex-chamfer-${uid})`}
+        />
+
+        {/* ================= LAYER 6: 3D CRYSTAL GEM CORE ================= */}
+        {/* Left Core Facet (Light) */}
+        <path
+          d="M50 15V61L32 49.5V26.5L50 15Z"
+          fill={`url(#gem-left-${uid})`}
+        />
+        {/* Right Core Facet (Shade) */}
+        <path
+          d="M50 15L68 26.5V49.5L50 61V15Z"
+          fill={`url(#gem-right-${uid})`}
+        />
+
+        {/* Core Vertical Center Ridge */}
+        <line
+          x1="50"
+          y1="15"
+          x2="50"
+          y2="61"
+          stroke="rgba(255,255,255,0.35)"
           strokeWidth="0.8"
-          filter="drop-shadow(0 1.5px 2px rgba(0,0,0,0.25))"
         />
 
-        {/* Inner Rosette Circular Inset */}
-        <circle
-          cx="24"
-          cy="21.5"
-          r="10.5"
-          fill="url(#qb-inset-grad)"
-          stroke="#93C5FD"
-          strokeWidth="0.75"
+        {/* ================= LAYER 7: SPECULAR GLASS GLOSS SHEEN ================= */}
+        <path
+          d="M32 26.5L50 15L68 26.5C68 26.5 58 37 32 31.5Z"
+          fill={`url(#specular-gloss-${uid})`}
         />
 
-        {/* 4. Center Queue Number */}
+        {/* Star Sparkle Glint on Top-Left Bevel Vertex */}
+        <g transform="translate(32, 19)">
+          <path
+            d="M0 -3.5L0.8 -0.8L3.5 0L0.8 0.8L0 3.5L-0.8 0.8L-3.5 0L-0.8 -0.8Z"
+            fill="#ffffff"
+            opacity="0.9"
+          />
+        </g>
+
+        {/* ================= LAYER 8: 3D EMBOSSED GAME NUMBER ================= */}
+        {/* 3D Extruded Depth Underlayer */}
         <text
-          x="24"
-          y="26"
+          x="50"
+          y="41"
+          dominantBaseline="central"
           textAnchor="middle"
-          fontSize={displayValue.length > 2 ? '11' : '13'}
+          fontSize={displayValue.length > 3 ? '14' : displayValue.length > 2 ? '17' : '20'}
           fontWeight="900"
-          fontFamily="system-ui, -apple-system, sans-serif"
-          fill="#1D4ED8"
-          className="select-none tracking-tight font-black"
+          fontFamily="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
+          fill={isDark ? '#041f3d' : '#0f2b66'}
+          className="select-none font-black tracking-tight"
+        >
+          {displayValue}
+        </text>
+
+        {/* Primary Front Face with Gradient */}
+        <text
+          x="50"
+          y="39"
+          dominantBaseline="central"
+          textAnchor="middle"
+          fontSize={displayValue.length > 3 ? '14' : displayValue.length > 2 ? '17' : '20'}
+          fontWeight="900"
+          fontFamily="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
+          fill={`url(#text-grad-${uid})`}
+          className="select-none font-black tracking-tight"
         >
           {displayValue}
         </text>
