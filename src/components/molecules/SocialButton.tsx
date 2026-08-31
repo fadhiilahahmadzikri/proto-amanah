@@ -1,5 +1,6 @@
 import { Mail } from 'lucide-react';
 import { Button } from '@/components/atoms/Button';
+import { cn } from '@/lib/utils';
 
 function AppleIcon() {
   return (
@@ -38,17 +39,24 @@ export function SocialButton(props: {
   onClick?: () => void;
   isLoading?: boolean;
   disabled?: boolean;
+  theme?: 'dark' | 'light';
 }) {
+  const isDark = props.theme === 'dark';
+
   if (props.provider === 'apple') {
     return (
       <Button
-        variant="primary"
         fullWidth
         startIcon={<AppleIcon />}
         onClick={props.onClick}
         isLoading={props.isLoading}
         disabled={props.disabled}
-        className="border-none bg-black text-white shadow-xs hover:bg-neutral-900"
+        className={cn(
+          'border-none shadow-xs transition-colors font-bold',
+          isDark
+            ? 'bg-white !text-black hover:bg-neutral-100'
+            : 'bg-black !text-white hover:bg-neutral-900',
+        )}
       >
         {props.label}
       </Button>
@@ -58,13 +66,18 @@ export function SocialButton(props: {
   if (props.provider === 'google') {
     return (
       <Button
-        variant="outline"
+        variant="ghost"
         fullWidth
         startIcon={<GoogleIcon />}
         onClick={props.onClick}
         isLoading={props.isLoading}
         disabled={props.disabled}
-        className="border-neutral-200 bg-white text-neutral-800 shadow-2xs hover:bg-neutral-50"
+        className={cn(
+          'border-none shadow-none font-semibold !bg-transparent',
+          isDark
+            ? '!text-white hover:!bg-white/10'
+            : '!text-neutral-800 hover:!bg-black/5',
+        )}
       >
         {props.label}
       </Button>
@@ -73,13 +86,17 @@ export function SocialButton(props: {
 
   return (
     <Button
-      variant="secondary"
       fullWidth
-      startIcon={<Mail className="h-4 w-4 text-neutral-800" />}
+      startIcon={<Mail className={cn('h-4 w-4', isDark ? 'text-white' : 'text-neutral-800')} />}
       onClick={props.onClick}
       isLoading={props.isLoading}
       disabled={props.disabled}
-      className="bg-neutral-100 text-neutral-900 hover:bg-neutral-200"
+      className={cn(
+        'transition-colors font-semibold border-none',
+        isDark
+          ? 'bg-white/10 !text-white hover:bg-white/15'
+          : 'bg-neutral-100 !text-neutral-900 hover:bg-neutral-200',
+      )}
     >
       {props.label}
     </Button>

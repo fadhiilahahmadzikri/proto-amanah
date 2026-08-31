@@ -8,8 +8,10 @@ import { cn } from '@/lib/utils';
 export function PasswordStrengthTicker(props: {
   password?: string;
   className?: string;
+  theme?: 'dark' | 'light';
 }) {
   const password = props.password ?? '';
+  const isDark = props.theme === 'dark';
   const itemRef = React.useRef<HTMLDivElement>(null);
 
   const criteria = React.useMemo(() => {
@@ -93,12 +95,7 @@ export function PasswordStrengthTicker(props: {
   return (
     <div
       className={cn(
-        'relative flex items-center justify-between overflow-hidden rounded-xl px-3 py-1.5 transition-colors duration-300',
-        allMet
-          ? 'bg-emerald-50/90 border border-emerald-200/80 text-emerald-900'
-          : metCount > 0
-            ? 'bg-neutral-50/95 border border-neutral-200/80 text-neutral-800'
-            : 'bg-neutral-50/70 border border-neutral-100 text-neutral-700',
+        'relative flex items-center justify-between px-1 py-1 bg-transparent border-none shadow-none transition-colors duration-300',
         props.className,
       )}
     >
@@ -112,16 +109,28 @@ export function PasswordStrengthTicker(props: {
             <div className="flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-emerald-600 text-white shadow-xs">
               <Check className="h-2.5 w-2.5 stroke-[3]" />
             </div>
-            <span className="text-[11px] font-semibold text-emerald-800">
+            <span className={cn(
+              'text-[11px] font-semibold transition-colors',
+              isDark ? 'text-emerald-400' : 'text-emerald-800',
+            )}>
               Password kuat & memenuhi syarat
             </span>
           </>
         ) : (
           <>
-            <div className="flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-neutral-200 text-neutral-600">
-              <div className="h-1.5 w-1.5 rounded-full bg-neutral-500" />
+            <div className={cn(
+              'flex h-4 w-4 shrink-0 items-center justify-center rounded-full transition-colors',
+              isDark ? 'bg-white/15 text-neutral-300' : 'bg-neutral-200 text-neutral-600',
+            )}>
+              <div className={cn(
+                'h-1.5 w-1.5 rounded-full transition-colors',
+                isDark ? 'bg-neutral-400' : 'bg-neutral-500',
+              )} />
             </div>
-            <span className="text-[11px] font-medium text-neutral-700">
+            <span className={cn(
+              'text-[11px] font-medium transition-colors',
+              isDark ? 'text-neutral-300' : 'text-neutral-700',
+            )}>
               {activeRequirement?.label}
             </span>
           </>
@@ -131,18 +140,21 @@ export function PasswordStrengthTicker(props: {
       {/* Progress Metric */}
       <div className="flex items-center gap-1 shrink-0 pl-2">
         {allMet ? (
-          <ShieldCheck className="h-3.5 w-3.5 text-emerald-600" />
+          <ShieldCheck className="h-3.5 w-3.5 text-emerald-500" />
         ) : (
-          <ShieldAlert className="h-3.5 w-3.5 text-neutral-400" />
+          <ShieldAlert className={cn(
+            'h-3.5 w-3.5 transition-colors',
+            isDark ? 'text-neutral-500' : 'text-neutral-400',
+          )} />
         )}
         <span
           className={cn(
-            'text-[10px] font-semibold tabular-nums',
+            'text-[10px] font-semibold tabular-nums transition-colors',
             allMet
-              ? 'text-emerald-700'
+              ? isDark ? 'text-emerald-400' : 'text-emerald-700'
               : metCount > 0
-                ? 'text-neutral-700'
-                : 'text-neutral-500',
+                ? isDark ? 'text-neutral-300' : 'text-neutral-700'
+                : isDark ? 'text-neutral-500' : 'text-neutral-500',
           )}
         >
           {metCount}/{criteria.length}

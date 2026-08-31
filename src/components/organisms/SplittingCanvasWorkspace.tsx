@@ -51,9 +51,7 @@ const SplittingSingleFrameInstance = React.memo(function SplittingSingleFrameIns
   const isDarkScreen =
     route.screen === 'onboarding'
       ? true
-      : route.screen === 'dashboard' || route.screen === 'id-card' || route.screen === 'presence-history'
-        ? isDark
-        : true;
+      : isDark;
 
   const noop = () => {};
 
@@ -82,14 +80,17 @@ const SplittingSingleFrameInstance = React.memo(function SplittingSingleFrameIns
 
     // Auth Sheets with Drawer Backdrop
     return (
-      <div className="relative flex h-full w-full flex-col justify-end overflow-hidden bg-neutral-950">
+      <div className={cn(
+        'relative flex h-full w-full flex-col justify-end overflow-hidden transition-colors',
+        isDark ? 'bg-neutral-950' : 'bg-slate-900',
+      )}>
         <div
           className="absolute inset-0 bg-cover bg-center"
           style={{
             backgroundImage: 'url("/assets/images/woman-signin-hero.png")',
           }}
         />
-        <div className="absolute inset-0 z-10 w-full h-full bg-black/65 backdrop-blur-[1.5px]" />
+        <div className="absolute inset-0 z-10 w-full h-full bg-black/60 backdrop-blur-xs transition-opacity duration-300" />
 
         {route.screen === 'login' && (
           <LoginScreen
@@ -101,6 +102,7 @@ const SplittingSingleFrameInstance = React.memo(function SplittingSingleFrameIns
             onForgotPassword={noop}
             onGoToSignUp={noop}
             onClose={noop}
+            theme={theme}
           />
         )}
 
@@ -113,6 +115,7 @@ const SplittingSingleFrameInstance = React.memo(function SplittingSingleFrameIns
             onSubmit={noop}
             onGoToLogin={noop}
             onClose={noop}
+            theme={theme}
           />
         )}
 
@@ -125,6 +128,7 @@ const SplittingSingleFrameInstance = React.memo(function SplittingSingleFrameIns
             onSubmit={noop}
             onBack={noop}
             onClose={noop}
+            theme={theme}
           />
         )}
 
@@ -142,6 +146,7 @@ const SplittingSingleFrameInstance = React.memo(function SplittingSingleFrameIns
             onResend={noop}
             onBack={noop}
             onClose={noop}
+            theme={theme}
           />
         )}
 
@@ -154,11 +159,12 @@ const SplittingSingleFrameInstance = React.memo(function SplittingSingleFrameIns
             onSubmit={noop}
             onBack={noop}
             onClose={noop}
+            theme={theme}
           />
         )}
 
         {route.screen === 'success' && (
-          <SuccessScreen onLogin={noop} onClose={noop} />
+          <SuccessScreen onLogin={noop} onClose={noop} theme={theme} />
         )}
       </div>
     );

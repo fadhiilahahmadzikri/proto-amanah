@@ -10,6 +10,8 @@ import { MobileAuthTemplate } from '@/components/templates/MobileAuthTemplate';
 import contentData from '@/data/auth/content.json';
 import type { AuthFormData, AuthValidationErrors } from '@/types/auth.types';
 
+import { cn } from '@/lib/utils';
+
 export function SignUpScreen(props: {
   formData: AuthFormData;
   errors: AuthValidationErrors;
@@ -18,21 +20,30 @@ export function SignUpScreen(props: {
   onSubmit: (event?: React.SyntheticEvent) => void;
   onGoToLogin: () => void;
   onClose: () => void;
+  theme?: 'dark' | 'light';
 }) {
   const content = contentData.signUp;
+  const isDark = props.theme === 'dark';
 
   return (
     <MobileAuthTemplate
       showClose
       onClose={props.onClose}
+      theme={props.theme}
     >
       <div className="flex flex-col gap-4 pt-1 pb-4">
         {/* Title */}
         <div className="flex flex-col gap-1">
-          <h2 className="text-2xl font-bold tracking-tight text-neutral-900 leading-snug">
+          <h2 className={cn(
+            'text-2xl font-bold tracking-tight leading-snug transition-colors',
+            isDark ? 'text-white' : 'text-neutral-900',
+          )}>
             {content.title}
           </h2>
-          <p className="text-xs text-neutral-500 leading-relaxed">
+          <p className={cn(
+            'text-xs leading-relaxed transition-colors',
+            isDark ? 'text-neutral-400' : 'text-neutral-500',
+          )}>
             {content.subtitle}
           </p>
         </div>
@@ -49,6 +60,7 @@ export function SignUpScreen(props: {
             startIcon={<User className="h-4 w-4 text-neutral-400" />}
             error={props.errors.fullName}
             autoComplete="name"
+            theme={props.theme}
           />
 
           <FormField
@@ -62,6 +74,7 @@ export function SignUpScreen(props: {
             startIcon={<Mail className="h-4 w-4 text-neutral-400" />}
             error={props.errors.email}
             autoComplete="email"
+            theme={props.theme}
           />
 
           <FormField
@@ -75,6 +88,7 @@ export function SignUpScreen(props: {
             startIcon={<Phone className="h-4 w-4 text-neutral-400" />}
             error={props.errors.phone}
             autoComplete="tel"
+            theme={props.theme}
           />
 
           <PasswordInput
@@ -87,6 +101,7 @@ export function SignUpScreen(props: {
             error={props.errors.password}
             showStrength
             autoComplete="new-password"
+            theme={props.theme}
           />
 
           <PasswordInput
@@ -98,6 +113,7 @@ export function SignUpScreen(props: {
             }}
             error={props.errors.confirmPassword}
             autoComplete="new-password"
+            theme={props.theme}
           />
 
           {/* Primary Submit Action & Alternative Options */}
@@ -114,8 +130,14 @@ export function SignUpScreen(props: {
             </Button>
 
             <div className="relative flex items-center justify-center my-0.5">
-              <div className="w-full border-t border-neutral-200" />
-              <span className="absolute bg-white px-3 text-[11px] text-neutral-400 font-medium">
+              <div className={cn(
+                'w-full border-t transition-colors',
+                isDark ? 'border-white/10' : 'border-neutral-200',
+              )} />
+              <span className={cn(
+                'absolute px-3 text-[11px] font-medium transition-colors',
+                isDark ? 'bg-[#0a0e1a] text-neutral-400' : 'bg-white text-neutral-400',
+              )}>
                 {content.dividerText}
               </span>
             </div>
@@ -124,17 +146,24 @@ export function SignUpScreen(props: {
               provider="google"
               label={content.continueWithGoogle}
               onClick={() => {}}
+              theme={props.theme}
             />
           </div>
         </form>
 
         {/* Footer Navigation */}
-        <div className="flex items-center justify-center gap-1.5 text-xs text-neutral-500 pt-1">
+        <div className={cn(
+          'flex items-center justify-center gap-1.5 text-xs pt-1 transition-colors',
+          isDark ? 'text-neutral-400' : 'text-neutral-500',
+        )}>
           <span>{content.alreadyHaveAccount}</span>
           <button
             type="button"
             onClick={props.onGoToLogin}
-            className="font-semibold text-[#0d66e9] hover:text-blue-700 hover:underline focus:outline-none cursor-pointer"
+            className={cn(
+              'font-semibold hover:underline focus:outline-none cursor-pointer transition-colors',
+              isDark ? 'text-cyan-400 hover:text-cyan-300' : 'text-[#0d66e9] hover:text-blue-700',
+            )}
           >
             {content.signInLink}
           </button>

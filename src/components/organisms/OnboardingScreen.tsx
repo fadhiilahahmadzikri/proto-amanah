@@ -42,21 +42,21 @@ export function OnboardingScreen(props: {
         {/* Buttons */}
         <div className="flex flex-col gap-2.5 pt-1">
           <Button
-            variant="outline"
+            variant="primary"
             fullWidth
             size="lg"
             onClick={props.onGetStarted}
-            className="bg-white font-semibold text-neutral-950 shadow-lg shadow-black/20 hover:bg-neutral-100"
+            className="font-semibold !text-white shadow-lg shadow-blue-600/20"
           >
             {content.getStarted}
           </Button>
 
           <Button
-            variant="glass"
+            variant="ghost"
             fullWidth
             size="lg"
             onClick={props.onAlreadyHaveAccount}
-            className="font-medium"
+            className="font-medium !text-white !bg-transparent hover:!bg-white/10 border-none shadow-none"
           >
             {content.alreadyHaveAccount}
           </Button>

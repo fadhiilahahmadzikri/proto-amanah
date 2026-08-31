@@ -8,6 +8,7 @@ import { cn } from '@/lib/utils';
 
 export function MobileAuthTemplate(props: {
   children: React.ReactNode;
+  theme?: 'dark' | 'light';
   onBack?: () => void;
   onClose?: () => void;
   showBack?: boolean;
@@ -15,6 +16,7 @@ export function MobileAuthTemplate(props: {
   className?: string;
   headerClassName?: string;
 }) {
+  const isDark = props.theme === 'dark';
   const drawerRef = React.useRef<HTMLDivElement>(null);
   const contentRef = React.useRef<HTMLDivElement>(null);
   const startYRef = React.useRef(0);
@@ -152,7 +154,10 @@ export function MobileAuthTemplate(props: {
       onPointerUp={handlePointerUp}
       onPointerCancel={handlePointerUp}
       className={cn(
-        'relative z-20 flex max-h-[92%] min-h-[82%] mt-auto w-full flex-col overflow-hidden rounded-t-[32px] sm:rounded-t-[36px] bg-white shadow-[0_-12px_45px_rgba(0,0,0,0.25)] border-t border-neutral-100 will-change-transform select-text touch-pan-y',
+        'relative z-20 flex max-h-[92%] min-h-[82%] mt-auto w-full flex-col overflow-hidden rounded-t-[32px] sm:rounded-t-[36px] will-change-transform select-text touch-pan-y transition-colors duration-300 shadow-[0_-12px_45px_rgba(0,0,0,0.25)] border-t',
+        isDark
+          ? 'bg-[#0a0e1a] border-white/10 text-white shadow-black/80'
+          : 'bg-white border-neutral-100 text-slate-900 shadow-[0_-12px_45px_rgba(0,0,0,0.25)]',
         props.className,
       )}
     >
@@ -165,15 +170,25 @@ export function MobileAuthTemplate(props: {
           e.stopPropagation();
           triggerClose();
         }}
-        className="flex w-full cursor-grab active:cursor-grabbing flex-col items-center justify-center pt-3.5 pb-1 shrink-0 touch-none select-none hover:bg-neutral-50/50 transition-colors"
+        className={cn(
+          'flex w-full cursor-grab active:cursor-grabbing flex-col items-center justify-center pt-3.5 pb-1 shrink-0 touch-none select-none transition-colors',
+          isDark ? 'hover:bg-white/5' : 'hover:bg-neutral-50/50',
+        )}
       >
-        <div className="h-1.25 w-11 rounded-full bg-neutral-300 hover:bg-neutral-400 active:bg-neutral-500 transition-colors duration-150" />
+        <div
+          className={cn(
+            'h-1.25 w-11 rounded-full transition-colors duration-150',
+            isDark
+              ? 'bg-white/25 hover:bg-white/40 active:bg-white/50'
+              : 'bg-neutral-300 hover:bg-neutral-400 active:bg-neutral-500',
+          )}
+        />
       </div>
 
       {/* Sheet Header Actions (Back & Close) */}
       <div
         className={cn(
-          'relative z-20 flex items-center justify-between px-5 pt-0.5 pb-2 shrink-0 h-11',
+          'relative z-20 flex items-center justify-between px-5 pt-0.5 pb-2 shrink-0 h-11 border-b border-inherit',
           props.headerClassName,
         )}
       >
@@ -190,9 +205,14 @@ export function MobileAuthTemplate(props: {
                 e.stopPropagation();
               }}
               variant="ghost"
-              className="text-neutral-700 hover:text-neutral-950 -ml-1 cursor-pointer"
+              className={cn(
+                '-ml-1 cursor-pointer transition-colors',
+                isDark
+                  ? 'bg-white/10 text-neutral-300 hover:text-white hover:bg-white/20'
+                  : 'bg-neutral-100/80 text-neutral-600 hover:text-neutral-900 hover:bg-slate-200',
+              )}
             >
-              <ArrowLeft className="h-5 w-5" />
+              <ArrowLeft className="h-4 w-4" />
             </IconButton>
           )}
         </div>
@@ -213,7 +233,12 @@ export function MobileAuthTemplate(props: {
                 e.stopPropagation();
               }}
               variant="ghost"
-              className="bg-neutral-100/80 text-neutral-500 hover:text-neutral-900 -mr-1 cursor-pointer"
+              className={cn(
+                '-mr-1 cursor-pointer transition-colors',
+                isDark
+                  ? 'bg-white/10 text-neutral-300 hover:text-white hover:bg-white/20'
+                  : 'bg-neutral-100/80 text-neutral-600 hover:text-neutral-900 hover:bg-slate-200',
+              )}
             >
               <X className="h-4 w-4" />
             </IconButton>

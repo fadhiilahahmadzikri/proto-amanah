@@ -7,6 +7,8 @@ import { MobileAuthTemplate } from '@/components/templates/MobileAuthTemplate';
 import contentData from '@/data/auth/content.json';
 import type { AuthFormData, AuthValidationErrors } from '@/types/auth.types';
 
+import { cn } from '@/lib/utils';
+
 export function ChangePasswordScreen(props: {
   formData: AuthFormData;
   errors: AuthValidationErrors;
@@ -15,8 +17,10 @@ export function ChangePasswordScreen(props: {
   onSubmit: (event?: React.SyntheticEvent) => void;
   onBack: () => void;
   onClose: () => void;
+  theme?: 'dark' | 'light';
 }) {
   const content = contentData.changePassword;
+  const isDark = props.theme === 'dark';
 
   return (
     <MobileAuthTemplate
@@ -24,14 +28,21 @@ export function ChangePasswordScreen(props: {
       showClose
       onBack={props.onBack}
       onClose={props.onClose}
+      theme={props.theme}
     >
       <div className="flex flex-col gap-5 pt-1 pb-4">
         {/* Header & Subtitle */}
         <div className="flex flex-col gap-1">
-          <h2 className="text-2xl font-bold tracking-tight text-neutral-900 leading-snug">
+          <h2 className={cn(
+            'text-2xl font-bold tracking-tight leading-snug transition-colors',
+            isDark ? 'text-white' : 'text-neutral-900',
+          )}>
             {content.title}
           </h2>
-          <p className="text-xs text-neutral-500 leading-relaxed">
+          <p className={cn(
+            'text-xs leading-relaxed transition-colors',
+            isDark ? 'text-neutral-400' : 'text-neutral-500',
+          )}>
             {content.subtitle}
           </p>
         </div>
@@ -48,6 +59,7 @@ export function ChangePasswordScreen(props: {
             error={props.errors.newPassword}
             showStrength
             autoComplete="new-password"
+            theme={props.theme}
           />
 
           <PasswordInput
@@ -59,6 +71,7 @@ export function ChangePasswordScreen(props: {
             }}
             error={props.errors.confirmNewPassword}
             autoComplete="new-password"
+            theme={props.theme}
           />
 
           <div className="pt-2">

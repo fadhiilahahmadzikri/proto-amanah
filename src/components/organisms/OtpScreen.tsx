@@ -8,6 +8,8 @@ import { MobileAuthTemplate } from '@/components/templates/MobileAuthTemplate';
 import contentData from '@/data/auth/content.json';
 import type { AuthFormData, AuthValidationErrors } from '@/types/auth.types';
 
+import { cn } from '@/lib/utils';
+
 export function OtpScreen(props: {
   formData: AuthFormData;
   errors: AuthValidationErrors;
@@ -22,8 +24,10 @@ export function OtpScreen(props: {
   onBack: () => void;
   onClose: () => void;
   statusMessage?: string | null;
+  theme?: 'dark' | 'light';
 }) {
   const content = contentData.otp;
+  const isDark = props.theme === 'dark';
 
   const minutes = Math.floor(props.countdownSeconds / 60);
   const seconds = props.countdownSeconds % 60;
@@ -39,16 +43,26 @@ export function OtpScreen(props: {
       showClose
       onBack={props.onBack}
       onClose={props.onClose}
+      theme={props.theme}
     >
       <div className="flex flex-col gap-5 pt-1 pb-4">
         {/* Header & Subtitle */}
         <div className="flex flex-col gap-1">
-          <h2 className="text-2xl font-bold tracking-tight text-neutral-900 leading-snug">
+          <h2 className={cn(
+            'text-2xl font-bold tracking-tight leading-snug transition-colors',
+            isDark ? 'text-white' : 'text-neutral-900',
+          )}>
             {content.title}
           </h2>
-          <p className="text-xs text-neutral-500 leading-relaxed">
+          <p className={cn(
+            'text-xs leading-relaxed transition-colors',
+            isDark ? 'text-neutral-400' : 'text-neutral-500',
+          )}>
             {content.subtitle}{' '}
-            <span className="font-semibold text-neutral-800">
+            <span className={cn(
+              'font-semibold transition-colors',
+              isDark ? 'text-neutral-200' : 'text-neutral-800',
+            )}>
               {emailDisplay}
             </span>
           </p>
@@ -63,6 +77,7 @@ export function OtpScreen(props: {
             onChange={props.onOtpChange}
             onComplete={props.onOtpComplete}
             error={props.errors.otp}
+            theme={props.theme}
           />
 
           {/* Resend OTP Area */}
@@ -72,7 +87,12 @@ export function OtpScreen(props: {
                 type="button"
                 onClick={props.onResend}
                 disabled={props.isResending}
-                className="inline-flex items-center gap-1.5 text-xs font-semibold text-neutral-800 hover:text-neutral-950 p-1.5 transition-colors cursor-pointer disabled:opacity-50"
+                className={cn(
+                  'inline-flex items-center gap-1.5 text-xs font-semibold p-1.5 transition-colors cursor-pointer disabled:opacity-50',
+                  isDark
+                    ? 'text-neutral-200 hover:text-white'
+                    : 'text-neutral-800 hover:text-neutral-950',
+                )}
               >
                 <RotateCw className={`h-3.5 w-3.5 ${props.isResending ? 'animate-spin' : ''}`} />
                 <span>
@@ -82,9 +102,15 @@ export function OtpScreen(props: {
                 </span>
               </button>
             ) : (
-              <div className="flex items-center gap-1 text-xs text-neutral-500 font-medium">
+              <div className={cn(
+                'flex items-center gap-1 text-xs font-medium transition-colors',
+                isDark ? 'text-neutral-400' : 'text-neutral-500',
+              )}>
                 <span>{content.resendCountdownPrefix}</span>
-                <span className="font-bold text-neutral-900 tabular-nums">
+                <span className={cn(
+                  'font-bold tabular-nums transition-colors',
+                  isDark ? 'text-white' : 'text-neutral-900',
+                )}>
                   {formattedCountdown}
                 </span>
               </div>
@@ -93,8 +119,13 @@ export function OtpScreen(props: {
 
           {/* In-place Toast / Status Feedback */}
           {props.statusMessage && (
-            <div className="flex items-center justify-center gap-1.5 text-xs font-medium text-emerald-700 bg-emerald-50 py-2 px-3 rounded-xl border border-emerald-200/60 animate-in fade-in slide-in-from-top-1">
-              <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0" />
+            <div className={cn(
+              'flex items-center justify-center gap-1.5 text-xs font-medium py-2 px-3 rounded-xl border animate-in fade-in slide-in-from-top-1 transition-colors',
+              isDark
+                ? 'text-emerald-300 bg-emerald-950/60 border-emerald-500/30'
+                : 'text-emerald-700 bg-emerald-50 border-emerald-200/60',
+            )}>
+              <CheckCircle2 className="h-4 w-4 text-emerald-500 shrink-0" />
               <span>{props.statusMessage}</span>
             </div>
           )}

@@ -18,18 +18,23 @@ export function PasswordInput(props: {
   onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
   error?: string;
   helperText?: string;
+  theme?: 'dark' | 'light';
   className?: string;
   showStrength?: boolean;
 }) {
   const [showPassword, setShowPassword] = React.useState(false);
   const value = props.value ?? '';
+  const isDark = props.theme === 'dark';
 
   return (
     <div className={cn('flex flex-col gap-1.5 w-full', props.className)}>
       {props.label && (
         <label
           htmlFor={props.id}
-          className="text-xs font-semibold tracking-wide text-neutral-700 pl-1"
+          className={cn(
+            'text-xs font-semibold tracking-wide pl-1 transition-colors',
+            isDark ? 'text-neutral-300' : 'text-neutral-700',
+          )}
         >
           {props.label}
           {props.required && <span className="text-red-500 ml-0.5">*</span>}
@@ -54,7 +59,10 @@ export function PasswordInput(props: {
               setShowPassword(prev => !prev);
             }}
             aria-label={showPassword ? 'Sembunyikan password' : 'Tampilkan password'}
-            className="text-neutral-400 hover:text-neutral-700 transition-colors p-1 rounded-full focus:outline-none cursor-pointer"
+            className={cn(
+              'transition-colors p-1 rounded-full focus:outline-none cursor-pointer',
+              isDark ? 'text-neutral-400 hover:text-white' : 'text-neutral-400 hover:text-neutral-700',
+            )}
           >
             {showPassword ? (
               <EyeOff className="h-4 w-4" />
@@ -64,14 +72,20 @@ export function PasswordInput(props: {
           </button>
         )}
         error={props.error}
+        theme={props.theme}
       />
       {props.showStrength && value.length > 0 && (
         <div className="mt-0.5">
-          <PasswordStrengthTicker password={value} />
+          <PasswordStrengthTicker password={value} theme={props.theme} />
         </div>
       )}
       {props.helperText && !props.error && (
-        <p className="text-[11px] text-neutral-500 pl-1">{props.helperText}</p>
+        <p className={cn(
+          'text-[11px] pl-1',
+          isDark ? 'text-neutral-400' : 'text-neutral-500',
+        )}>
+          {props.helperText}
+        </p>
       )}
     </div>
   );

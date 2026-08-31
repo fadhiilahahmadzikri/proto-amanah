@@ -84,9 +84,7 @@ export function AuthPrototype() {
   const isDarkScreen =
     currentScreen === 'onboarding'
       ? true
-      : currentScreen === 'dashboard' || currentScreen === 'id-card' || currentScreen === 'presence-history'
-        ? theme === 'dark'
-        : true;
+      : theme === 'dark';
 
   const toggleTheme = () => {
     setTheme(prev => (prev === 'dark' ? 'light' : 'dark'));
@@ -332,7 +330,10 @@ export function AuthPrototype() {
               onBack={() => navigateTo('dashboard')}
             />
           ) : (
-            <div className="relative flex h-full w-full flex-col justify-end overflow-hidden bg-neutral-950">
+            <div className={cn(
+              'relative flex h-full w-full flex-col justify-end overflow-hidden transition-colors',
+              theme === 'dark' ? 'bg-neutral-950' : 'bg-slate-900',
+            )}>
               {/* Underlying Hero Background Image */}
               <div
                 className="absolute inset-0 bg-cover bg-center transition-transform duration-700"
@@ -348,7 +349,7 @@ export function AuthPrototype() {
                 onClick={() => {
                   navigateTo('onboarding');
                 }}
-                className="absolute inset-0 z-10 w-full h-full bg-black/65 backdrop-blur-[1.5px] cursor-pointer focus:outline-none transition-opacity duration-300"
+                className="absolute inset-0 z-10 w-full h-full bg-black/60 backdrop-blur-xs cursor-pointer focus:outline-none transition-opacity duration-300"
               />
 
               {/* Render Active Screen as the Single Sheet Drawer */}
@@ -368,6 +369,7 @@ export function AuthPrototype() {
                   onClose={() => {
                     navigateTo('onboarding');
                   }}
+                  theme={theme}
                 />
               )}
 
@@ -384,6 +386,7 @@ export function AuthPrototype() {
                   onClose={() => {
                     navigateTo('onboarding');
                   }}
+                  theme={theme}
                 />
               )}
 
@@ -400,6 +403,7 @@ export function AuthPrototype() {
                   onClose={() => {
                     navigateTo('login');
                   }}
+                  theme={theme}
                 />
               )}
 
@@ -426,6 +430,7 @@ export function AuthPrototype() {
                     navigateTo('login');
                   }}
                   statusMessage={statusMessage}
+                  theme={theme}
                 />
               )}
 
@@ -442,6 +447,7 @@ export function AuthPrototype() {
                   onClose={() => {
                     navigateTo('login');
                   }}
+                  theme={theme}
                 />
               )}
 
@@ -455,6 +461,7 @@ export function AuthPrototype() {
                     handleSuccessLogin();
                     navigateTo('login');
                   }}
+                  theme={theme}
                 />
               )}
             </div>
