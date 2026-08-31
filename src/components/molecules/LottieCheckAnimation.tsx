@@ -87,7 +87,7 @@ export function LottieCheckAnimation(props: {
           cx="50"
           cy="50"
           r="44"
-          stroke="#2563EB"
+          stroke="#0d66e9"
           strokeWidth="3.5"
           strokeLinecap="round"
           strokeDasharray="280"
@@ -99,7 +99,7 @@ export function LottieCheckAnimation(props: {
         {/* Checkmark Stroke */}
         <path
           d="M32 52L44 64L68 38"
-          stroke="#1E40AF"
+          stroke="#1d58ac"
           strokeWidth="4.5"
           strokeLinecap="round"
           strokeLinejoin="round"

@@ -207,7 +207,7 @@ export function ScheduleCard(props: {
             <span
               className={cn(
                 'font-extrabold text-[12.5px] truncate leading-tight',
-                isDark ? 'text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.6)]' : 'text-slate-900',
+                isDark ? 'text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.6)]' : 'text-[#0f172b]',
               )}
             >
               {props.schedule.poli}
@@ -225,10 +225,10 @@ export function ScheduleCard(props: {
           {/* Clean Integrated Booking Pill in Liquid Glass Pill Style */}
           <div
             className={cn(
-              'px-2.5 py-1 rounded-full text-[11px] font-bold tracking-tight shadow-2xs shrink-0 flex items-center gap-1',
+              'px-2.5 py-1 rounded-full text-[11px] font-bold tracking-tight shadow-2xs shrink-0 flex items-center gap-1 tabular-nums',
               isDark
-                ? 'bg-white/10 border border-white/20 text-cyan-300 backdrop-blur-md'
-                : 'bg-sky-50 border border-sky-100 text-[#023e8a]',
+                ? 'bg-white/10 border border-white/20 text-white backdrop-blur-md'
+                : 'bg-slate-100 border border-slate-200 text-[#0f172b]',
             )}
           >
             <span>{props.schedule.slotCount} {props.schedule.slotText}</span>

@@ -120,13 +120,13 @@ export function M3Banner(props: M3BannerProps) {
           container: isDark
             ? 'bg-blue-950/40 border-b border-blue-500/20 text-cyan-200'
             : 'bg-blue-50 border-b border-blue-200 text-blue-950',
-          illustrationBg: isDark ? 'text-cyan-400' : 'text-blue-600',
+          illustrationBg: isDark ? 'text-cyan-400' : 'text-[#0d66e9]',
           primaryBtn: isDark
-            ? 'bg-cyan-500 hover:bg-cyan-400 text-cyan-950'
-            : 'bg-blue-600 hover:bg-blue-700 text-white',
+            ? 'btn-crisp-blue-dark font-bold'
+            : 'btn-crisp-blue font-bold',
           secondaryBtn: isDark
             ? 'text-cyan-300 hover:bg-cyan-500/15'
-            : 'text-blue-800 hover:bg-blue-100',
+            : 'text-[#0d66e9] hover:bg-blue-100/80',
           defaultIcon: <Info className="h-5 w-5 shrink-0" />,
         };
       case 'success':

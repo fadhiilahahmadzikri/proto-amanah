@@ -358,10 +358,9 @@ const SelectionModal = (props: {
             <button
               type="submit"
               className={cn(
-                'px-3 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer shrink-0 active:scale-95',
-                props.isDark
-                  ? 'bg-cyan-500 text-cyan-950 hover:bg-cyan-400'
-                  : 'bg-blue-600 text-white hover:bg-blue-700',
+                'px-3 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer shrink-0 active:scale-95 shadow-xs',
+                'btn-crisp-blue',
+                props.isDark && 'btn-crisp-blue-dark',
               )}
             >
               Gunakan
@@ -400,14 +399,14 @@ const SelectionModal = (props: {
                         : isSelected
                           ? props.isDark
                             ? 'border-cyan-400 bg-cyan-500/10 text-cyan-300 font-bold shadow-xs cursor-pointer active:scale-95'
-                            : 'border-blue-600 bg-blue-50 text-blue-700 font-bold shadow-xs cursor-pointer active:scale-95'
+                            : 'border-[#0d66e9] bg-blue-50 text-[#0d66e9] font-bold shadow-xs cursor-pointer active:scale-95'
                           : props.isDark
                             ? 'border-white/15 bg-transparent text-neutral-300 hover:border-white/30 hover:bg-white/5 cursor-pointer active:scale-95'
                             : 'border-slate-200 bg-transparent text-slate-700 hover:border-slate-300 hover:bg-slate-50 cursor-pointer active:scale-95',
                     )}
                   >
                     <span className="truncate">{opt}</span>
-                    {isSelected && <Check className="w-3.5 h-3.5 shrink-0 ml-1 text-cyan-400 dark:text-cyan-300" />}
+                    {isSelected && <Check className="w-3.5 h-3.5 shrink-0 ml-1 text-[#0d66e9] dark:text-cyan-300" />}
                   </button>
                 );
               })
@@ -1070,7 +1069,7 @@ export function ScheduleTabScreen(props: {
                 'p-1.5 -mr-1.5 rounded-full transition-all cursor-pointer active:scale-90 flex items-center justify-center',
                 isDark
                   ? 'text-cyan-400 hover:text-cyan-300 hover:bg-white/10'
-                  : 'text-blue-600 hover:text-blue-700 hover:bg-slate-100',
+                  : 'text-[#0d66e9] hover:text-blue-700 hover:bg-slate-100',
               )}
             >
               <Plus className="h-6 w-6 stroke-[2]" />
@@ -1117,8 +1116,8 @@ export function ScheduleTabScreen(props: {
                   <svg className="w-11 h-11 -rotate-90 transform-gpu" viewBox="0 0 48 48">
                     <defs>
                       <linearGradient id="capacityRadialGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                        <stop offset="0%" stopColor={isDark ? '#22d3ee' : '#2563eb'} />
-                        <stop offset="100%" stopColor={isDark ? '#06b6d4' : '#4f46e5'} />
+                        <stop offset="0%" stopColor={isDark ? '#22d3ee' : '#38bdf8'} />
+                        <stop offset="100%" stopColor={isDark ? '#06b6d4' : '#0d66e9'} />
                       </linearGradient>
                     </defs>
                     {/* Track Circle */}
@@ -1156,7 +1155,7 @@ export function ScheduleTabScreen(props: {
                     Kapasitas Hari Ini
                   </span>
                   <p className={cn('text-[11px] font-medium mt-0.5', isDark ? 'text-neutral-400' : 'text-slate-500')}>
-                    <span className={cn('font-bold', isDark ? 'text-cyan-400' : 'text-blue-600')}>
+                    <span className={cn('font-bold', isDark ? 'text-cyan-400' : 'text-[#0d66e9]')}>
                       {totalBookedPatientsToday}
                     </span>
                     <span> / {targetDailyQuota} Pasien Terdaftar</span>
@@ -1175,7 +1174,7 @@ export function ScheduleTabScreen(props: {
                   'text-xs font-bold transition-all cursor-pointer flex items-center gap-1 shrink-0 hover:underline',
                   isDark
                     ? 'text-cyan-400 hover:text-cyan-300'
-                    : 'text-blue-600 hover:text-blue-700',
+                    : 'text-[#0d66e9] hover:text-blue-700',
                 )}
               >
                 <span>Lihat Schedule</span>
@@ -1422,9 +1421,8 @@ export function ScheduleTabScreen(props: {
                           }}
                           className={cn(
                             'w-full py-2.5 rounded-2xl font-bold text-xs shadow-md transition-all text-center cursor-pointer active:scale-[0.98]',
-                            isDark
-                              ? 'bg-white hover:bg-white/90 text-slate-950 shadow-black/30'
-                              : 'bg-[#0a44ff] hover:bg-[#0038ff] text-white shadow-blue-500/25',
+                            'btn-crisp-blue',
+                            isDark && 'btn-crisp-blue-dark',
                           )}
                         >
                           Detail Pasien
@@ -1461,9 +1459,8 @@ export function ScheduleTabScreen(props: {
                           onClick={() => handleReopenSchedule(selectedDateKey)}
                           className={cn(
                             'w-full flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-xs font-bold shadow-md transition-all cursor-pointer active:scale-95',
-                            isDark
-                              ? 'bg-cyan-500 hover:bg-cyan-400 text-cyan-950 shadow-cyan-500/20'
-                              : 'bg-blue-600 hover:bg-blue-700 text-white shadow-blue-600/25',
+                            'btn-crisp-blue',
+                            isDark && 'btn-crisp-blue-dark',
                           )}
                         >
                           <span>Buka Jadwal</span>
@@ -1488,9 +1485,8 @@ export function ScheduleTabScreen(props: {
                           onClick={() => handleOpenAddDrawer(selectedDate)}
                           className={cn(
                             'w-full flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-xs font-bold shadow-md transition-all cursor-pointer active:scale-95',
-                            isDark
-                              ? 'bg-cyan-500 hover:bg-cyan-400 text-cyan-950 shadow-cyan-500/20'
-                              : 'bg-blue-600 hover:bg-blue-700 text-white shadow-blue-600/25',
+                            'btn-crisp-blue',
+                            isDark && 'btn-crisp-blue-dark',
                           )}
                         >
                           <Plus className="h-3.5 w-3.5" />
@@ -1623,24 +1619,24 @@ export function ScheduleTabScreen(props: {
                           className={cn(
                             'flex items-center gap-1.5 backdrop-blur-md px-3 py-1.5 rounded-full shadow-md transition-colors border',
                             isDark
-                              ? 'bg-[#0a0e1a]/70 border-white/10 text-cyan-400 shadow-black/40'
-                              : 'bg-white/90 border-slate-200/80 text-[#023e8a] shadow-slate-900/5',
+                              ? 'bg-[#0a0e1a]/70 border-white/10 text-white shadow-black/40'
+                              : 'bg-white/90 border-slate-200/80 text-[#0f172b] shadow-slate-900/5',
                           )}
                         >
                           <Users className="w-3.5 h-3.5 opacity-80" />
-                          <span className="text-xs font-bold tracking-tight">
+                          <span className="text-xs font-bold tracking-tight tabular-nums">
                             {bookedCount} Pasien Booking
                           </span>
                         </div>
                       </div>
 
                       {/* Card Content Overlay Layer */}
-                      <div className={cn('absolute bottom-0 inset-x-0 z-20 p-5 pt-6', isDark ? 'text-white' : 'text-slate-900')}>
+                      <div className={cn('absolute bottom-0 inset-x-0 z-20 p-5 pt-6', isDark ? 'text-white' : 'text-[#0f172b]')}>
                         {/* Session Name Heading */}
                         <h1
                           className={cn(
                             'text-[24px] font-black tracking-tight leading-none mb-3 truncate',
-                            isDark ? 'text-white' : 'text-slate-900',
+                            isDark ? 'text-white' : 'text-[#0f172b]',
                           )}
                         >
                           {sessionTitle}
@@ -1650,22 +1646,22 @@ export function ScheduleTabScreen(props: {
                         <div className="flex items-end justify-between gap-2">
                           {/* Room & Poli */}
                           <div className="flex flex-col justify-end text-left space-y-0.5 max-w-[55%]">
-                            <p
+                            <span
                               className={cn(
-                                'text-[13px] font-medium leading-snug tracking-tight truncate',
+                                'text-[14.5px] font-bold leading-snug tracking-tight truncate',
+                                isDark ? 'text-white' : 'text-[#0f172b]',
+                              )}
+                            >
+                              {sch.poli}
+                            </span>
+                            <span
+                              className={cn(
+                                'text-[12px] font-medium leading-snug tracking-tight truncate',
                                 isDark ? 'text-slate-300' : 'text-[#64748b]',
                               )}
                             >
-                              {sch.poli} • {sch.room}
-                            </p>
-                            <p
-                              className={cn(
-                                'text-[13.5px] font-bold leading-snug tracking-tight',
-                                isDark ? 'text-white' : 'text-slate-900',
-                              )}
-                            >
-                              {sch.date}
-                            </p>
+                              {sch.room}
+                            </span>
                           </div>
 
                           {/* Specifications: Jam Mulai & Jam Selesai */}
@@ -1674,11 +1670,11 @@ export function ScheduleTabScreen(props: {
                             <div className="flex flex-col items-center">
                               <div
                                 className={cn(
-                                  'flex items-center gap-1 font-bold text-[13.5px]',
-                                  isDark ? 'text-white' : 'text-slate-900',
+                                  'flex items-center gap-1 font-bold text-[13.5px] tabular-nums',
+                                  isDark ? 'text-white' : 'text-[#0f172b]',
                                 )}
                               >
-                                <Clock className={cn('w-3.5 h-3.5', isDark ? 'text-cyan-400' : 'text-blue-600')} />
+                                <Clock className={cn('w-3.5 h-3.5', isDark ? 'text-slate-300' : 'text-[#64748b]')} />
                                 <span>{displayStartTime}</span>
                               </div>
                               <span
@@ -1698,11 +1694,11 @@ export function ScheduleTabScreen(props: {
                             <div className="flex flex-col items-center">
                               <div
                                 className={cn(
-                                  'flex items-center gap-1 font-bold text-[13.5px]',
-                                  isDark ? 'text-white' : 'text-slate-900',
+                                  'flex items-center gap-1 font-bold text-[13.5px] tabular-nums',
+                                  isDark ? 'text-white' : 'text-[#0f172b]',
                                 )}
                               >
-                                <Clock className={cn('w-3.5 h-3.5', isDark ? 'text-cyan-400' : 'text-blue-600')} />
+                                <Clock className={cn('w-3.5 h-3.5', isDark ? 'text-slate-300' : 'text-[#64748b]')} />
                                 <span>{displayEndTime}</span>
                               </div>
                               <span
@@ -1730,9 +1726,8 @@ export function ScheduleTabScreen(props: {
                             }}
                             className={cn(
                               'flex-1 py-2.5 rounded-2xl font-bold text-xs shadow-md transition-all text-center cursor-pointer active:scale-[0.98]',
-                              isDark
-                                ? 'bg-white hover:bg-white/90 text-slate-950 shadow-black/30'
-                                : 'bg-[#0a44ff] hover:bg-[#0038ff] text-white shadow-blue-500/25',
+                              'btn-crisp-blue',
+                              isDark && 'btn-crisp-blue-dark',
                             )}
                           >
                             Detail Sesi
@@ -1804,9 +1799,8 @@ export function ScheduleTabScreen(props: {
                       onClick={() => handleOpenAddDrawer(selectedDate)}
                       className={cn(
                         'w-full flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-xs font-bold shadow-md transition-all cursor-pointer active:scale-95',
-                        isDark
-                          ? 'bg-cyan-500 hover:bg-cyan-400 text-cyan-950 shadow-cyan-500/20'
-                          : 'bg-blue-600 hover:bg-blue-700 text-white shadow-blue-600/25',
+                        'btn-crisp-blue',
+                        isDark && 'btn-crisp-blue-dark',
                       )}
                     >
                       <Plus className="h-4 w-4" />
@@ -1848,7 +1842,7 @@ export function ScheduleTabScreen(props: {
                     ))
                   ) : null}
                 </div>
-                <span className={cn('text-xs font-bold', isDark ? 'text-cyan-400' : 'text-blue-600')}>
+                <span className={cn('text-xs font-bold tabular-nums', isDark ? 'text-white' : 'text-[#0f172b]')}>
                   {detailSchedule?.bookedPatients?.length ?? 0} Pasien
                 </span>
               </div>
@@ -2061,9 +2055,8 @@ export function ScheduleTabScreen(props: {
                           }}
                           className={cn(
                             'w-full py-2.5 rounded-2xl font-bold text-xs shadow-md transition-all text-center cursor-pointer active:scale-[0.98]',
-                            isDark
-                              ? 'bg-white hover:bg-white/90 text-slate-950 shadow-black/30'
-                              : 'bg-[#0a44ff] hover:bg-[#0038ff] text-white shadow-blue-500/25',
+                            'btn-crisp-blue',
+                            isDark && 'btn-crisp-blue-dark',
                           )}
                         >
                           Detail Pasien
@@ -2261,7 +2254,7 @@ export function ScheduleTabScreen(props: {
                       <div
                         className={cn(
                           'p-1.5 rounded-lg shrink-0 transition-colors',
-                          isDark ? 'bg-blue-950/60 text-cyan-400' : 'bg-blue-50 text-blue-600',
+                          isDark ? 'bg-blue-950/60 text-cyan-400' : 'bg-blue-50 text-[#0d66e9]',
                         )}
                       >
                         <Calendar className="h-4 w-4" />
@@ -2345,12 +2338,12 @@ export function ScheduleTabScreen(props: {
                                 'h-8 w-8 mx-auto rounded-xl text-xs font-semibold flex items-center justify-center transition-all cursor-pointer active:scale-95',
                                 isSelected
                                   ? isDark
-                                    ? 'bg-cyan-500 text-cyan-950 font-bold shadow-md shadow-cyan-500/25'
-                                    : 'bg-blue-600 text-white font-bold shadow-md shadow-blue-600/25'
+                                    ? 'btn-crisp-blue-dark font-bold shadow-md shadow-cyan-500/25'
+                                    : 'btn-crisp-blue font-bold shadow-md shadow-blue-600/25'
                                   : isTodayDate
                                     ? isDark
-                                      ? 'bg-cyan-500/15 text-cyan-400 font-bold'
-                                      : 'bg-blue-50 text-blue-600 font-bold'
+                                      ? 'bg-cyan-500/15 text-cyan-400 font-bold border border-cyan-500/30'
+                                      : 'bg-blue-50 text-[#0d66e9] font-bold border border-blue-200/60'
                                     : isCurMonth
                                       ? isDark ? 'text-neutral-200 hover:bg-white/10' : 'text-slate-800 hover:bg-slate-100'
                                       : isDark ? 'text-neutral-600 hover:bg-white/5' : 'text-slate-300 hover:bg-slate-50',
@@ -2591,10 +2584,9 @@ export function ScheduleTabScreen(props: {
                   <button
                     type="submit"
                     className={cn(
-                      'flex-1 py-3 rounded-xl text-xs font-bold shadow-lg transition-all cursor-pointer active:scale-98',
-                      isDark
-                        ? 'bg-cyan-500 hover:bg-cyan-400 text-cyan-950 shadow-cyan-500/20'
-                        : 'bg-blue-600 hover:bg-blue-700 text-white shadow-blue-600/30',
+                      'flex-1 py-3 rounded-xl text-xs font-bold shadow-md transition-all cursor-pointer active:scale-98',
+                      'btn-crisp-blue',
+                      isDark && 'btn-crisp-blue-dark',
                     )}
                   >
                     {editingSchedule ? 'Simpan Perubahan' : 'Tambah Jadwal'}
@@ -2676,7 +2668,7 @@ export function ScheduleTabScreen(props: {
                         ? isDark ? 'bg-emerald-500/20 text-emerald-400' : 'bg-emerald-50 text-emerald-700'
                         : detailSchedule.badgeVariant === 'warning'
                           ? isDark ? 'bg-amber-500/20 text-amber-400' : 'bg-amber-50 text-amber-700'
-                          : isDark ? 'bg-blue-500/20 text-blue-400' : 'bg-blue-50 text-blue-700',
+                          : isDark ? 'bg-cyan-500/20 text-cyan-400' : 'bg-blue-50 text-[#0d66e9]',
                   )}
                 >
                   <span
@@ -2688,7 +2680,7 @@ export function ScheduleTabScreen(props: {
                           ? 'bg-emerald-500 animate-pulse'
                           : detailSchedule.badgeVariant === 'warning'
                             ? 'bg-amber-500'
-                            : 'bg-blue-500',
+                            : isDark ? 'bg-cyan-400' : 'bg-[#0d66e9]',
                     )}
                   />
                   <span>{isDayCuti ? 'Cuti' : detailSchedule.badge}</span>
@@ -2747,7 +2739,7 @@ export function ScheduleTabScreen(props: {
                   <span className={cn('font-medium', isDark ? 'text-neutral-400' : 'text-slate-500')}>
                     Total Pasien Booking
                   </span>
-                  <span className={cn('font-bold', isDark ? 'text-cyan-400' : 'text-blue-600')}>
+                  <span className={cn('font-bold tabular-nums', isDark ? 'text-white' : 'text-[#0f172b]')}>
                     {detailSchedule.bookedPatients?.length ?? 0} Pasien
                   </span>
                 </div>
@@ -2763,7 +2755,7 @@ export function ScheduleTabScreen(props: {
                   }}
                   className={cn(
                     'w-full flex items-center justify-between py-1 text-xs font-bold transition-all cursor-pointer group',
-                    isDark ? 'text-cyan-400 hover:text-cyan-300' : 'text-blue-600 hover:text-blue-700',
+                    isDark ? 'text-cyan-400 hover:text-cyan-300' : 'text-[#0d66e9] hover:text-blue-700',
                   )}
                 >
                   <div className="flex items-center gap-2.5">
@@ -2802,10 +2794,9 @@ export function ScheduleTabScreen(props: {
                     handleOpenEditDrawer(detailSchedule);
                   }}
                   className={cn(
-                    'w-full py-3 rounded-2xl text-xs font-bold shadow-lg transition-all cursor-pointer active:scale-98 flex items-center justify-center gap-2',
-                    isDark
-                      ? 'bg-cyan-500 hover:bg-cyan-400 text-cyan-950 shadow-cyan-500/20'
-                      : 'bg-blue-600 hover:bg-blue-700 text-white shadow-blue-600/30',
+                    'w-full py-3 rounded-2xl text-xs font-bold shadow-md transition-all cursor-pointer active:scale-98 flex items-center justify-center gap-2',
+                    'btn-crisp-blue',
+                    isDark && 'btn-crisp-blue-dark',
                   )}
                 >
                   <Edit3 className="h-4 w-4" />
@@ -2951,7 +2942,7 @@ export function ScheduleTabScreen(props: {
                         !isCurMonth && 'opacity-0 pointer-events-none',
                         isCurMonth && statusInfo.status === 'past' && 'opacity-30 cursor-not-allowed',
                         isCurMonth && statusInfo.status !== 'past' && 'cursor-pointer hover:bg-white/5 active:scale-95',
-                        isSelected && (isDark ? 'ring-2 ring-cyan-400 bg-white/10' : 'ring-2 ring-blue-600 bg-blue-50/80'),
+                        isSelected && (isDark ? 'ring-2 ring-cyan-400 bg-white/10 text-cyan-300' : 'ring-2 ring-[#0d66e9] bg-blue-50/80 text-[#0d66e9]'),
                         isCurMonth && !isSelected && statusInfo.status === 'today' && (isDark ? 'bg-white/5' : 'bg-slate-100/70'),
                       )}
                     >
@@ -2959,7 +2950,7 @@ export function ScheduleTabScreen(props: {
                       <span
                         className={cn(
                           'text-xs font-bold leading-none',
-                          isCurMonth && isTodayDate && (isDark ? 'text-cyan-400 font-extrabold' : 'text-blue-600 font-extrabold'),
+                          isCurMonth && isTodayDate && (isDark ? 'text-cyan-400 font-extrabold' : 'text-[#0d66e9] font-extrabold'),
                           isCurMonth && !isTodayDate && (isDark ? 'text-white' : 'text-slate-900'),
                         )}
                       >
@@ -2971,7 +2962,7 @@ export function ScheduleTabScreen(props: {
                         <span
                           className={cn(
                             'h-1.5 w-1.5 rounded-full shrink-0',
-                            statusInfo.status === 'today' && (isDark ? 'bg-cyan-400' : 'bg-blue-600'),
+                            statusInfo.status === 'today' && (isDark ? 'bg-cyan-400' : 'bg-[#0d66e9]'),
                             statusInfo.status === 'upcoming' && 'bg-emerald-500',
                             statusInfo.status === 'leave' && 'bg-amber-500',
                             statusInfo.status === 'closed' && (isDark ? 'bg-neutral-600' : 'bg-slate-300'),
@@ -2998,7 +2989,7 @@ export function ScheduleTabScreen(props: {
                   <span>Tutup</span>
                 </div>
                 <div className="flex items-center gap-1.5 text-[10px] font-semibold">
-                  <span className={cn('h-2 w-2 rounded-full shrink-0', isDark ? 'bg-cyan-400' : 'bg-blue-600')} />
+                  <span className={cn('h-2 w-2 rounded-full shrink-0', isDark ? 'bg-cyan-400' : 'bg-[#0d66e9]')} />
                   <span>Hari Ini</span>
                 </div>
               </div>

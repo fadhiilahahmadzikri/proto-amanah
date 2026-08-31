@@ -8,7 +8,7 @@
 
   /* Amanah Portal Aurora & Brand Design Tokens */
   --color-portal-bg: #f8faff;
-  --color-portal-brand: #0a44ff;
+  --color-portal-brand: #0d66e9;
   --color-portal-cyan: #00d4ff;
   --color-portal-emerald: #38c474;
   --color-portal-navy: #1c1645;
@@ -55,7 +55,11 @@ body {
   animation: retroLaserSweep 3.2s ease-in-out infinite;
 }
 
-/* Crisp Royal Blue Button Gradient System (Zero Glow) */
+/* ==========================================================================
+   Harmonized Crisp Button Design System (1:1 Carousel Grade)
+   ========================================================================== */
+
+/* 1. Primary Solid Crisp Blue / Cyan Button */
 .btn-crisp-blue {
   background-color: #0d66e9 !important;
   background-image: linear-gradient(to bottom, rgba(255, 255, 255, 0.28), rgba(255, 255, 255, 0)) !important;
@@ -74,7 +78,6 @@ body {
   filter: brightness(0.95);
 }
 
-/* Dark Mode Theme Respecting Gradient Composition (Zero Glow) */
 .dark .btn-crisp-blue,
 [data-theme="dark"] .btn-crisp-blue,
 .btn-crisp-blue-dark {
@@ -90,3 +93,104 @@ body {
 .btn-crisp-blue-dark:hover {
   filter: brightness(1.08);
 }
+
+/* 2. Soft Accent Variant (No heavy border, preserves subtle gradient & inner sheen) */
+.btn-crisp-soft {
+  background-color: #eef4ff !important;
+  background-image: linear-gradient(to bottom, rgba(255, 255, 255, 0.85), rgba(255, 255, 255, 0)) !important;
+  border: 0.8px solid rgba(13, 102, 233, 0.16) !important;
+  box-shadow: rgba(255, 255, 255, 0.6) 0px 0px 0px 1px inset, 0px 1px 2px rgba(13, 102, 233, 0.04) !important;
+  color: #0d66e9 !important;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.btn-crisp-soft:hover {
+  background-color: #e0ecff !important;
+  filter: brightness(1.02);
+}
+
+.btn-crisp-soft:active {
+  transform: scale(0.98);
+  background-color: #d4e4ff !important;
+}
+
+.dark .btn-crisp-soft,
+[data-theme="dark"] .btn-crisp-soft,
+.btn-crisp-soft-dark {
+  background-color: rgba(2, 132, 199, 0.16) !important;
+  background-image: linear-gradient(to bottom, rgba(56, 189, 248, 0.2) 0%, rgba(2, 132, 199, 0.05) 100%) !important;
+  border: 0.8px solid rgba(56, 189, 248, 0.32) !important;
+  box-shadow: rgba(255, 255, 255, 0.1) 0px 0px 0px 1px inset !important;
+  color: #38bdf8 !important;
+}
+
+.dark .btn-crisp-soft:hover,
+[data-theme="dark"] .btn-crisp-soft:hover,
+.btn-crisp-soft-dark:hover {
+  background-color: rgba(2, 132, 199, 0.24) !important;
+  filter: brightness(1.08);
+}
+
+/* 3. Ghost Accent Variant */
+.btn-crisp-ghost {
+  background-color: transparent !important;
+  color: #0d66e9 !important;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.btn-crisp-ghost:hover {
+  background-color: rgba(238, 244, 255, 0.75) !important;
+}
+
+.btn-crisp-ghost:active {
+  transform: scale(0.98);
+  background-color: rgba(224, 236, 255, 0.9) !important;
+}
+
+.dark .btn-crisp-ghost,
+[data-theme="dark"] .btn-crisp-ghost,
+.btn-crisp-ghost-dark {
+  background-color: transparent !important;
+  color: #38bdf8 !important;
+}
+
+.dark .btn-crisp-ghost:hover,
+[data-theme="dark"] .btn-crisp-ghost:hover,
+.btn-crisp-ghost-dark:hover {
+  background-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+/* 4. Crisp Outline Variant */
+.btn-crisp-outline {
+  background-color: #ffffff !important;
+  background-image: linear-gradient(to bottom, rgba(255, 255, 255, 1), rgba(248, 250, 255, 1)) !important;
+  border: 1px solid #bfdbfe !important;
+  box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.04) !important;
+  color: #0d66e9 !important;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.btn-crisp-outline:hover {
+  border-color: #0d66e9 !important;
+  background-color: #f4f8ff !important;
+}
+
+.btn-crisp-outline:active {
+  transform: scale(0.98);
+}
+
+.dark .btn-crisp-outline,
+[data-theme="dark"] .btn-crisp-outline,
+.btn-crisp-outline-dark {
+  background-color: rgba(255, 255, 255, 0.03) !important;
+  border: 1px solid rgba(56, 189, 248, 0.35) !important;
+  color: #38bdf8 !important;
+}
+
+.dark .btn-crisp-outline:hover,
+[data-theme="dark"] .btn-crisp-outline:hover,
+.btn-crisp-outline-dark:hover {
+  border-color: rgba(56, 189, 248, 0.6) !important;
+  background-color: rgba(56, 189, 248, 0.08) !important;
+}
+

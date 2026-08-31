@@ -218,7 +218,7 @@ export async function downloadDoctorIdCardPdf(
 
   // Sheet Header
   (ctx as any).letterSpacing = '-1px';
-  ctx.fillStyle = isDark ? '#67e8f9' : '#0a44ff';
+  ctx.fillStyle = isDark ? '#67e8f9' : '#0d66e9';
   ctx.font = `bold 56px ${fontSans}`;
   ctx.textAlign = 'left';
   ctx.fillText('RS AMANAH SEHAT', 180, 160);
@@ -277,10 +277,10 @@ export async function downloadDoctorIdCardPdf(
 
     const lightPalette = [
       { fg: '#002b9e', bg: '#eef4ff' },
-      { fg: '#0a44ff', bg: '#dbeafe' },
+      { fg: '#0d66e9', bg: '#dbeafe' },
       { fg: '#07247a', bg: '#eef4ff' },
       { fg: '#00d4ff', bg: '#002b9e' },
-      { fg: '#0a44ff', bg: '#ffffff' },
+      { fg: '#0d66e9', bg: '#ffffff' },
       { fg: '#002b9e', bg: '#dbeafe' },
     ];
     const darkPalette = [
@@ -300,7 +300,7 @@ export async function downloadDoctorIdCardPdf(
       ctx.beginPath();
       ctx.roundRect(startX + 100, cardY + 100, 52, 52, 14);
       ctx.fill();
-      ctx.fillStyle = isDark ? '#00d4ff' : '#0a44ff';
+      ctx.fillStyle = isDark ? '#00d4ff' : '#0d66e9';
       ctx.fillRect(startX + 118, cardY + 112, 16, 28);
       ctx.fillRect(startX + 112, cardY + 118, 28, 16);
 
@@ -371,7 +371,7 @@ export async function downloadDoctorIdCardPdf(
       ctx.font = `bold 36px "Plus Jakarta Sans", monospace`;
       ctx.fillText(profile.sip, startX + cardW - 100, bottomY + 165);
 
-      ctx.fillStyle = isDark ? '#2dd4bf' : '#0a44ff';
+      ctx.fillStyle = isDark ? '#2dd4bf' : '#0d66e9';
       ctx.font = `700 32px ${fontSans}`;
       ctx.fillText('RS AMANAH SEHAT', startX + cardW - 100, bottomY + 225);
     } else {
@@ -407,7 +407,7 @@ export async function downloadDoctorIdCardPdf(
       ctx.beginPath();
       ctx.roundRect(backCenterX - 140, cardY + 1720, 56, 56, 16);
       ctx.fill();
-      ctx.fillStyle = isDark ? '#00d4ff' : '#0a44ff';
+      ctx.fillStyle = isDark ? '#00d4ff' : '#0d66e9';
       ctx.fillRect(backCenterX - 124, cardY + 1734, 24, 28);
       ctx.fillRect(backCenterX - 130, cardY + 1738, 36, 20);
 

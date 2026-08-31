@@ -50,7 +50,7 @@ export function AuroraBackground(props: {
           {/* Vibrant Apple/Amanah Blue Base */}
           <div
             className={cn(
-              'absolute -top-[10%] -left-[20%] w-[140%] bg-[#0A44FF] rounded-full filter blur-[100px] transition-all duration-700',
+              'absolute -top-[10%] -left-[20%] w-[140%] bg-[#0d66e9] rounded-full filter blur-[100px] transition-all duration-700',
               isSoft ? 'h-[180px] opacity-50' : 'h-[270px] opacity-90',
             )}
           />

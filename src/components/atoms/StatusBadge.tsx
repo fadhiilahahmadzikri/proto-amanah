@@ -34,7 +34,7 @@ export function StatusBadge(props: {
           'px-2.5 py-1 rounded-md flex items-center gap-1 shrink-0 select-none transition-colors',
           isDark
             ? 'bg-blue-950/70 text-cyan-400 border border-cyan-500/20'
-            : 'bg-blue-50 text-[#0A44FF] border border-blue-100',
+            : 'bg-blue-50 text-[#0d66e9] border border-blue-100',
           props.className,
         )}
       >

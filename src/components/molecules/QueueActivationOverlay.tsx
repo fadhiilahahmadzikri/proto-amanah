@@ -137,9 +137,8 @@ export function QueueActivationOverlay(props: {
             onClick={handleCollectClick}
             className={cn(
               'w-full rounded-2xl py-3.5 text-sm font-bold active:scale-98 transition-all cursor-pointer text-center',
-              isDark
-                ? 'bg-gradient-to-r from-cyan-500 via-sky-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white shadow-[0_0_25px_rgba(6,182,212,0.45)]'
-                : 'bg-gradient-to-r from-[#0a44ff] via-[#1a55ff] to-[#0055ff] hover:from-blue-700 hover:to-blue-600 text-white shadow-[0_10px_25px_rgba(10,68,255,0.3)]',
+              'btn-crisp-blue',
+              isDark && 'btn-crisp-blue-dark',
             )}
           >
             Panggil &amp; Proses Pasien

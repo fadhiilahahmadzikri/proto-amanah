@@ -46,9 +46,9 @@ const INITIAL_NOTIFICATIONS: NotificationItem[] = [
     category: 'queue',
     isUnread: true,
     isUrgent: false,
-    colorPrimary: '#2563EB',
-    colorLight: '#60A5FA',
-    colorDark: '#1D4ED8',
+    colorPrimary: '#0d66e9',
+    colorLight: '#38bdf8',
+    colorDark: '#1d58ac',
     icon: Activity,
   },
   {

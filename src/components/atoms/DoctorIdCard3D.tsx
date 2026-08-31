@@ -142,10 +142,10 @@ function drawThemeGrid(
 ) {
   const lightPalette = [
     { fg: '#002b9e', bg: '#eef4ff' },
-    { fg: '#0a44ff', bg: '#dbeafe' },
+    { fg: '#0d66e9', bg: '#dbeafe' },
     { fg: '#07247a', bg: '#eef4ff' },
     { fg: '#00d4ff', bg: '#002b9e' },
-    { fg: '#0a44ff', bg: '#ffffff' },
+    { fg: '#0d66e9', bg: '#ffffff' },
     { fg: '#002b9e', bg: '#dbeafe' },
   ];
 
@@ -277,7 +277,7 @@ function createDoctorCardCanvasTexture(
   ctx.beginPath();
   ctx.roundRect(180, 200, 72, 72, 20);
   ctx.fill();
-  ctx.fillStyle = isDark ? '#00d4ff' : '#0a44ff';
+  ctx.fillStyle = isDark ? '#00d4ff' : '#0d66e9';
   ctx.fillRect(204, 216, 24, 40);
   ctx.fillRect(196, 224, 40, 24);
 
@@ -335,7 +335,7 @@ function createDoctorCardCanvasTexture(
   ctx.fillText(profile.sip || '503/442.1/SIP-D/2026', 1868, bottomPanelY + 225);
 
   (ctx as any).letterSpacing = '-1px';
-  ctx.fillStyle = isDark ? '#2dd4bf' : '#0a44ff';
+  ctx.fillStyle = isDark ? '#2dd4bf' : '#0d66e9';
   ctx.font = `700 46px ${fontSans}`;
   ctx.fillText('RS AMANAH SEHAT', 1868, bottomPanelY + 310);
 
@@ -360,7 +360,7 @@ function createDoctorCardCanvasTexture(
   ctx.beginPath();
   ctx.roundRect(backCenterX - 220, 2580, 76, 76, 22);
   ctx.fill();
-  ctx.fillStyle = isDark ? '#00d4ff' : '#0a44ff';
+  ctx.fillStyle = isDark ? '#00d4ff' : '#0d66e9';
   ctx.fillRect(backCenterX - 198, 2600, 32, 36);
   ctx.fillRect(backCenterX - 206, 2604, 48, 28);
 

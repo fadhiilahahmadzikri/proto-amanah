@@ -467,12 +467,12 @@ export function QueueDock3DCarousel(props: {
       >
         <div className="flex flex-col items-center">
           <ChevronDown
-            className={cn('animate-bounce', isDark ? 'text-sky-400' : 'text-[#0a44ff]')}
+            className={cn('animate-bounce', isDark ? 'text-sky-400' : 'text-[#0d66e9]')}
             size={24}
             strokeWidth={3}
           />
           <ChevronDown
-            className={cn('-mt-4 animate-bounce delay-150', isDark ? 'text-sky-400' : 'text-[#0a44ff]')}
+            className={cn('-mt-4 animate-bounce delay-150', isDark ? 'text-sky-400' : 'text-[#0d66e9]')}
             size={24}
             strokeWidth={3}
           />

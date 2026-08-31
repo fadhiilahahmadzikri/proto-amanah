@@ -4,8 +4,8 @@ import { cn } from '@/lib/utils';
 
 export function Button(props: {
   children: React.ReactNode;
-  variant?: 'primary' | 'secondary' | 'outline' | 'ghost' | 'glass';
-  size?: 'sm' | 'md' | 'lg';
+  variant?: 'primary' | 'secondary' | 'soft' | 'outline' | 'ghost' | 'glass';
+  size?: 'xs' | 'sm' | 'md' | 'lg';
   fullWidth?: boolean;
   disabled?: boolean;
   isLoading?: boolean;
@@ -17,25 +17,28 @@ export function Button(props: {
   endIcon?: React.ReactNode;
 }) {
   const baseClasses =
-    'relative inline-flex items-center justify-center font-medium transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:cursor-not-allowed select-none active:scale-[0.985] cursor-pointer';
+    'relative inline-flex items-center justify-center font-bold transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:cursor-not-allowed select-none active:scale-[0.985] cursor-pointer';
 
   const variantClasses = {
     primary:
       'btn-crisp-blue dark:btn-crisp-blue-dark font-bold active:scale-[0.985] disabled:opacity-50',
+    soft:
+      'btn-crisp-soft dark:btn-crisp-soft-dark font-bold active:scale-[0.985] disabled:opacity-50',
     secondary:
-      'bg-neutral-100 text-neutral-900 hover:bg-neutral-200 active:bg-neutral-300 focus-visible:ring-neutral-400 disabled:bg-neutral-100 disabled:text-neutral-400',
+      'bg-slate-100 dark:bg-white/10 text-slate-800 dark:text-white hover:bg-slate-200/80 dark:hover:bg-white/15 border border-slate-200/60 dark:border-white/10 shadow-2xs',
     outline:
-      'border border-neutral-200 bg-white text-neutral-900 hover:bg-neutral-50 active:bg-neutral-100 focus-visible:ring-neutral-400 disabled:border-neutral-200 disabled:text-neutral-400 shadow-2xs',
+      'btn-crisp-outline dark:btn-crisp-outline-dark font-bold active:scale-[0.985]',
     ghost:
-      'bg-transparent text-neutral-600 hover:text-neutral-950 hover:bg-neutral-100/60 active:bg-neutral-100 focus-visible:ring-neutral-400 disabled:text-neutral-400 disabled:hover:bg-transparent',
+      'btn-crisp-ghost dark:btn-crisp-ghost-dark font-semibold',
     glass:
       'bg-white/20 backdrop-blur-md text-white border border-white/30 hover:bg-white/30 active:bg-white/40 focus-visible:ring-white/50 shadow-md',
   };
 
   const sizeClasses = {
-    sm: 'h-10 px-4 text-xs rounded-full gap-2',
-    md: 'h-12 px-6 text-sm rounded-full gap-2.5',
-    lg: 'h-14 px-8 text-base rounded-full gap-3',
+    xs: 'h-8 px-3 text-[11px] rounded-xl gap-1.5',
+    sm: 'h-10 px-4 text-xs rounded-xl gap-2',
+    md: 'h-12 px-6 text-sm rounded-2xl gap-2.5',
+    lg: 'h-14 px-8 text-base rounded-2xl gap-3',
   };
 
   const selectedVariant = props.variant

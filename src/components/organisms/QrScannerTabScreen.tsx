@@ -60,7 +60,7 @@ export function QrScannerTabScreen(props: {
   const videoRef = React.useRef<HTMLVideoElement>(null);
   const mediaStreamRef = React.useRef<MediaStream | null>(null);
 
-  // GSAP Master Drawer Gesture Refs (Matching MobileAuthTemplate architecture)
+  // GSAP Master Drawer Gesture Refs
   const drawerRef = React.useRef<HTMLDivElement>(null);
   const startYRef = React.useRef(0);
   const currentDragYRef = React.useRef(0);
@@ -282,7 +282,11 @@ export function QrScannerTabScreen(props: {
                 <button
                   type="button"
                   onClick={requestCamera}
-                  className="mt-2 flex items-center gap-1.5 px-4 py-2 rounded-full bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-bold shadow-lg shadow-cyan-600/30 transition-all cursor-pointer"
+                  className={cn(
+                    'mt-2 flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-bold transition-all cursor-pointer',
+                    'btn-crisp-blue',
+                    isDark && 'btn-crisp-blue-dark',
+                  )}
                 >
                   <RotateCcw className="h-3.5 w-3.5" />
                   <span>Minta Izin Kamera</span>
@@ -303,15 +307,70 @@ export function QrScannerTabScreen(props: {
         {/* Ambient Dark Vignette overlay on top of video */}
         <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-transparent to-black/75 pointer-events-none z-10" />
 
-        {/* Retro Scanner Silhouette Pass (Translucent optical silhouette lines, full-width tanpa gap) */}
+        {/* Holographic Scanner Reticle Box Frame (Center Viewport Framing) */}
+        {!isScanned && (
+          <div className="absolute inset-0 z-15 flex flex-col items-center justify-center pointer-events-none pb-28">
+            <div className="relative w-64 h-64 sm:w-72 sm:h-72">
+              {/* Top-Left Corner Bracket */}
+              <div
+                className={cn(
+                  'absolute -top-1 -left-1 w-8 h-8 border-t-3 border-l-3 rounded-tl-xl transition-colors duration-300',
+                  isDark ? 'border-[#38bdf8] shadow-[0_0_12px_rgba(56,189,248,0.6)]' : 'border-[#0d66e9] shadow-[0_0_12px_rgba(13,102,233,0.5)]',
+                )}
+              />
+              {/* Top-Right Corner Bracket */}
+              <div
+                className={cn(
+                  'absolute -top-1 -right-1 w-8 h-8 border-t-3 border-r-3 rounded-tr-xl transition-colors duration-300',
+                  isDark ? 'border-[#38bdf8] shadow-[0_0_12px_rgba(56,189,248,0.6)]' : 'border-[#0d66e9] shadow-[0_0_12px_rgba(13,102,233,0.5)]',
+                )}
+              />
+              {/* Bottom-Left Corner Bracket */}
+              <div
+                className={cn(
+                  'absolute -bottom-1 -left-1 w-8 h-8 border-b-3 border-l-3 rounded-bl-xl transition-colors duration-300',
+                  isDark ? 'border-[#38bdf8] shadow-[0_0_12px_rgba(56,189,248,0.6)]' : 'border-[#0d66e9] shadow-[0_0_12px_rgba(13,102,233,0.5)]',
+                )}
+              />
+              {/* Bottom-Right Corner Bracket */}
+              <div
+                className={cn(
+                  'absolute -bottom-1 -right-1 w-8 h-8 border-b-3 border-r-3 rounded-br-xl transition-colors duration-300',
+                  isDark ? 'border-[#38bdf8] shadow-[0_0_12px_rgba(56,189,248,0.6)]' : 'border-[#0d66e9] shadow-[0_0_12px_rgba(13,102,233,0.5)]',
+                )}
+              />
+
+              {/* Centered Reticle Crosshair Pulse */}
+              <div className="absolute inset-0 flex items-center justify-center opacity-40">
+                <div className={cn('w-4 h-[1.5px]', isDark ? 'bg-cyan-400' : 'bg-blue-400')} />
+                <div className={cn('h-4 w-[1.5px] absolute', isDark ? 'bg-cyan-400' : 'bg-blue-400')} />
+              </div>
+            </div>
+
+            {/* Prompt Helper Pill */}
+            <div
+              className={cn(
+                'mt-5 px-3.5 py-1.5 rounded-full border backdrop-blur-md text-[11px] font-bold shadow-md transition-colors',
+                isDark
+                  ? 'bg-neutral-900/85 border-white/15 text-neutral-200 shadow-black/50'
+                  : 'bg-white/90 border-slate-200/80 text-slate-800 shadow-slate-900/10',
+              )}
+            >
+              <span>Arahkan kamera ke QR Code</span>
+            </div>
+          </div>
+        )}
+
+        {/* Retro Scanner Laser Sweep Pass */}
         {!isScanned && (
           <div className="absolute left-0 right-0 w-full pointer-events-none z-20 animate-retro-laser flex flex-col mix-blend-screen">
             {/* Retro Horizontal Silhouette Mask Trail */}
             <div
               className="w-full h-24 flex flex-col justify-end"
               style={{
-                background:
-                  'linear-gradient(to bottom, transparent 0%, rgba(0, 212, 255, 0.02) 35%, rgba(0, 212, 255, 0.12) 80%, rgba(0, 212, 255, 0.28) 100%)',
+                background: isDark
+                  ? 'linear-gradient(to bottom, transparent 0%, rgba(56, 189, 248, 0.02) 35%, rgba(56, 189, 248, 0.12) 80%, rgba(56, 189, 248, 0.28) 100%)'
+                  : 'linear-gradient(to bottom, transparent 0%, rgba(13, 102, 233, 0.02) 35%, rgba(13, 102, 233, 0.12) 80%, rgba(13, 102, 233, 0.28) 100%)',
                 maskImage:
                   'repeating-linear-gradient(0deg, black 0px, black 1px, transparent 1px, transparent 3.5px)',
                 WebkitMaskImage:
@@ -321,10 +380,11 @@ export function QrScannerTabScreen(props: {
 
             {/* Subdued Soft Master Scan Line */}
             <div
-              className="w-full h-[1.5px] bg-cyan-400/70"
+              className={cn('w-full h-[1.5px]', isDark ? 'bg-cyan-400/80' : 'bg-[#0d66e9]')}
               style={{
-                boxShadow:
-                  '0 0 6px rgba(34, 211, 238, 0.5), 0 0 12px rgba(10, 68, 255, 0.25)',
+                boxShadow: isDark
+                  ? '0 0 6px rgba(56, 189, 248, 0.6), 0 0 12px rgba(2, 132, 199, 0.35)'
+                  : '0 0 6px rgba(13, 102, 233, 0.6), 0 0 12px rgba(13, 102, 233, 0.35)',
               }}
             />
           </div>
@@ -426,7 +486,7 @@ export function QrScannerTabScreen(props: {
                 : 'bg-white/95 border-slate-200 text-slate-800 hover:bg-white shadow-slate-900/10',
             )}
           >
-            <LayoutGrid className="h-4 w-4 text-cyan-500" />
+            <LayoutGrid className={cn('h-4 w-4', isDark ? 'text-cyan-400' : 'text-[#0d66e9]')} />
             <span className="text-xs font-bold">Buka Menu Presensi</span>
           </button>
         </div>
@@ -443,8 +503,8 @@ export function QrScannerTabScreen(props: {
           className={cn(
             'relative z-30 w-full rounded-t-[32px] border-t p-4 pb-32 sm:pb-36 shadow-2xl transition-colors duration-300 select-text touch-pan-y backdrop-blur-2xl will-change-transform',
             isDark
-              ? 'bg-neutral-900/95 border-white/10 text-white shadow-black/80'
-              : 'bg-white/95 border-slate-200/90 text-slate-900 shadow-xl',
+              ? 'bg-[#0f1422]/98 border-white/10 text-white shadow-black/80'
+              : 'bg-white/98 border-slate-200/90 text-slate-900 shadow-2xl',
           )}
         >
           {/* Interactive Drag Handle (Drag down or click to dismiss) */}
@@ -467,16 +527,23 @@ export function QrScannerTabScreen(props: {
           {drawerView === 'menu' && (
             <div className="animate-in fade-in duration-200">
               {/* Blue Info Strip Banner with Minimize Action */}
-              <div className="flex items-center justify-between p-2.5 pl-3 rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-700 text-white text-xs font-semibold mb-3 shadow-md shadow-blue-500/20">
+              <div
+                className={cn(
+                  'flex items-center justify-between p-2.5 pl-3.5 rounded-2xl text-white text-xs font-semibold mb-3 shadow-md',
+                  isDark
+                    ? 'bg-gradient-to-r from-cyan-600 to-blue-700 shadow-cyan-600/20'
+                    : 'bg-gradient-to-r from-[#0d66e9] to-[#0055ff] shadow-blue-500/25',
+                )}
+              >
                 <div className="flex items-center gap-2 truncate">
-                  <Sparkles className="h-4 w-4 text-cyan-300 shrink-0" />
+                  <Sparkles className={cn('h-4 w-4 shrink-0', isDark ? 'text-cyan-200' : 'text-cyan-300')} />
                   <span className="text-[11px] truncate">Praktek Poli Anak dimulai 08:00 WIB</span>
                 </div>
                 <button
                   type="button"
                   onClick={triggerCloseDrawer}
                   title="Tutup Menu"
-                  className="flex h-6 w-6 items-center justify-center rounded-full bg-black/30 text-white hover:bg-black/50 transition-colors shrink-0 ml-2 cursor-pointer"
+                  className="flex h-6 w-6 items-center justify-center rounded-full bg-black/25 text-white hover:bg-black/40 transition-colors shrink-0 ml-2 cursor-pointer"
                 >
                   <ChevronDown className="h-3.5 w-3.5" />
                 </button>
@@ -489,13 +556,18 @@ export function QrScannerTabScreen(props: {
                   type="button"
                   onClick={() => setDrawerView('my-qr')}
                   className={cn(
-                    'flex flex-col items-center justify-center gap-2 p-3 rounded-2xl border transition-all cursor-pointer shadow-sm active:scale-95',
+                    'flex flex-col items-center justify-center gap-2 p-3 rounded-2xl border transition-all cursor-pointer shadow-xs active:scale-95',
                     isDark
-                      ? 'bg-neutral-800/80 border-white/10 hover:border-cyan-400/50 hover:bg-neutral-800 text-white'
-                      : 'bg-slate-50 border-slate-200/80 hover:border-cyan-500/50 hover:bg-white text-slate-900',
+                      ? 'bg-white/5 border-white/10 hover:border-cyan-400/50 hover:bg-white/10 text-white'
+                      : 'bg-slate-50/80 border-slate-200/80 hover:border-blue-300 hover:bg-white text-slate-900',
                   )}
                 >
-                  <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-cyan-500/15 text-cyan-500 dark:text-cyan-400">
+                  <div
+                    className={cn(
+                      'flex h-9 w-9 items-center justify-center rounded-xl transition-colors',
+                      isDark ? 'bg-cyan-500/15 text-cyan-400' : 'bg-blue-50 text-[#0d66e9]',
+                    )}
+                  >
                     <QrCode className="h-5 w-5" />
                   </div>
                   <span className="text-[11px] font-bold text-center leading-tight">
@@ -503,7 +575,7 @@ export function QrScannerTabScreen(props: {
                   </span>
                 </button>
 
-                {/* Card 2: Presensi Manual (Switches drawer context directly to 6-grid PIN) */}
+                {/* Card 2: Presensi Manual */}
                 <button
                   type="button"
                   onClick={() => {
@@ -512,13 +584,18 @@ export function QrScannerTabScreen(props: {
                     setDrawerView('manual-pin');
                   }}
                   className={cn(
-                    'flex flex-col items-center justify-center gap-2 p-3 rounded-2xl border transition-all cursor-pointer shadow-sm active:scale-95',
+                    'flex flex-col items-center justify-center gap-2 p-3 rounded-2xl border transition-all cursor-pointer shadow-xs active:scale-95',
                     isDark
-                      ? 'bg-neutral-800/80 border-white/10 hover:border-cyan-400/50 hover:bg-neutral-800 text-white'
-                      : 'bg-slate-50 border-slate-200/80 hover:border-cyan-500/50 hover:bg-white text-slate-900',
+                      ? 'bg-white/5 border-white/10 hover:border-cyan-400/50 hover:bg-white/10 text-white'
+                      : 'bg-slate-50/80 border-slate-200/80 hover:border-blue-300 hover:bg-white text-slate-900',
                   )}
                 >
-                  <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-cyan-500/15 text-cyan-500 dark:text-cyan-400">
+                  <div
+                    className={cn(
+                      'flex h-9 w-9 items-center justify-center rounded-xl transition-colors',
+                      isDark ? 'bg-cyan-500/15 text-cyan-400' : 'bg-blue-50 text-[#0d66e9]',
+                    )}
+                  >
                     <KeyRound className="h-5 w-5" />
                   </div>
                   <span className="text-[11px] font-bold text-center leading-tight">
@@ -533,13 +610,18 @@ export function QrScannerTabScreen(props: {
                     setDrawerView('upload-qr');
                   }}
                   className={cn(
-                    'flex flex-col items-center justify-center gap-2 p-3 rounded-2xl border transition-all cursor-pointer shadow-sm active:scale-95',
+                    'flex flex-col items-center justify-center gap-2 p-3 rounded-2xl border transition-all cursor-pointer shadow-xs active:scale-95',
                     isDark
-                      ? 'bg-neutral-800/80 border-white/10 hover:border-cyan-400/50 hover:bg-neutral-800 text-white'
-                      : 'bg-slate-50 border-slate-200/80 hover:border-cyan-500/50 hover:bg-white text-slate-900',
+                      ? 'bg-white/5 border-white/10 hover:border-cyan-400/50 hover:bg-white/10 text-white'
+                      : 'bg-slate-50/80 border-slate-200/80 hover:border-blue-300 hover:bg-white text-slate-900',
                   )}
                 >
-                  <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-cyan-500/15 text-cyan-500 dark:text-cyan-400">
+                  <div
+                    className={cn(
+                      'flex h-9 w-9 items-center justify-center rounded-xl transition-colors',
+                      isDark ? 'bg-cyan-500/15 text-cyan-400' : 'bg-blue-50 text-[#0d66e9]',
+                    )}
+                  >
                     <ImageIcon className="h-5 w-5" />
                   </div>
                   <span className="text-[11px] font-bold text-center leading-tight">
@@ -553,7 +635,7 @@ export function QrScannerTabScreen(props: {
           {/* VIEW 2: Drawer Base Inline View for 6-Grid Non-Label PIN Input */}
           {drawerView === 'manual-pin' && (
             <div className="animate-in fade-in slide-in-from-right-4 duration-200 flex flex-col items-center text-center">
-              {/* Header Navigation Bar inside Drawer Base (No border, trailing text variant) */}
+              {/* Header Navigation Bar inside Drawer Base */}
               <div className="w-full flex items-center justify-between pb-2 mb-3">
                 <button
                   type="button"
@@ -562,7 +644,7 @@ export function QrScannerTabScreen(props: {
                     'flex items-center gap-1.5 text-xs font-bold transition-colors cursor-pointer py-1 -ml-0.5',
                     isDark
                       ? 'text-cyan-400 hover:text-cyan-300'
-                      : 'text-blue-600 hover:text-blue-700',
+                      : 'text-[#0d66e9] hover:text-blue-700',
                   )}
                 >
                   <ArrowLeft className="h-4 w-4" />
@@ -596,11 +678,15 @@ export function QrScannerTabScreen(props: {
                 />
               </div>
 
-              {/* Verification Button inside Drawer */}
+              {/* Harmonized Verification Button */}
               <button
                 type="button"
                 onClick={() => handleVerifyManualPin(manualPin)}
-                className="w-full py-3 px-4 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-lg shadow-blue-600/30 transition-all cursor-pointer active:scale-98"
+                className={cn(
+                  'w-full py-3 px-4 rounded-2xl font-bold text-xs shadow-md transition-all cursor-pointer active:scale-98',
+                  'btn-crisp-blue',
+                  isDark && 'btn-crisp-blue-dark',
+                )}
               >
                 Verifikasi Presensi
               </button>
@@ -610,7 +696,7 @@ export function QrScannerTabScreen(props: {
           {/* VIEW 3: Drawer Base Inline View for Doctor QR Generator & 5-Digit Code */}
           {drawerView === 'my-qr' && (
             <div className="animate-in fade-in slide-in-from-right-4 duration-200 flex flex-col items-center text-center">
-              {/* Header Bar inside Drawer Base (No border, trailing text variant) */}
+              {/* Header Bar inside Drawer Base */}
               <div className="w-full flex items-center justify-between pb-2 mb-2">
                 <button
                   type="button"
@@ -619,14 +705,14 @@ export function QrScannerTabScreen(props: {
                     'flex items-center gap-1.5 text-xs font-bold transition-colors cursor-pointer py-1 -ml-0.5',
                     isDark
                       ? 'text-cyan-400 hover:text-cyan-300'
-                      : 'text-blue-600 hover:text-blue-700',
+                      : 'text-[#0d66e9] hover:text-blue-700',
                   )}
                 >
                   <ArrowLeft className="h-4 w-4" />
                   <span>Kembali</span>
                 </button>
 
-                {/* Pure Icon-Based Actions (Clipboard / Copy, Download) */}
+                {/* Pure Icon-Based Actions */}
                 <div className="flex items-center gap-1.5">
                   <button
                     type="button"
@@ -636,7 +722,7 @@ export function QrScannerTabScreen(props: {
                     className={cn(
                       'flex h-7 w-7 items-center justify-center rounded-lg border transition-all cursor-pointer',
                       isDark
-                        ? 'border-white/15 bg-neutral-800 text-neutral-300 hover:text-white'
+                        ? 'border-white/15 bg-white/5 text-neutral-300 hover:text-white'
                         : 'border-slate-200 bg-slate-100 text-slate-600 hover:text-slate-900',
                     )}
                   >
@@ -651,7 +737,7 @@ export function QrScannerTabScreen(props: {
                     className={cn(
                       'flex h-7 w-7 items-center justify-center rounded-lg border transition-all cursor-pointer',
                       isDark
-                        ? 'border-white/15 bg-neutral-800 text-neutral-300 hover:text-white'
+                        ? 'border-white/15 bg-white/5 text-neutral-300 hover:text-white'
                         : 'border-slate-200 bg-slate-100 text-slate-600 hover:text-slate-900',
                     )}
                   >
@@ -671,7 +757,7 @@ export function QrScannerTabScreen(props: {
                 </div>
               </div>
 
-              {/* Dynamic Vector SVG QR Code Generator (Enlarged Scale) */}
+              {/* Dynamic Vector SVG QR Code Generator */}
               <div className="p-3 rounded-2xl bg-white shadow-md border border-slate-100 inline-block mb-3">
                 <QrCodeSvg
                   value="AMANAH:DOC-2026-0819:POLI-ANAK:20260521:84920"
@@ -683,8 +769,20 @@ export function QrScannerTabScreen(props: {
 
               {/* Large Prominent 5-Digit Code */}
               <div className="w-full flex flex-col items-center">
-                <div className="inline-flex items-center justify-center px-6 py-2 rounded-2xl bg-blue-500/10 dark:bg-cyan-500/10 border border-blue-500/25 dark:border-cyan-500/25 shadow-xs">
-                  <span className="font-mono text-2xl sm:text-3xl font-black tracking-[0.25em] text-blue-600 dark:text-cyan-400">
+                <div
+                  className={cn(
+                    'inline-flex items-center justify-center px-6 py-2 rounded-2xl border shadow-xs transition-colors',
+                    isDark
+                      ? 'bg-cyan-500/10 border-cyan-500/25'
+                      : 'bg-blue-50 border-blue-200/80',
+                  )}
+                >
+                  <span
+                    className={cn(
+                      'font-mono text-2xl sm:text-3xl font-black tracking-[0.25em]',
+                      isDark ? 'text-cyan-400' : 'text-[#0d66e9]',
+                    )}
+                  >
                     84920
                   </span>
                 </div>
@@ -698,10 +796,10 @@ export function QrScannerTabScreen(props: {
             </div>
           )}
 
-          {/* VIEW 4: Drawer Base Inline View for Upload QR (Dashed Dropzone Upload Target Field) */}
+          {/* VIEW 4: Drawer Base Inline View for Upload QR (Dashed Dropzone) */}
           {drawerView === 'upload-qr' && (
             <div className="animate-in fade-in slide-in-from-right-4 duration-200 flex flex-col items-center text-center w-full">
-              {/* Header Bar inside Drawer Base (No border, trailing text variant) */}
+              {/* Header Bar inside Drawer Base */}
               <div className="w-full flex items-center justify-between pb-2 mb-3">
                 <button
                   type="button"
@@ -710,7 +808,7 @@ export function QrScannerTabScreen(props: {
                     'flex items-center gap-1.5 text-xs font-bold transition-colors cursor-pointer py-1 -ml-0.5',
                     isDark
                       ? 'text-cyan-400 hover:text-cyan-300'
-                      : 'text-blue-600 hover:text-blue-700',
+                      : 'text-[#0d66e9] hover:text-blue-700',
                   )}
                 >
                   <ArrowLeft className="h-4 w-4" />
@@ -734,8 +832,8 @@ export function QrScannerTabScreen(props: {
                 className={cn(
                   'w-full flex flex-col items-center justify-center p-7 rounded-3xl border-2 border-dashed transition-all cursor-pointer group select-none',
                   isDark
-                    ? 'border-white/20 bg-neutral-800/40 hover:border-cyan-400/60 hover:bg-neutral-800/70'
-                    : 'border-slate-300 bg-slate-50/60 hover:border-blue-500/60 hover:bg-blue-50/30',
+                    ? 'border-white/20 bg-white/[0.02] hover:border-cyan-400/60 hover:bg-white/[0.05]'
+                    : 'border-blue-200/80 bg-blue-50/20 hover:border-blue-400 hover:bg-blue-50/50',
                 )}
               >
                 <input
@@ -750,7 +848,7 @@ export function QrScannerTabScreen(props: {
                 <div
                   className={cn(
                     'flex h-12 w-12 items-center justify-center rounded-2xl mb-2.5 transition-transform group-hover:scale-105',
-                    isDark ? 'bg-cyan-500/15 text-cyan-400' : 'bg-blue-500/15 text-blue-600',
+                    isDark ? 'bg-cyan-500/15 text-cyan-400' : 'bg-blue-50 text-[#0d66e9]',
                   )}
                 >
                   <UploadCloud className="h-6 w-6" />
@@ -817,3 +915,4 @@ export function QrScannerTabScreen(props: {
     </div>
   );
 }
+

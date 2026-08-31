@@ -48,13 +48,13 @@ export function QueueBadge(props: {
         <defs>
           {/* 1. Ribbon Gradients (3D Fold: Left Highlight / Right Shaded) */}
           <linearGradient id={`ribbon-l-${uid}`} x1="34" y1="44" x2="50" y2="84" gradientUnits="userSpaceOnUse">
-            <stop stopColor={isDark ? '#0284c7' : '#2563eb'} />
-            <stop offset="1" stopColor={isDark ? '#0369a1' : '#1d4ed8'} />
+            <stop stopColor={isDark ? '#38bdf8' : '#0d66e9'} />
+            <stop offset="1" stopColor={isDark ? '#0284c7' : '#1d58ac'} />
           </linearGradient>
 
           <linearGradient id={`ribbon-r-${uid}`} x1="50" y1="44" x2="66" y2="84" gradientUnits="userSpaceOnUse">
-            <stop stopColor={isDark ? '#0369a1' : '#1d4ed8'} />
-            <stop offset="1" stopColor={isDark ? '#075985' : '#1e3a8a'} />
+            <stop stopColor={isDark ? '#0284c7' : '#1d58ac'} />
+            <stop offset="1" stopColor={isDark ? '#075985' : '#0e3a7a'} />
           </linearGradient>
 
           {/* 2. Crystal Wings Gradients & Cyan Platinum Accent Trim */}
@@ -69,48 +69,48 @@ export function QueueBadge(props: {
             <stop stopColor={isDark ? '#e0f2fe' : '#ffffff'} />
             <stop offset="0.3" stopColor={isDark ? '#a5f3fc' : '#bfdbfe'} />
             <stop offset="0.7" stopColor={isDark ? '#38bdf8' : '#60a5fa'} />
-            <stop offset="1" stopColor={isDark ? '#0284c7' : '#2563eb'} />
+            <stop offset="1" stopColor={isDark ? '#0284c7' : '#0d66e9'} />
           </linearGradient>
 
           <linearGradient id={`wing-top-r-${uid}`} x1="97" y1="8" x2="66" y2="23" gradientUnits="userSpaceOnUse">
             <stop stopColor={isDark ? '#e0f2fe' : '#ffffff'} />
             <stop offset="0.3" stopColor={isDark ? '#a5f3fc' : '#bfdbfe'} />
             <stop offset="0.7" stopColor={isDark ? '#38bdf8' : '#60a5fa'} />
-            <stop offset="1" stopColor={isDark ? '#0284c7' : '#2563eb'} />
+            <stop offset="1" stopColor={isDark ? '#0284c7' : '#0d66e9'} />
           </linearGradient>
 
           <linearGradient id={`wing-mid-l-${uid}`} x1="10" y1="22" x2="24" y2="29" gradientUnits="userSpaceOnUse">
-            <stop stopColor={isDark ? '#38bdf8' : '#3b82f6'} />
-            <stop offset="1" stopColor={isDark ? '#0369a1' : '#1d4ed8'} />
+            <stop stopColor={isDark ? '#38bdf8' : '#0d66e9'} />
+            <stop offset="1" stopColor={isDark ? '#0369a1' : '#1d58ac'} />
           </linearGradient>
 
           <linearGradient id={`wing-mid-r-${uid}`} x1="90" y1="22" x2="76" y2="29" gradientUnits="userSpaceOnUse">
-            <stop stopColor={isDark ? '#38bdf8' : '#3b82f6'} />
-            <stop offset="1" stopColor={isDark ? '#0369a1' : '#1d4ed8'} />
+            <stop stopColor={isDark ? '#38bdf8' : '#0d66e9'} />
+            <stop offset="1" stopColor={isDark ? '#0369a1' : '#1d58ac'} />
           </linearGradient>
 
           <linearGradient id={`wing-bot-l-${uid}`} x1="13" y1="29" x2="24" y2="38" gradientUnits="userSpaceOnUse">
-            <stop stopColor={isDark ? '#0284c7' : '#1d4ed8'} />
-            <stop offset="1" stopColor={isDark ? '#082f49' : '#1e3a8a'} />
+            <stop stopColor={isDark ? '#0284c7' : '#1d58ac'} />
+            <stop offset="1" stopColor={isDark ? '#082f49' : '#0e3a7a'} />
           </linearGradient>
 
           <linearGradient id={`wing-bot-r-${uid}`} x1="87" y1="29" x2="76" y2="38" gradientUnits="userSpaceOnUse">
-            <stop stopColor={isDark ? '#0284c7' : '#1d4ed8'} />
-            <stop offset="1" stopColor={isDark ? '#082f49' : '#1e3a8a'} />
+            <stop stopColor={isDark ? '#0284c7' : '#1d58ac'} />
+            <stop offset="1" stopColor={isDark ? '#082f49' : '#0e3a7a'} />
           </linearGradient>
 
           {/* 3. Outer Hex Frame 3D Metallic / Crystal Gradient */}
           <linearGradient id={`hex-frame-${uid}`} x1="22" y1="6" x2="78" y2="70" gradientUnits="userSpaceOnUse">
             <stop stopColor={isDark ? '#e0f2fe' : '#ffffff'} />
             <stop offset="0.15" stopColor={isDark ? '#38bdf8' : '#93c5fd'} />
-            <stop offset="0.5" stopColor={isDark ? '#0284c7' : '#3b82f6'} />
-            <stop offset="0.85" stopColor={isDark ? '#075985' : '#1d4ed8'} />
-            <stop offset="1" stopColor={isDark ? '#082f49' : '#1e3a8a'} />
+            <stop offset="0.5" stopColor={isDark ? '#0284c7' : '#0d66e9'} />
+            <stop offset="0.85" stopColor={isDark ? '#075985' : '#1d58ac'} />
+            <stop offset="1" stopColor={isDark ? '#082f49' : '#0e3a7a'} />
           </linearGradient>
 
           {/* 4. Extruded 3D Bottom Lip Bevel Gradient */}
           <linearGradient id={`hex-bottom-bevel-${uid}`} x1="50" y1="54" x2="50" y2="74" gradientUnits="userSpaceOnUse">
-            <stop stopColor={isDark ? '#0369a1' : '#1d4ed8'} />
+            <stop stopColor={isDark ? '#0369a1' : '#1d58ac'} />
             <stop offset="1" stopColor={isDark ? '#082f49' : '#0f172a'} />
           </linearGradient>
 
@@ -118,20 +118,20 @@ export function QueueBadge(props: {
           <linearGradient id={`hex-chamfer-${uid}`} x1="27" y1="11" x2="73" y2="65" gradientUnits="userSpaceOnUse">
             <stop stopColor={isDark ? '#67e8f9' : '#bfdbfe'} />
             <stop offset="0.4" stopColor={isDark ? '#22d3ee' : '#60a5fa'} />
-            <stop offset="1" stopColor={isDark ? '#0284c7' : '#1e40af'} />
+            <stop offset="1" stopColor={isDark ? '#0284c7' : '#1d58ac'} />
           </linearGradient>
 
           {/* 6. Crystal Gem Core: Left Facet (Light) & Right Facet (Shade) */}
           <linearGradient id={`gem-left-${uid}`} x1="32" y1="15" x2="50" y2="61" gradientUnits="userSpaceOnUse">
-            <stop stopColor={isDark ? '#38bdf8' : '#3b82f6'} />
-            <stop offset="0.5" stopColor={isDark ? '#0284c7' : '#2563eb'} />
-            <stop offset="1" stopColor={isDark ? '#0369a1' : '#1d4ed8'} />
+            <stop stopColor={isDark ? '#38bdf8' : '#38bdf8'} />
+            <stop offset="0.5" stopColor={isDark ? '#0284c7' : '#0d66e9'} />
+            <stop offset="1" stopColor={isDark ? '#0369a1' : '#1d58ac'} />
           </linearGradient>
 
           <linearGradient id={`gem-right-${uid}`} x1="50" y1="15" x2="68" y2="61" gradientUnits="userSpaceOnUse">
-            <stop stopColor={isDark ? '#0284c7' : '#1d4ed8'} />
-            <stop offset="0.6" stopColor={isDark ? '#0369a1' : '#1e40af'} />
-            <stop offset="1" stopColor={isDark ? '#082f49' : '#1e3a8a'} />
+            <stop stopColor={isDark ? '#0284c7' : '#1d58ac'} />
+            <stop offset="0.6" stopColor={isDark ? '#0369a1' : '#1d58ac'} />
+            <stop offset="1" stopColor={isDark ? '#082f49' : '#0e3a7a'} />
           </linearGradient>
 
           {/* 7. Specular Gloss Curve */}

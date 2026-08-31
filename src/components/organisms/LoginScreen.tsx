@@ -69,7 +69,7 @@ export function LoginScreen(props: {
               <button
                 type="button"
                 onClick={props.onForgotPassword}
-                className="text-xs font-semibold text-blue-600 hover:text-blue-700 hover:underline transition-colors focus:outline-none cursor-pointer"
+                className="text-xs font-semibold text-[#0d66e9] hover:text-blue-700 hover:underline transition-colors focus:outline-none cursor-pointer"
               >
                 {content.forgotPasswordLink}
               </button>
@@ -111,7 +111,7 @@ export function LoginScreen(props: {
           <button
             type="button"
             onClick={props.onGoToSignUp}
-            className="font-semibold text-blue-600 hover:text-blue-700 hover:underline focus:outline-none cursor-pointer"
+            className="font-semibold text-[#0d66e9] hover:text-blue-700 hover:underline focus:outline-none cursor-pointer"
           >
             {content.signUpLink}
           </button>

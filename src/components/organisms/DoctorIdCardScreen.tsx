@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { DoctorIdCard3D } from '@/components/atoms/DoctorIdCard3D';
+import { QrCodeSvg } from '@/components/atoms/QrCodeSvg';
 import { ScreenHeader } from '@/components/molecules/ScreenHeader';
 import { useDoctorStore } from '@/features/doctor/hooks/use-doctor-store';
 import { downloadDoctorIdCardPdf } from '@/lib/generateCardPdf';
@@ -137,7 +138,7 @@ export function DoctorIdCardScreen(props: {
                 'p-1.5 rounded-full transition-all cursor-pointer active:scale-90 flex items-center justify-center',
                 isDark
                   ? 'text-cyan-400 hover:text-cyan-300 hover:bg-white/10'
-                  : 'text-[#0a44ff] hover:text-[#0038ff] hover:bg-blue-50',
+                  : 'text-[#0d66e9] hover:text-[#0038ff] hover:bg-blue-50',
               )}
             >
               <Info className="w-5 h-5 stroke-[2]" />
@@ -151,7 +152,7 @@ export function DoctorIdCardScreen(props: {
                 'p-1.5 rounded-full transition-all cursor-pointer active:scale-90 flex items-center justify-center',
                 isDark
                   ? 'text-cyan-400 hover:text-cyan-300 hover:bg-white/10'
-                  : 'text-[#0a44ff] hover:text-[#0038ff] hover:bg-blue-50',
+                  : 'text-[#0d66e9] hover:text-[#0038ff] hover:bg-blue-50',
               )}
             >
               <QrCode className="w-5 h-5 stroke-[2]" />
@@ -207,9 +208,8 @@ export function DoctorIdCardScreen(props: {
           onClick={handleDownloadPdf}
           className={cn(
             'flex-1 py-3 px-4 rounded-2xl text-xs font-bold transition-all cursor-pointer select-none flex items-center justify-center gap-2 active:scale-98 shadow-md pointer-events-auto',
-            isDark
-              ? 'bg-gradient-to-r from-cyan-400 to-cyan-500 hover:from-cyan-300 hover:to-cyan-400 text-slate-950 font-extrabold shadow-cyan-500/25'
-              : 'bg-[#0a44ff] hover:bg-[#0038ff] text-white shadow-blue-500/25',
+            'btn-crisp-blue',
+            isDark && 'btn-crisp-blue-dark',
           )}
         >
           {isDownloading ? (
@@ -285,7 +285,7 @@ export function DoctorIdCardScreen(props: {
                   <div className="flex items-start gap-3 p-3">
                     <div className={cn(
                       'w-7 h-7 rounded-xl flex items-center justify-center shrink-0 mt-0.5',
-                      isDark ? 'bg-cyan-500/10 text-cyan-400' : 'bg-blue-50 text-[#0a44ff]',
+                      isDark ? 'bg-cyan-500/10 text-cyan-400' : 'bg-blue-50 text-[#0d66e9]',
                     )}>
                       <Compass className="w-4 h-4" />
                     </div>
@@ -302,7 +302,7 @@ export function DoctorIdCardScreen(props: {
                   <div className="flex items-start gap-3 p-3">
                     <div className={cn(
                       'w-7 h-7 rounded-xl flex items-center justify-center shrink-0 mt-0.5',
-                      isDark ? 'bg-cyan-500/10 text-cyan-400' : 'bg-blue-50 text-[#0a44ff]',
+                      isDark ? 'bg-cyan-500/10 text-cyan-400' : 'bg-blue-50 text-[#0d66e9]',
                     )}>
                       <Fingerprint className="w-4 h-4" />
                     </div>
@@ -319,7 +319,7 @@ export function DoctorIdCardScreen(props: {
                   <div className="flex items-start gap-3 p-3">
                     <div className={cn(
                       'w-7 h-7 rounded-xl flex items-center justify-center shrink-0 mt-0.5',
-                      isDark ? 'bg-cyan-500/10 text-cyan-400' : 'bg-blue-50 text-[#0a44ff]',
+                      isDark ? 'bg-cyan-500/10 text-cyan-400' : 'bg-blue-50 text-[#0d66e9]',
                     )}>
                       <ShieldCheck className="w-4 h-4" />
                     </div>
@@ -343,9 +343,8 @@ export function DoctorIdCardScreen(props: {
                 onClick={triggerCloseInfoDrawer}
                 className={cn(
                   'w-full py-3.5 rounded-2xl text-xs font-bold transition-all cursor-pointer shadow-xs active:scale-98',
-                  isDark
-                    ? 'text-white bg-white/10 hover:bg-white/15'
-                    : 'text-white bg-[#0a44ff] hover:bg-[#0038ff]',
+                  'btn-crisp-blue',
+                  isDark && 'btn-crisp-blue-dark',
                 )}
               >
                 Mengerti
@@ -371,7 +370,12 @@ export function DoctorIdCardScreen(props: {
                 : 'bg-white/95 border-slate-100 text-slate-900 shadow-2xl',
             )}
           >
-            <div className="w-10 h-10 rounded-2xl bg-cyan-500/10 text-cyan-500 flex items-center justify-center mb-3">
+            <div
+              className={cn(
+                'w-10 h-10 rounded-2xl flex items-center justify-center mb-3 transition-colors',
+                isDark ? 'bg-cyan-500/15 text-cyan-400' : 'bg-blue-50 text-[#0d66e9]',
+              )}
+            >
               <QrCode className="w-6 h-6 stroke-[2]" />
             </div>
 
@@ -382,14 +386,13 @@ export function DoctorIdCardScreen(props: {
               Gunakan barcode ini untuk tap-in di reader poli atau ruang tindakan.
             </p>
 
-            {/* Generated QR Placeholder Container */}
-            <div className="p-3 bg-white rounded-2xl border border-slate-200 shadow-inner mb-4">
-              <img
-                src={`https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=AMANAH-DOC-${encodeURIComponent(profile.sip)}`}
-                alt="QR Code ID Dokter"
-                width={160}
-                height={160}
-                className="rounded-lg"
+            {/* Local Dynamic Vector SVG QR Code Container */}
+            <div className="p-3 bg-white rounded-2xl border border-slate-200/90 shadow-md mb-4 inline-block">
+              <QrCodeSvg
+                value={`AMANAH:DOC:${profile.sip}:POLI-ANAK:PRESENSI`}
+                size={160}
+                fgColor="#0a0e1a"
+                bgColor="#ffffff"
               />
             </div>
 
@@ -402,8 +405,9 @@ export function DoctorIdCardScreen(props: {
               type="button"
               onClick={() => setShowQrModal(false)}
               className={cn(
-                'w-full py-2.5 rounded-xl text-xs font-semibold transition-all cursor-pointer active:scale-95',
-                isDark ? 'bg-white/10 text-white hover:bg-white/15' : 'bg-slate-100 text-slate-800 hover:bg-slate-200',
+                'w-full py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer active:scale-98',
+                'btn-crisp-soft',
+                isDark && 'btn-crisp-soft-dark',
               )}
             >
               Tutup

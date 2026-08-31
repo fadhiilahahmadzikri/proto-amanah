@@ -276,70 +276,66 @@ export function DateCarouselStrip(props: {
                 className={cn(
                   'w-full h-full relative flex flex-col items-center justify-between py-2 px-1.5 rounded-2xl cursor-pointer select-none transition-all',
                   isCloseToCenter
-                    ? isDark
-                      ? isCuti
-                        ? 'bg-amber-500 text-neutral-950 font-bold shadow-md'
-                        : 'bg-cyan-500 text-neutral-950 font-bold shadow-md'
-                      : isCuti
-                        ? 'bg-amber-500 text-white font-bold shadow-md'
-                        : 'bg-blue-600 text-white font-bold shadow-md'
+                    ? isCuti
+                      ? 'bg-amber-500 bg-gradient-to-b from-white/30 to-transparent border border-amber-600/80 text-white font-bold shadow-md'
+                      : isDark
+                        ? 'btn-crisp-blue-dark font-bold shadow-md'
+                        : 'btn-crisp-blue font-bold shadow-md'
                     : isDark
-                      ? 'bg-neutral-850 text-white/90 font-medium border border-white/10 hover:border-white/20'
-                      : 'bg-white text-slate-700 font-medium border border-slate-200 shadow-sm hover:bg-slate-50',
+                      ? 'bg-white/5 text-white/90 font-medium border border-white/10 hover:border-white/20 shadow-2xs'
+                      : 'bg-white text-slate-700 font-medium border border-slate-200/90 shadow-2xs hover:bg-slate-50',
                 )}
               >
-              {/* Atas: AGS (Bulan) */}
-              <span
-                className={cn(
-                  'text-[10px] font-extrabold tracking-wider uppercase leading-none block',
-                  isCloseToCenter ? 'opacity-95' : 'opacity-65',
-                )}
-              >
-                {monthName}
-              </span>
-
-              {/* Bawah: Tanggal Besar */}
-              <span className="text-2xl font-black tabular-nums leading-none block my-0.5">
-                {dayNumber}
-              </span>
-
-              {/* Bawahnya lagi: Tahun / Hari ini + Indicator */}
-              <div className="flex flex-col items-center gap-0.5 leading-none">
+                {/* Atas: AGS (Bulan) */}
                 <span
                   className={cn(
-                    'text-[9px] font-bold tabular-nums leading-none block',
-                    isCloseToCenter ? 'opacity-95' : 'opacity-55',
+                    'text-[10px] font-extrabold tracking-wider uppercase leading-none block',
+                    isCloseToCenter ? 'opacity-95' : 'opacity-65',
                   )}
                 >
-                  {isToday ? 'Hari ini' : isCuti ? 'Cuti' : yearNumber}
+                  {monthName}
                 </span>
 
-                {/* Event Schedule Dot Indicator */}
-                {isCuti ? (
+                {/* Bawah: Tanggal Besar */}
+                <span className="text-2xl font-black tabular-nums leading-none block my-0.5">
+                  {dayNumber}
+                </span>
+
+                {/* Bawahnya lagi: Tahun / Hari ini + Indicator */}
+                <div className="flex flex-col items-center gap-0.5 leading-none">
                   <span
                     className={cn(
-                      'h-1.5 w-1.5 rounded-full shrink-0 block mt-0.5',
-                      isCloseToCenter ? (isDark ? 'bg-neutral-950' : 'bg-white') : 'bg-amber-500',
+                      'text-[9px] font-bold tabular-nums leading-none block',
+                      isCloseToCenter ? 'opacity-95' : 'opacity-55',
                     )}
-                  />
-                ) : hasSchedules ? (
-                  <span
-                    className={cn(
-                      'h-1.5 w-1.5 rounded-full shrink-0 block mt-0.5',
-                      isCloseToCenter
-                        ? isDark
-                          ? 'bg-neutral-950'
-                          : 'bg-white'
-                        : isDark
-                          ? 'bg-cyan-400'
-                          : 'bg-blue-600',
-                    )}
-                  />
-                ) : (
-                  <span className="h-1.5 w-1.5 opacity-0 block mt-0.5" />
-                )}
-              </div>
-            </button>
+                  >
+                    {isToday ? 'Hari ini' : isCuti ? 'Cuti' : yearNumber}
+                  </span>
+
+                  {/* Event Schedule Dot Indicator */}
+                  {isCuti ? (
+                    <span
+                      className={cn(
+                        'h-1.5 w-1.5 rounded-full shrink-0 block mt-0.5',
+                        isCloseToCenter ? 'bg-white shadow-xs' : 'bg-amber-500',
+                      )}
+                    />
+                  ) : hasSchedules ? (
+                    <span
+                      className={cn(
+                        'h-1.5 w-1.5 rounded-full shrink-0 block mt-0.5',
+                        isCloseToCenter
+                          ? 'bg-white shadow-xs'
+                          : isDark
+                            ? 'bg-cyan-400'
+                            : 'bg-[#0d66e9]',
+                      )}
+                    />
+                  ) : (
+                    <span className="h-1.5 w-1.5 opacity-0 block mt-0.5" />
+                  )}
+                </div>
+              </button>
           </div>
         );
       })}

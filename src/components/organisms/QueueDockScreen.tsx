@@ -441,7 +441,7 @@ export function QueueDockScreen(props: {
                       isDark ? 'hover:bg-white/10 text-white' : 'hover:bg-slate-100 text-slate-800',
                     )}
                   >
-                    <Info className={cn('w-4 h-4 shrink-0', isDark ? 'text-cyan-400' : 'text-[#0a44ff]')} />
+                    <Info className={cn('w-4 h-4 shrink-0', isDark ? 'text-cyan-400' : 'text-[#0d66e9]')} />
                     <span>Panduan antrean</span>
                   </button>
 
@@ -458,7 +458,7 @@ export function QueueDockScreen(props: {
                         : 'hover:bg-slate-100 text-slate-700 border-slate-100',
                     )}
                   >
-                    <History className={cn('w-4 h-4 shrink-0', isDark ? 'text-cyan-400' : 'text-[#0a44ff]')} />
+                    <History className={cn('w-4 h-4 shrink-0', isDark ? 'text-cyan-400' : 'text-[#0d66e9]')} />
                     <span>Riwayat antrean</span>
                     {collectedCards.length > 0 && (
                       <span
@@ -466,7 +466,7 @@ export function QueueDockScreen(props: {
                           'ml-auto text-[10px] font-bold px-1.5 py-0.5 rounded-full tabular-nums',
                           isDark
                             ? 'bg-cyan-500/20 text-cyan-300'
-                            : 'bg-blue-50 text-[#0a44ff] border border-blue-200',
+                            : 'bg-blue-50 text-[#0d66e9] border border-blue-200',
                         )}
                       >
                         {collectedCards.length}
@@ -510,9 +510,9 @@ export function QueueDockScreen(props: {
           className={cn(
             'text-center text-xl sm:text-2xl font-extrabold tracking-tight leading-snug select-none will-change-[filter,transform,opacity]',
             isMorphingActive
-              ? isDark ? 'text-cyan-400 max-w-[240px]' : 'text-[#0a44ff] max-w-[240px]'
+              ? isDark ? 'text-cyan-400 max-w-[240px]' : 'text-[#0d66e9] max-w-[240px]'
               : isNearSlot
-                ? isDark ? 'text-cyan-400 max-w-[220px]' : 'text-[#0a44ff] max-w-[220px]'
+                ? isDark ? 'text-cyan-400 max-w-[220px]' : 'text-[#0d66e9] max-w-[220px]'
                 : isDark ? 'text-white max-w-[200px]' : 'text-slate-900 max-w-[200px]',
           )}
         >

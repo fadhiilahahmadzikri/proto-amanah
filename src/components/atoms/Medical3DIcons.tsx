@@ -52,22 +52,22 @@ export function Medical3DSVGDefs() {
 
         {/* Base Main Blue Gradient (Front faces) */}
         <linearGradient id="grad-blue-main" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor="#b6dbff" />
-          <stop offset="40%" stopColor="#6eb5ff" />
-          <stop offset="100%" stopColor="#3a96ff" />
+          <stop offset="0%" stopColor="#80b8ff" />
+          <stop offset="40%" stopColor="#3d8eff" />
+          <stop offset="100%" stopColor="#0d66e9" />
         </linearGradient>
 
         <radialGradient id="grad-blue-radial" cx="30%" cy="30%" r="70%">
           <stop offset="0%" stopColor="#ffffff" />
           <stop offset="30%" stopColor="#93ccff" />
-          <stop offset="80%" stopColor="#4aa1ff" />
-          <stop offset="100%" stopColor="#227eff" />
+          <stop offset="75%" stopColor="#3d8eff" />
+          <stop offset="100%" stopColor="#0d66e9" />
         </radialGradient>
 
         {/* Dark Blue Gradient (Extrusions / Shadows) */}
         <linearGradient id="grad-blue-dark" x1="0%" y1="0%" x2="0%" y2="100%">
-          <stop offset="0%" stopColor="#50a4ff" />
-          <stop offset="100%" stopColor="#146ae6" />
+          <stop offset="0%" stopColor="#0d66e9" />
+          <stop offset="100%" stopColor="#1d58ac" />
         </linearGradient>
 
         {/* Light Cyan Gradient (Crosses / Highlights) */}

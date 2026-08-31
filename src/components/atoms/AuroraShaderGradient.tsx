@@ -21,7 +21,7 @@ export function AuroraShaderGradient(props: {
   const isDark = props.theme === 'dark';
 
   // Amanah Brand Theme Color Mapping
-  const activeColor1 = props.color1 ?? (isDark ? '#07247a' : '#0a44ff');
+  const activeColor1 = props.color1 ?? (isDark ? '#07247a' : '#0d66e9');
   const activeColor2 = props.color2 ?? (isDark ? '#0088cc' : '#00d4ff');
   const activeColor3 = props.color3 ?? (isDark ? '#14103b' : '#70a6ff');
 
@@ -71,7 +71,7 @@ export const amanahWaterPlaneConfig = {
   cDistance: 3.6,
   cPolarAngle: 90,
   cameraZoom: 1,
-  color1: '#0a44ff', // Amanah Electric Sapphire Blue
+  color1: '#0d66e9', // Amanah Electric Sapphire Blue
   color2: '#00d4ff', // Radiant Cyan
   color3: '#14103b', // Deep Midnight Navy
   envPreset: 'city' as const,

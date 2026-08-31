@@ -234,7 +234,7 @@ export function LeavePermissionTabScreen(props: {
               margin: 0;
             }
             .header {
-              border-bottom: 2.5px solid #0a44ff;
+              border-bottom: 2.5px solid #0d66e9;
               padding-bottom: 12px;
               margin-bottom: 20px;
               display: flex;
@@ -244,7 +244,7 @@ export function LeavePermissionTabScreen(props: {
             .hospital-title {
               font-size: 20px;
               font-weight: 800;
-              color: #0a44ff;
+              color: #0d66e9;
               margin: 0;
               text-transform: uppercase;
               letter-spacing: 0.5px;
@@ -606,7 +606,7 @@ export function LeavePermissionTabScreen(props: {
               'p-1.5 -mr-1.5 rounded-full transition-all cursor-pointer active:scale-90 flex items-center justify-center',
               isDark
                 ? 'text-cyan-400 hover:text-cyan-300 hover:bg-white/10'
-                : 'text-blue-600 hover:text-blue-700 hover:bg-slate-100',
+                : 'text-[#0d66e9] hover:text-blue-700 hover:bg-slate-100',
             )}
           >
             <Plus className="h-6 w-6 stroke-[2]" />
@@ -728,7 +728,7 @@ export function LeavePermissionTabScreen(props: {
                     <h4
                       className={cn(
                         'text-[16px] sm:text-[17px] font-black tracking-tight truncate',
-                        isDark ? 'text-white' : 'text-slate-900',
+                        isDark ? 'text-white' : 'text-[#0f172b]',
                       )}
                     >
                       {item.type}
@@ -737,7 +737,7 @@ export function LeavePermissionTabScreen(props: {
                     {/* Reason (Truncated with Ellipsis) */}
                     <p
                       className={cn(
-                        'text-[12.5px] font-medium leading-relaxed truncate text-slate-400 dark:text-neutral-400 -mt-0.5',
+                        'text-[12.5px] font-medium leading-relaxed truncate text-[#90a1b9] dark:text-neutral-400 -mt-0.5',
                       )}
                       title={item.reason}
                     >
@@ -749,17 +749,17 @@ export function LeavePermissionTabScreen(props: {
                       {/* Mulai */}
                       <div className="flex flex-col">
                         <div className="flex items-center gap-1.5">
-                          <Calendar className="w-4 h-4 text-slate-400 dark:text-neutral-400 stroke-[2] shrink-0" />
+                          <Calendar className="w-4 h-4 text-[#90a1b9] dark:text-neutral-400 stroke-[2] shrink-0" />
                           <span
                             className={cn(
                               'text-[14px] sm:text-[14.5px] font-bold tracking-tight leading-none',
-                              isDark ? 'text-white' : 'text-slate-900',
+                              isDark ? 'text-white' : 'text-[#0f172b]',
                             )}
                           >
                             {formatDateIndo(item.startDate)}
                           </span>
                         </div>
-                        <span className="text-[11px] font-medium text-slate-400 dark:text-neutral-400 mt-1 pl-5.5">
+                        <span className="text-[11px] font-medium text-[#90a1b9] dark:text-neutral-400 mt-1 pl-5.5">
                           Mulai
                         </span>
                       </div>
@@ -767,17 +767,17 @@ export function LeavePermissionTabScreen(props: {
                       {/* Selesai */}
                       <div className="flex flex-col">
                         <div className="flex items-center gap-1.5">
-                          <Calendar className="w-4 h-4 text-slate-400 dark:text-neutral-400 stroke-[2] shrink-0" />
+                          <Calendar className="w-4 h-4 text-[#90a1b9] dark:text-neutral-400 stroke-[2] shrink-0" />
                           <span
                             className={cn(
                               'text-[14px] sm:text-[14.5px] font-bold tracking-tight leading-none',
-                              isDark ? 'text-white' : 'text-slate-900',
+                              isDark ? 'text-white' : 'text-[#0f172b]',
                             )}
                           >
                             {formatDateIndo(item.endDate)}
                           </span>
                         </div>
-                        <span className="text-[11px] font-medium text-slate-400 dark:text-neutral-400 mt-1 pl-5.5">
+                        <span className="text-[11px] font-medium text-[#90a1b9] dark:text-neutral-400 mt-1 pl-5.5">
                           Selesai
                         </span>
                       </div>
@@ -803,8 +803,8 @@ export function LeavePermissionTabScreen(props: {
             className={cn(
               'absolute inset-x-0 bottom-0 z-60 flex max-h-[88%] min-h-[480px] w-full flex-col overflow-hidden rounded-t-[32px] sm:rounded-t-[36px] shadow-[0_-12px_45px_rgba(0,0,0,0.3)] border-t will-change-transform select-text touch-pan-y backdrop-blur-2xl',
               isDark
-                ? 'bg-[#0a0e1a] border-white/10 text-white shadow-black/80'
-                : 'bg-white border-neutral-100 text-slate-900',
+                ? 'bg-[#0a0e1a]/98 border-white/10 text-white shadow-black/80'
+                : 'bg-white/98 border-[#e2e8f0] text-[#0f172b]',
             )}
           >
             {/* Interactive Drag Handle */}
@@ -815,16 +815,16 @@ export function LeavePermissionTabScreen(props: {
               onClick={triggerCloseDetailDrawer}
               className="flex w-full cursor-grab active:cursor-grabbing flex-col items-center justify-center pt-3.5 pb-1 shrink-0 touch-none select-none"
             >
-              <div className={cn('h-1.25 w-11 rounded-full transition-colors', isDark ? 'bg-white/25' : 'bg-neutral-300')} />
+              <div className={cn('h-1.25 w-11 rounded-full transition-colors', isDark ? 'bg-white/25' : 'bg-[#cbd5e1]')} />
             </div>
 
             {/* Header */}
-            <div className="relative z-20 flex items-center justify-between px-6 pt-0.5 pb-3 shrink-0 border-b border-slate-100 dark:border-white/10">
-              <h3 className={cn('text-base font-bold tracking-tight', isDark ? 'text-white' : 'text-slate-900')}>
+            <div className="relative z-20 flex items-center justify-between px-6 pt-0.5 pb-3 shrink-0 border-b border-[#e2e8f0] dark:border-white/10">
+              <h3 className={cn('text-base font-bold tracking-tight', isDark ? 'text-white' : 'text-[#0f172b]')}>
                 Detail perizinan
               </h3>
               <div className="flex items-center gap-1.5 -mr-2">
-                {/* Download PDF Button (Icon base) */}
+                {/* Download PDF Button */}
                 <button
                   type="button"
                   aria-label="Unduh Dokumen PDF"
@@ -832,7 +832,9 @@ export function LeavePermissionTabScreen(props: {
                   onClick={() => handleDownloadPdf(detailRecord)}
                   className={cn(
                     'p-1.5 rounded-full transition-colors cursor-pointer flex items-center justify-center shrink-0',
-                    isDark ? 'bg-white/10 text-neutral-300 hover:text-white hover:bg-white/15' : 'bg-neutral-100 text-neutral-600 hover:text-neutral-900 hover:bg-neutral-200',
+                    isDark
+                      ? 'bg-white/10 text-neutral-300 hover:text-white hover:bg-white/15'
+                      : 'bg-[#eff6ff] text-[#0d66e9] hover:bg-blue-100/80',
                   )}
                 >
                   <Download className="h-4 w-4" />
@@ -844,7 +846,9 @@ export function LeavePermissionTabScreen(props: {
                   onClick={triggerCloseDetailDrawer}
                   className={cn(
                     'p-1.5 rounded-full transition-colors cursor-pointer flex items-center justify-center shrink-0',
-                    isDark ? 'bg-white/10 text-neutral-300 hover:text-white' : 'bg-neutral-100 text-neutral-600 hover:text-neutral-900',
+                    isDark
+                      ? 'bg-white/10 text-neutral-300 hover:text-white'
+                      : 'bg-slate-100 text-[#314158] hover:text-[#0f172b] hover:bg-slate-200',
                   )}
                 >
                   <X className="h-4 w-4" />
@@ -853,13 +857,13 @@ export function LeavePermissionTabScreen(props: {
             </div>
 
             {/* Drawer Body Content */}
-            <div className="flex w-full flex-1 flex-col px-6 pt-2 pb-6 overflow-y-auto no-scrollbar select-text divide-y divide-slate-100 dark:divide-white/10">
+            <div className="flex w-full flex-1 flex-col px-6 pt-2 pb-6 overflow-y-auto no-scrollbar select-text divide-y divide-[#e2e8f0] dark:divide-white/10">
               {/* 1. Header: Type Title & Status Pill Row */}
               <div className="flex items-center justify-between gap-3 pb-4">
                 <h4
                   className={cn(
                     'text-lg sm:text-[19px] font-black tracking-tight truncate',
-                    isDark ? 'text-white' : 'text-slate-900',
+                    isDark ? 'text-white' : 'text-[#0f172b]',
                   )}
                 >
                   {detailRecord.type}
@@ -903,7 +907,7 @@ export function LeavePermissionTabScreen(props: {
                         : 'bg-rose-50 border-rose-200 text-rose-800',
                     )}
                   >
-                    <span className="w-2 h-2 rounded-full bg-rose-500 shrink-0" />
+                    <span className="w-2 h-2 rounded-full bg-[#fb2c36] shrink-0" />
                     <span>Ditolak</span>
                   </div>
                 )}
@@ -927,24 +931,24 @@ export function LeavePermissionTabScreen(props: {
               <div className="py-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div className="flex flex-col">
-                    <span className={cn('text-[11px] font-semibold block mb-1', isDark ? 'text-neutral-400' : 'text-slate-500')}>
+                    <span className={cn('text-xs font-bold block mb-1', isDark ? 'text-white' : 'text-[#0f172b]')}>
                       Mulai Izin
                     </span>
-                    <span className={cn('text-sm font-bold block', isDark ? 'text-white' : 'text-slate-900')}>
+                    <span className={cn('text-sm font-bold block', isDark ? 'text-white' : 'text-[#0f172b]')}>
                       {formatDateIndo(detailRecord.startDate)}
                     </span>
                   </div>
                   <div className="flex flex-col">
-                    <span className={cn('text-[11px] font-semibold block mb-1', isDark ? 'text-neutral-400' : 'text-slate-500')}>
+                    <span className={cn('text-xs font-bold block mb-1', isDark ? 'text-white' : 'text-[#0f172b]')}>
                       Selesai Izin
                     </span>
-                    <span className={cn('text-sm font-bold block', isDark ? 'text-white' : 'text-slate-900')}>
+                    <span className={cn('text-sm font-bold block', isDark ? 'text-white' : 'text-[#0f172b]')}>
                       {formatDateIndo(detailRecord.endDate)}
                     </span>
                   </div>
                 </div>
                 <div className="mt-2.5 flex items-center gap-1.5">
-                  <span className="text-[11px] font-bold text-blue-600 dark:text-cyan-400">
+                  <span className={cn('text-xs font-bold tracking-tight tabular-nums', isDark ? 'text-white' : 'text-[#0f172b]')}>
                     Durasi: {detailRecord.durationDays} Hari Kerja
                   </span>
                 </div>
@@ -952,10 +956,10 @@ export function LeavePermissionTabScreen(props: {
 
               {/* 3. Reason / Message */}
               <div className="flex flex-col gap-1.5 py-4">
-                <span className={cn('text-[11px] font-semibold block', isDark ? 'text-neutral-400' : 'text-slate-500')}>
+                <span className={cn('text-xs font-bold block', isDark ? 'text-white' : 'text-[#0f172b]')}>
                   Pesan / Alasan Perizinan
                 </span>
-                <p className={cn('text-[13.5px] leading-relaxed font-medium', isDark ? 'text-neutral-200' : 'text-slate-700')}>
+                <p className={cn('text-[13.5px] leading-relaxed font-medium', isDark ? 'text-neutral-200' : 'text-[#314158]')}>
                   {detailRecord.reason}
                 </p>
               </div>
@@ -963,7 +967,7 @@ export function LeavePermissionTabScreen(props: {
               {/* 4. Substitute Doctor */}
               {detailRecord.substituteDoctor && (
                 <div className="flex flex-col gap-2.5 py-4">
-                  <span className={cn('text-[11px] font-semibold block', isDark ? 'text-neutral-400' : 'text-slate-500')}>
+                  <span className={cn('text-xs font-bold block', isDark ? 'text-white' : 'text-[#0f172b]')}>
                     Dokter Pengganti
                   </span>
                   <div className="flex items-center gap-3">
@@ -974,10 +978,10 @@ export function LeavePermissionTabScreen(props: {
                       className="shrink-0 ring-1 ring-black/5 dark:ring-white/10"
                     />
                     <div className="flex flex-col min-w-0">
-                      <span className={cn('text-sm font-bold truncate leading-tight', isDark ? 'text-white' : 'text-slate-900')}>
+                      <span className={cn('text-sm font-bold truncate leading-tight', isDark ? 'text-white' : 'text-[#0f172b]')}>
                         {detailRecord.substituteDoctor}
                       </span>
-                      <span className={cn('text-xs font-medium truncate mt-0.5', isDark ? 'text-neutral-400' : 'text-slate-500')}>
+                      <span className={cn('text-xs font-medium truncate mt-0.5', isDark ? 'text-neutral-400' : 'text-[#90a1b9]')}>
                         Dokter Spesialis Anak / Dokter Pengganti
                       </span>
                     </div>
@@ -988,14 +992,14 @@ export function LeavePermissionTabScreen(props: {
               {/* 5. Reviewer Notes */}
               {detailRecord.reviewerNotes && (
                 <div className="flex flex-col gap-1.5 py-4">
-                  <span className={cn('text-[11px] font-semibold block', isDark ? 'text-neutral-400' : 'text-slate-500')}>
+                  <span className={cn('text-xs font-bold block', isDark ? 'text-white' : 'text-[#0f172b]')}>
                     Catatan Verifikasi
                   </span>
-                  <p className={cn('text-[13.5px] leading-relaxed font-medium', isDark ? 'text-neutral-200' : 'text-slate-700')}>
+                  <p className={cn('text-[13.5px] leading-relaxed font-medium', isDark ? 'text-neutral-200' : 'text-[#314158]')}>
                     {detailRecord.reviewerNotes}
                   </p>
                   {detailRecord.reviewerName && (
-                    <span className={cn('text-xs font-semibold mt-1 block', isDark ? 'text-neutral-400' : 'text-slate-500')}>
+                    <span className={cn('text-xs font-semibold mt-1 block', isDark ? 'text-neutral-400' : 'text-[#90a1b9]')}>
                       Oleh: {detailRecord.reviewerName}
                     </span>
                   )}
@@ -1003,7 +1007,7 @@ export function LeavePermissionTabScreen(props: {
               )}
 
               {/* 6. Actions Footer */}
-              <div className="flex flex-col gap-2 pt-5 mt-auto border-t border-slate-100 dark:border-white/10">
+              <div className="flex flex-col gap-2 pt-5 mt-auto border-t border-[#e2e8f0] dark:border-white/10">
                 {detailRecord.status === 'menunggu' && (
                   <div className="grid grid-cols-2 gap-2.5">
                     <Button
@@ -1021,8 +1025,8 @@ export function LeavePermissionTabScreen(props: {
                       variant="ghost"
                       size="md"
                       onClick={() => setRecordToCancel(detailRecord)}
-                      startIcon={<Trash2 className="w-4 h-4 text-rose-500" />}
-                      className="text-rose-600 hover:text-rose-700 hover:bg-rose-50/80 dark:text-rose-400 dark:hover:bg-rose-950/40 font-bold border-0 shadow-none"
+                      startIcon={<Trash2 className="w-4 h-4 text-[#fb2c36]" />}
+                      className="text-[#fb2c36] hover:text-rose-700 hover:bg-rose-50/80 dark:text-rose-400 dark:hover:bg-rose-950/40 font-bold border-0 shadow-none"
                     >
                       Batalkan
                     </Button>
@@ -1059,8 +1063,8 @@ export function LeavePermissionTabScreen(props: {
             className={cn(
               'absolute inset-x-0 bottom-0 z-60 flex max-h-[92%] min-h-[520px] w-full flex-col overflow-hidden rounded-t-[32px] sm:rounded-t-[36px] shadow-[0_-12px_45px_rgba(0,0,0,0.3)] border-t will-change-transform select-text touch-pan-y backdrop-blur-2xl',
               isDark
-                ? 'bg-[#0a0e1a] border-white/10 text-white shadow-black/80'
-                : 'bg-white border-neutral-100 text-slate-900',
+                ? 'bg-[#0a0e1a]/98 border-white/10 text-white shadow-black/80'
+                : 'bg-white/98 border-[#e2e8f0] text-[#0f172b]',
             )}
           >
             {/* Interactive Drag Handle */}
@@ -1071,12 +1075,12 @@ export function LeavePermissionTabScreen(props: {
               onClick={triggerCloseFormDrawer}
               className="flex w-full cursor-grab active:cursor-grabbing flex-col items-center justify-center pt-3.5 pb-1 shrink-0 touch-none select-none"
             >
-              <div className={cn('h-1.25 w-11 rounded-full transition-colors', isDark ? 'bg-white/25' : 'bg-neutral-300')} />
+              <div className={cn('h-1.25 w-11 rounded-full transition-colors', isDark ? 'bg-white/25' : 'bg-[#cbd5e1]')} />
             </div>
 
             {/* Header */}
-            <div className="relative z-20 flex items-center justify-between px-6 pt-0.5 pb-3 shrink-0 border-b border-slate-100 dark:border-white/10">
-              <h3 className="text-base font-bold tracking-tight">
+            <div className="relative z-20 flex items-center justify-between px-6 pt-0.5 pb-3 shrink-0 border-b border-[#e2e8f0] dark:border-white/10">
+              <h3 className={cn('text-base font-bold tracking-tight', isDark ? 'text-white' : 'text-[#0f172b]')}>
                 {editingRecordId ? 'Edit perizinan' : 'Pengajuan izin baru'}
               </h3>
               <button
@@ -1085,7 +1089,7 @@ export function LeavePermissionTabScreen(props: {
                 onClick={triggerCloseFormDrawer}
                 className={cn(
                   'p-1.5 -mr-2 rounded-full transition-colors cursor-pointer flex items-center justify-center shrink-0',
-                  isDark ? 'bg-white/10 text-neutral-300 hover:text-white' : 'bg-neutral-100 text-neutral-600 hover:text-neutral-900',
+                  isDark ? 'bg-white/10 text-neutral-300 hover:text-white' : 'bg-slate-100 text-[#314158] hover:text-[#0f172b] hover:bg-slate-200',
                 )}
               >
                 <X className="h-4 w-4" />
@@ -1099,8 +1103,8 @@ export function LeavePermissionTabScreen(props: {
             >
               {/* Field 1: Subjek Perizinan (Free text input) */}
               <div className="flex flex-col gap-1.5">
-                <label className="text-xs font-bold tracking-tight text-slate-700 dark:text-neutral-300">
-                  Subjek Perizinan <span className="text-red-500">*</span>
+                <label className={cn('text-xs font-bold tracking-tight', isDark ? 'text-white' : 'text-[#0f172b]')}>
+                  Subjek Perizinan <span className="text-[#fb2c36]">*</span>
                 </label>
                 <input
                   type="text"
@@ -1111,22 +1115,22 @@ export function LeavePermissionTabScreen(props: {
                     'w-full h-11 px-3.5 rounded-2xl border text-xs font-semibold focus:outline-none transition-all',
                     isDark
                       ? 'bg-white/5 border-white/10 text-white placeholder:text-neutral-500 focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20'
-                      : 'bg-white border-slate-200 text-slate-900 placeholder:text-slate-400 focus:border-blue-600 focus:ring-2 focus:ring-blue-600/15 shadow-2xs',
-                    formErrors.type && 'border-red-500 ring-1 ring-red-500/30',
+                      : 'bg-white border-[#e2e8f0] text-[#0f172b] placeholder:text-[#90a1b9] focus:border-[#0d66e9] focus:ring-2 focus:ring-[#0d66e9]/15 shadow-2xs',
+                    formErrors.type && 'border-[#fb2c36] ring-1 ring-[#fb2c36]/30',
                   )}
                 />
                 {formErrors.type && (
-                  <span className="text-[10px] text-red-500 pl-1">{formErrors.type}</span>
+                  <span className="text-[11px] font-medium text-[#fb2c36] pl-1">{formErrors.type}</span>
                 )}
               </div>
 
               {/* Field 2: Rentang Tanggal */}
               <div className="flex flex-col gap-1.5">
                 <div className="flex items-center justify-between">
-                  <label className="text-xs font-bold tracking-tight text-slate-700 dark:text-neutral-300">
-                    Rentang Tanggal <span className="text-red-500">*</span>
+                  <label className={cn('text-xs font-bold tracking-tight', isDark ? 'text-white' : 'text-[#0f172b]')}>
+                    Rentang Tanggal <span className="text-[#fb2c36]">*</span>
                   </label>
-                  <span className="text-[11px] font-bold text-blue-600 dark:text-cyan-400">
+                  <span className={cn('text-xs font-bold tracking-tight tabular-nums', isDark ? 'text-white' : 'text-[#0f172b]')}>
                     {calculatedDays} Hari Kerja
                   </span>
                 </div>
@@ -1158,8 +1162,8 @@ export function LeavePermissionTabScreen(props: {
 
               {/* Field 3: Pesan / Alasan */}
               <div className="flex flex-col gap-1.5">
-                <label className="text-xs font-bold tracking-tight text-slate-700 dark:text-neutral-300">
-                  Pesan / Alasan Perizinan <span className="text-red-500">*</span>
+                <label className={cn('text-xs font-bold tracking-tight', isDark ? 'text-white' : 'text-[#0f172b]')}>
+                  Pesan / Alasan Perizinan <span className="text-[#fb2c36]">*</span>
                 </label>
                 <textarea
                   rows={3}
@@ -1169,21 +1173,21 @@ export function LeavePermissionTabScreen(props: {
                   className={cn(
                     'w-full p-3 rounded-2xl border text-xs leading-relaxed transition-all focus:outline-none resize-none',
                     formErrors.reason
-                      ? 'border-red-400 bg-red-50/20 text-red-900'
+                      ? 'border-[#fb2c36] bg-red-50/20 text-[#fb2c36]'
                       : isDark
-                        ? 'bg-white/5 border-white/10 text-white placeholder:text-neutral-500 focus:border-blue-500'
-                        : 'bg-white border-slate-200 text-slate-900 placeholder:text-slate-400 focus:border-blue-600',
+                        ? 'bg-white/5 border-white/10 text-white placeholder:text-neutral-500 focus:border-cyan-400'
+                        : 'bg-white border-[#e2e8f0] text-[#0f172b] placeholder:text-[#90a1b9] focus:border-[#0d66e9] focus:ring-2 focus:ring-[#0d66e9]/15 shadow-2xs',
                   )}
                 />
                 {formErrors.reason && (
-                  <span className="text-[10px] text-red-500 pl-1">{formErrors.reason}</span>
+                  <span className="text-[11px] font-medium text-[#fb2c36] pl-1">{formErrors.reason}</span>
                 )}
               </div>
 
               {/* Field 4: Dokter Pengganti */}
               <div className="flex flex-col gap-1.5">
-                <label className="text-xs font-bold tracking-tight text-slate-700 dark:text-neutral-300">
-                  Dokter Pengganti (Opsional)
+                <label className={cn('text-xs font-bold tracking-tight', isDark ? 'text-white' : 'text-[#0f172b]')}>
+                  Dokter Pengganti <span className={cn('font-normal', isDark ? 'text-neutral-400' : 'text-[#90a1b9]')}> (Opsional)</span>
                 </label>
                 <input
                   type="text"
@@ -1191,8 +1195,10 @@ export function LeavePermissionTabScreen(props: {
                   value={formData.substituteDoctor}
                   onChange={(e) => setFormData((prev) => ({ ...prev, substituteDoctor: e.target.value }))}
                   className={cn(
-                    'w-full p-2.5 rounded-2xl border text-xs focus:outline-none transition-all',
-                    isDark ? 'bg-white/5 border-white/10 text-white' : 'bg-white border-slate-200 text-slate-900',
+                    'w-full h-11 px-3.5 rounded-2xl border text-xs font-semibold focus:outline-none transition-all',
+                    isDark
+                      ? 'bg-white/5 border-white/10 text-white placeholder:text-neutral-500 focus:border-cyan-400'
+                      : 'bg-white border-[#e2e8f0] text-[#0f172b] placeholder:text-[#90a1b9] focus:border-[#0d66e9] focus:ring-2 focus:ring-[#0d66e9]/15 shadow-2xs',
                   )}
                 />
               </div>
@@ -1227,24 +1233,24 @@ export function LeavePermissionTabScreen(props: {
             className={cn(
               'absolute inset-x-5 top-1/2 -translate-y-1/2 z-80 p-5 rounded-3xl shadow-2xl border transition-all animate-in zoom-in-95 duration-200 select-none flex flex-col gap-3 backdrop-blur-2xl',
               isDark
-                ? 'bg-[#111624]/98 border-rose-500/30 text-white shadow-black/90'
-                : 'bg-white/98 border-rose-200 text-slate-900 shadow-2xl',
+                ? 'bg-[#111624]/98 border-[#fb2c36]/30 text-white shadow-black/90'
+                : 'bg-white/98 border-rose-200 text-[#0f172b] shadow-2xl',
             )}
           >
-            <h4 className="text-sm font-bold tracking-tight">
+            <h4 className={cn('text-sm font-bold tracking-tight', isDark ? 'text-white' : 'text-[#0f172b]')}>
               Batalkan pengajuan perizinan?
             </h4>
-            <p className="text-xs leading-relaxed text-slate-500 dark:text-neutral-300">
+            <p className="text-xs leading-relaxed text-[#314158] dark:text-neutral-300">
               Apakah Anda yakin ingin membatalkan pengajuan izin ini ({formatDateIndo(recordToCancel.startDate)} — {formatDateIndo(recordToCancel.endDate)})? Tindakan ini tidak dapat dibatalkan.
             </p>
 
-            <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-100 dark:border-white/10">
+            <div className="flex items-center justify-end gap-2 pt-2 border-t border-[#e2e8f0] dark:border-white/10">
               <button
                 type="button"
                 onClick={() => setRecordToCancel(null)}
                 className={cn(
                   'px-4 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer active:scale-95',
-                  isDark ? 'bg-white/10 text-white hover:bg-white/15' : 'bg-slate-100 text-slate-800 hover:bg-slate-200',
+                  isDark ? 'bg-white/10 text-white hover:bg-white/15' : 'bg-slate-100 text-[#314158] hover:bg-slate-200',
                 )}
               >
                 Kembali
@@ -1252,7 +1258,7 @@ export function LeavePermissionTabScreen(props: {
               <button
                 type="button"
                 onClick={handleConfirmCancelRecord}
-                className="px-4 py-2 rounded-xl text-xs font-bold bg-rose-600 text-white hover:bg-rose-700 active:scale-95 transition-all cursor-pointer"
+                className="px-4 py-2 rounded-xl text-xs font-bold bg-[#fb2c36] text-white hover:bg-rose-700 active:scale-95 transition-all cursor-pointer"
               >
                 Ya, Batalkan Izin
               </button>

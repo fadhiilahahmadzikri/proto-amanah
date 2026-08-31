@@ -213,7 +213,7 @@ export function PatientDetailDrawer(props: PatientDetailDrawerProps) {
                     'px-2 py-0.5 rounded-full text-[10px] font-bold shrink-0',
                     badgeVariant === 'success'
                       ? isDark ? 'bg-emerald-500/20 text-emerald-400' : 'bg-emerald-50 text-emerald-700'
-                      : isDark ? 'bg-blue-500/20 text-blue-400' : 'bg-blue-50 text-blue-700',
+                      : isDark ? 'bg-cyan-500/20 text-cyan-400' : 'bg-blue-50 text-[#0d66e9]',
                   )}
                 >
                   {badgeText}

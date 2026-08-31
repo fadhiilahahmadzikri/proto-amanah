@@ -134,7 +134,7 @@ export function SignUpScreen(props: {
           <button
             type="button"
             onClick={props.onGoToLogin}
-            className="font-semibold text-blue-600 hover:text-blue-700 hover:underline focus:outline-none cursor-pointer"
+            className="font-semibold text-[#0d66e9] hover:text-blue-700 hover:underline focus:outline-none cursor-pointer"
           >
             {content.signInLink}
           </button>

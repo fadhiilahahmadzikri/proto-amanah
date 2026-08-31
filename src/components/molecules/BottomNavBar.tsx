@@ -34,7 +34,7 @@ export function BottomNavBar(props: {
         className={cn(
           'flex flex-col items-center gap-1 w-14 pb-1 transition-all cursor-pointer focus:outline-none',
           activeTab === 'home'
-            ? isDark ? 'text-cyan-400 font-bold scale-105' : 'text-[#0a44ff] font-bold scale-105'
+            ? isDark ? 'text-cyan-400 font-bold scale-105' : 'text-[#0d66e9] font-bold scale-105'
             : isDark ? 'text-neutral-500 hover:text-neutral-300 font-medium' : 'text-[#9CA3AF] hover:text-slate-600 font-medium',
         )}
       >
@@ -49,7 +49,7 @@ export function BottomNavBar(props: {
         className={cn(
           'flex flex-col items-center gap-1 w-14 pb-1 transition-all cursor-pointer focus:outline-none',
           activeTab === 'schedule'
-            ? isDark ? 'text-cyan-400 font-bold scale-105' : 'text-[#0a44ff] font-bold scale-105'
+            ? isDark ? 'text-cyan-400 font-bold scale-105' : 'text-[#0d66e9] font-bold scale-105'
             : isDark ? 'text-neutral-500 hover:text-neutral-300 font-medium' : 'text-[#9CA3AF] hover:text-slate-600 font-medium',
         )}
       >
@@ -67,8 +67,8 @@ export function BottomNavBar(props: {
             'absolute bottom-1 w-14 h-14 rounded-[20px] flex items-center justify-center text-2xl shadow-lg transform hover:scale-105 active:scale-95 transition-all cursor-pointer focus:outline-none',
             activeTab === 'qr' && (isDark ? 'ring-2 ring-cyan-300' : 'ring-2 ring-blue-500'),
             isDark
-              ? 'bg-cyan-500 text-neutral-950 shadow-cyan-500/30 ring-4 ring-neutral-950 hover:bg-cyan-400'
-              : 'bg-[#0a44ff] text-white shadow-blue-500/30 ring-4 ring-white hover:bg-[#0038ff]',
+              ? 'btn-crisp-blue-dark ring-4 ring-neutral-950'
+              : 'btn-crisp-blue ring-4 ring-white',
           )}
         >
           <QrCode className="h-7 w-7 stroke-[2]" />
@@ -83,7 +83,7 @@ export function BottomNavBar(props: {
         className={cn(
           'flex flex-col items-center gap-1 w-14 pb-1 transition-all cursor-pointer focus:outline-none',
           activeTab === 'notification'
-            ? isDark ? 'text-cyan-400 font-bold scale-105' : 'text-[#0a44ff] font-bold scale-105'
+            ? isDark ? 'text-cyan-400 font-bold scale-105' : 'text-[#0d66e9] font-bold scale-105'
             : isDark ? 'text-neutral-500 hover:text-neutral-300 font-medium' : 'text-[#9CA3AF] hover:text-slate-600 font-medium',
         )}
       >
@@ -98,7 +98,7 @@ export function BottomNavBar(props: {
         className={cn(
           'flex flex-col items-center gap-1 w-14 pb-1 transition-all cursor-pointer focus:outline-none',
           activeTab === 'account'
-            ? isDark ? 'text-cyan-400 font-bold scale-105' : 'text-[#0a44ff] font-bold scale-105'
+            ? isDark ? 'text-cyan-400 font-bold scale-105' : 'text-[#0d66e9] font-bold scale-105'
             : isDark ? 'text-neutral-500 hover:text-neutral-300 font-medium' : 'text-[#9CA3AF] hover:text-slate-600 font-medium',
         )}
       >

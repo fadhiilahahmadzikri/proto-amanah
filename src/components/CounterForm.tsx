@@ -50,7 +50,7 @@ export const CounterForm = () => {
 
       <div className="mt-2">
         <button
-          className="rounded-sm bg-blue-500 px-5 py-1 font-bold text-white hover:bg-blue-600 focus:ring-3 focus:ring-blue-300/50 focus:outline-hidden disabled:pointer-events-none disabled:opacity-50"
+          className="rounded-xl btn-crisp-blue px-5 py-1.5 font-bold text-white shadow-xs cursor-pointer active:scale-95 disabled:pointer-events-none disabled:opacity-50 transition-all"
           type="submit"
           disabled={form.formState.isSubmitting}
         >

@@ -53,10 +53,10 @@ function QueueCardCover(props: {
         colorMode={isDarkCard ? 'custom' : 'theme'}
         customColors={
           isDarkCard
-            ? ['#00d4ff', '#38bdf8', '#0a44ff', '#60a5fa', '#93c5fd']
-            : ['#0a44ff', '#38bdf8', '#93c5fd', '#bfdbfe']
+            ? ['#00d4ff', '#38bdf8', '#0d66e9', '#60a5fa', '#93c5fd']
+            : ['#0d66e9', '#38bdf8', '#93c5fd', '#bfdbfe']
         }
-        primaryColor={isDarkCard ? '#00d4ff' : '#0a44ff'}
+        primaryColor={isDarkCard ? '#00d4ff' : '#0d66e9'}
         secondaryColor={isDarkCard ? '#38bdf8' : '#60a5fa'}
         opacity={isDarkCard ? 0.32 : 0.22}
         blendMode={isDarkCard ? 'screen' : 'multiply'}
@@ -74,7 +74,7 @@ function QueueCardCover(props: {
             'h-28 w-28 sm:h-32 sm:w-32 transition-all duration-300 drop-shadow-sm',
             isDarkCard
               ? 'bg-gradient-to-br from-cyan-300 via-cyan-400 to-teal-400'
-              : 'bg-gradient-to-br from-[#0a44ff] via-[#1a55ff] to-[#00d4ff]',
+              : 'bg-gradient-to-br from-[#0d66e9] via-[#1a55ff] to-[#00d4ff]',
           )}
           style={{
             maskImage: `url("${wmUrl}")`,
@@ -92,7 +92,7 @@ function QueueCardCover(props: {
         <span
           className={cn(
             'text-3xl sm:text-4xl font-extrabold tracking-tight font-sans leading-none drop-shadow-xs',
-            isDarkCard ? 'text-cyan-400' : 'text-[#0a44ff]',
+            isDarkCard ? 'text-cyan-400' : 'text-[#0d66e9]',
           )}
         >
           {props.queueNumber || '#01'}
@@ -387,8 +387,8 @@ export function QueueCardMaster(props: {
             <PixelTexture
               maskVariant="bottom-left"
               colorMode={isDarkCard ? 'custom' : 'theme'}
-              customColors={isDarkCard ? ['#00d4ff', '#38bdf8', '#0a44ff', '#60a5fa', '#93c5fd'] : ['#0a44ff', '#38bdf8', '#93c5fd', '#bfdbfe']}
-              primaryColor={isDarkCard ? '#00d4ff' : '#0a44ff'}
+              customColors={isDarkCard ? ['#00d4ff', '#38bdf8', '#0d66e9', '#60a5fa', '#93c5fd'] : ['#0d66e9', '#38bdf8', '#93c5fd', '#bfdbfe']}
+              primaryColor={isDarkCard ? '#00d4ff' : '#0d66e9'}
               secondaryColor={isDarkCard ? '#38bdf8' : '#60a5fa'}
               opacity={isDarkCard ? 0.32 : 0.22}
               blendMode={isDarkCard ? 'screen' : 'multiply'}
@@ -407,7 +407,7 @@ export function QueueCardMaster(props: {
               <span
                 className={cn(
                   'text-3xl sm:text-4xl font-extrabold tracking-tighter drop-shadow-sm font-sans leading-none',
-                  isDarkCard ? 'text-cyan-400' : 'text-[#0a44ff]',
+                  isDarkCard ? 'text-cyan-400' : 'text-[#0d66e9]',
                 )}
               >
                 {props.card.queueNumber || '#01'}
@@ -456,7 +456,7 @@ export function QueueCardMaster(props: {
                 <ArrowUpRight
                   className={cn(
                     'h-5 w-5 mr-0.5 stroke-[3] shrink-0 inline-block transition-transform duration-150 group-hover:translate-x-0.5 group-hover:-translate-y-0.5',
-                    isDarkCard ? 'text-cyan-400' : 'text-[#0a44ff]',
+                    isDarkCard ? 'text-cyan-400' : 'text-[#0d66e9]',
                   )}
                 />
                 <span className="truncate">{props.card.patientName || props.card.brand || 'Budi Mulyono'}</span>
@@ -481,7 +481,7 @@ export function QueueCardMaster(props: {
               <span
                 className={cn(
                   'text-xs sm:text-sm font-bold tracking-tight',
-                  isDarkCard ? 'text-cyan-400' : 'text-[#0a44ff]',
+                  isDarkCard ? 'text-cyan-400' : 'text-[#0d66e9]',
                 )}
               >
                 {props.card.poly || 'Poli gigi'}

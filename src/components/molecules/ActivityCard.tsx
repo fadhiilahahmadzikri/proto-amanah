@@ -28,8 +28,8 @@ export function ActivityCard(props: {
         className={cn(
           'absolute -right-6 w-28 h-28 rounded-full blur-[20px] group-hover:scale-125 transition-transform duration-700 pointer-events-none',
           isBlue
-            ? '-top-6 bg-gradient-to-br from-[#0A44FF]/20 to-[#00D4FF]/10'
-            : '-bottom-6 bg-gradient-to-tl from-[#1D4ED8]/20 to-[#38BDF8]/15',
+            ? '-top-6 bg-gradient-to-br from-[#0d66e9]/20 to-[#00D4FF]/10'
+            : '-bottom-6 bg-gradient-to-tl from-[#0d66e9]/20 to-[#38BDF8]/15',
         )}
       />
 
@@ -44,7 +44,7 @@ export function ActivityCard(props: {
                   ? 'bg-blue-950/70 text-cyan-400'
                   : 'bg-indigo-950/70 text-sky-400'
                 : isBlue
-                  ? 'bg-blue-50 text-[#0A44FF]'
+                  ? 'bg-blue-50 text-[#0d66e9]'
                   : 'bg-sky-50 text-[#0284C7]',
             )}
           >

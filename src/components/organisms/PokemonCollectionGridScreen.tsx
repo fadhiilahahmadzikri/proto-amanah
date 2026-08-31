@@ -36,7 +36,7 @@ export function PokemonCollectionGridScreen(props: {
             <div
               className={cn(
                 'mb-4 h-20 w-20 rounded-2xl flex items-center justify-center border',
-                isDark ? 'bg-blue-500/10 border-blue-500/20 text-cyan-400' : 'bg-blue-50 border-blue-200 text-[#0a44ff]',
+                isDark ? 'bg-blue-500/10 border-blue-500/20 text-cyan-400' : 'bg-blue-50 border-blue-200 text-[#0d66e9]',
               )}
             >
               <span className="text-3xl font-extrabold">#</span>
@@ -76,7 +76,7 @@ export function PokemonCollectionGridScreen(props: {
                   <span
                     className={cn(
                       'text-xl font-black leading-none tracking-tight',
-                      isDark ? 'text-cyan-400' : 'text-[#0a44ff]',
+                      isDark ? 'text-cyan-400' : 'text-[#0d66e9]',
                     )}
                   >
                     {card.queueNumber || '#01'}
@@ -86,7 +86,7 @@ export function PokemonCollectionGridScreen(props: {
                       'text-[10px] font-bold px-2 py-0.5 rounded-full shrink-0 whitespace-nowrap',
                       isDark
                         ? 'bg-cyan-500/15 text-cyan-300 border border-cyan-500/20'
-                        : 'bg-blue-50 text-[#0a44ff] border border-blue-100',
+                        : 'bg-blue-50 text-[#0d66e9] border border-blue-100',
                     )}
                   >
                     {card.poly || 'Poli Gigi'}
@@ -140,9 +140,8 @@ export function PokemonCollectionGridScreen(props: {
           onClick={props.onRedraw}
           className={cn(
             'w-full rounded-2xl py-3.5 text-xs font-bold active:scale-[0.98] transition-all cursor-pointer text-center',
-            isDark
-              ? 'bg-gradient-to-r from-cyan-500 via-sky-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white shadow-[0_0_25px_rgba(6,182,212,0.35)]'
-              : 'bg-gradient-to-r from-[#0a44ff] via-[#1a55ff] to-[#0055ff] hover:from-blue-700 hover:to-blue-600 text-white shadow-[0_10px_25px_rgba(10,68,255,0.25)]',
+            'btn-crisp-blue',
+            isDark && 'btn-crisp-blue-dark',
           )}
         >
           Panggil lagi

@@ -120,15 +120,15 @@ export function OtpInput(props: {
                 'h-13 w-11 sm:h-14 sm:w-12 text-center text-xl font-bold rounded-2xl border transition-all duration-200 focus:outline-none',
                 isDark
                   ? isFilled
-                    ? 'border-cyan-400/60 bg-neutral-800 text-white shadow-2xs ring-1 ring-cyan-400/20'
-                    : 'border-white/20 bg-neutral-850/90 text-white hover:border-white/30 focus:border-cyan-400 focus:bg-neutral-800'
+                    ? 'border-cyan-400/60 bg-white/10 text-white shadow-2xs ring-1 ring-cyan-400/30'
+                    : 'border-white/20 bg-white/5 text-white hover:border-white/30 focus:border-cyan-400 focus:bg-white/10 focus:ring-2 focus:ring-cyan-500/25'
                   : isFilled
-                    ? 'border-neutral-900 bg-neutral-50 text-neutral-950 shadow-2xs ring-1 ring-neutral-900/10'
-                    : 'border-neutral-300 bg-white text-neutral-900 hover:border-neutral-400 focus:border-blue-600 focus:bg-white',
+                    ? 'border-[#0d66e9] bg-blue-50/60 text-[#0d66e9] shadow-2xs ring-2 ring-blue-500/20'
+                    : 'border-slate-300 bg-white text-slate-900 hover:border-slate-400 focus:border-[#0d66e9] focus:ring-2 focus:ring-blue-500/25',
                 props.error
                   ? 'border-red-400 bg-red-50/40 text-red-700 ring-2 ring-red-500/20'
-                  : 'focus:ring-2 focus:ring-cyan-500/20',
-                props.disabled ? 'opacity-50 cursor-not-allowed bg-neutral-100 dark:bg-neutral-800' : '',
+                  : '',
+                props.disabled ? 'opacity-50 cursor-not-allowed bg-neutral-100 dark:bg-white/5' : '',
               )}
             />
           );

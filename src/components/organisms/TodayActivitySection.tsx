@@ -31,7 +31,7 @@ export function TodayActivitySection(props: {
             'px-3 py-1.5 rounded-full text-[11px] font-bold shadow-xs active:scale-95 transition-all flex items-center gap-1 cursor-pointer focus:outline-none select-none',
             isDark
               ? 'bg-white/10 text-cyan-400 hover:bg-white/15 backdrop-blur-md'
-              : 'bg-white text-[#0A44FF] hover:bg-gray-50 shadow-sm',
+              : 'bg-white text-[#0d66e9] hover:bg-gray-50 shadow-sm',
           )}
         >
           <span>Detail</span>

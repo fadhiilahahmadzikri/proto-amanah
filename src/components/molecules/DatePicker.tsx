@@ -196,12 +196,12 @@ export function DatePicker(props: {
   return (
     <div ref={containerRef} className={cn('relative flex flex-col gap-1 w-full', props.className)}>
       {props.label && (
-        <label className={cn('block text-xs font-semibold px-0.5', isDark ? 'text-neutral-200' : 'text-slate-700')}>
+        <label className={cn('block text-xs font-bold px-0.5 tracking-tight', isDark ? 'text-white' : 'text-[#0f172b]')}>
           {props.label}
         </label>
       )}
 
-      {/* Trigger Button (1:1 with ScheduleTabScreen master pattern) */}
+      {/* Trigger Button */}
       <button
         type="button"
         onClick={() => {
@@ -215,37 +215,39 @@ export function DatePicker(props: {
           'w-full px-3.5 py-2.5 rounded-2xl text-xs font-medium flex items-center justify-between transition-all duration-200 cursor-pointer select-none border',
           isDark
             ? isCalendarOpen
-              ? 'bg-white/10 text-white border-cyan-400/40 ring-1 ring-cyan-400/20'
+              ? 'bg-white/10 text-white border-cyan-400/50 ring-1 ring-cyan-400/20'
               : 'bg-white/5 text-white border-white/10 hover:bg-white/[0.08]'
             : isCalendarOpen
-              ? 'bg-slate-100/90 text-slate-900 border-blue-600/40 ring-1 ring-blue-600/20'
-              : 'bg-slate-50 text-slate-900 border-slate-200 hover:bg-slate-100/70',
-          props.error && 'border-red-500 ring-1 ring-red-500/30',
+              ? 'bg-[#eff6ff] text-[#0f172b] border-[#0d66e9] ring-2 ring-[#0d66e9]/15'
+              : 'bg-[#f8fafc] text-[#0f172b] border-[#e2e8f0] hover:bg-slate-100/80 shadow-2xs',
+          props.error && 'border-[#fb2c36] ring-1 ring-[#fb2c36]/30',
         )}
       >
-        <div className="flex items-center gap-2 truncate">
+        <div className="flex items-center gap-2.5 truncate">
           <div
             className={cn(
-              'p-1.5 rounded-lg shrink-0 transition-colors',
-              isDark ? 'bg-blue-950/60 text-cyan-400' : 'bg-blue-50 text-blue-600',
+              'p-1.5 rounded-xl shrink-0 transition-colors',
+              isDark ? 'bg-cyan-500/15 text-cyan-400' : 'bg-[#eff6ff] text-[#0d66e9]',
             )}
           >
             <CalendarIcon className="h-4 w-4" />
           </div>
-          <span className={cn('font-semibold truncate', !parsedSelectedDate && 'text-slate-400 font-normal')}>
+          <span className={cn('font-semibold truncate text-xs', !parsedSelectedDate && 'text-[#90a1b9] font-normal')}>
             {formattedDisplay}
           </span>
         </div>
 
         <ChevronDown
           className={cn(
-            'h-4 w-4 text-slate-400 transition-transform duration-250 ease-out shrink-0 ml-1',
-            isCalendarOpen && 'rotate-180 text-blue-600 dark:text-cyan-400',
+            'h-4 w-4 transition-transform duration-250 ease-out shrink-0 ml-1',
+            isCalendarOpen
+              ? 'rotate-180 text-[#0d66e9] dark:text-cyan-400'
+              : 'text-[#90a1b9] dark:text-neutral-400',
           )}
         />
       </button>
 
-      {props.error && <span className="text-[10px] text-red-500 pl-1">{props.error}</span>}
+      {props.error && <span className="text-[11px] font-medium text-[#fb2c36] pl-1">{props.error}</span>}
 
       {/* GSAP Animated Calendar Dropdown Panel */}
       {isCalendarOpen && (
@@ -254,8 +256,8 @@ export function DatePicker(props: {
           className={cn(
             'absolute left-0 right-0 z-50 mt-1.5 p-3.5 rounded-2xl select-none border shadow-2xl backdrop-blur-xl will-change-transform',
             isDark
-              ? 'bg-[#0f1524]/95 text-white border-white/15 shadow-black/80'
-              : 'bg-white/95 text-slate-900 border-slate-200 shadow-slate-300/60',
+              ? 'bg-[#0f1524]/98 text-white border-white/15 shadow-black/80'
+              : 'bg-white/98 text-[#0f172b] border-[#e2e8f0] shadow-xl',
           )}
           style={{ top: '100%' }}
         >
@@ -270,13 +272,13 @@ export function DatePicker(props: {
               }}
               className={cn(
                 'p-1.5 rounded-lg transition-colors cursor-pointer',
-                isDark ? 'hover:bg-white/10 text-neutral-300' : 'hover:bg-slate-100 text-slate-600',
+                isDark ? 'hover:bg-white/10 text-neutral-300' : 'hover:bg-slate-100 text-[#314158]',
               )}
             >
               <ChevronLeft className="h-4 w-4" />
             </button>
 
-            <span className={cn('text-xs font-bold capitalize', isDark ? 'text-white' : 'text-slate-900')}>
+            <span className={cn('text-xs font-bold capitalize', isDark ? 'text-white' : 'text-[#0f172b]')}>
               {format(calendarMonth, 'MMMM yyyy', { locale: idLocale })}
             </span>
 
@@ -289,7 +291,7 @@ export function DatePicker(props: {
               }}
               className={cn(
                 'p-1.5 rounded-lg transition-colors cursor-pointer',
-                isDark ? 'hover:bg-white/10 text-neutral-300' : 'hover:bg-slate-100 text-slate-600',
+                isDark ? 'hover:bg-white/10 text-neutral-300' : 'hover:bg-slate-100 text-[#314158]',
               )}
             >
               <ChevronRight className="h-4 w-4" />
@@ -301,7 +303,7 @@ export function DatePicker(props: {
             {dayNames.map((dayName) => (
               <span
                 key={dayName}
-                className={cn('text-[10px] font-semibold', isDark ? 'text-neutral-500' : 'text-slate-400')}
+                className={cn('text-[10px] font-semibold', isDark ? 'text-neutral-500' : 'text-[#90a1b9]')}
               >
                 {dayName}
               </span>
@@ -324,19 +326,19 @@ export function DatePicker(props: {
                     'calendar-day-cell h-8 w-8 mx-auto rounded-xl text-xs font-semibold flex items-center justify-center transition-all cursor-pointer active:scale-95',
                     isSelected
                       ? isDark
-                        ? 'bg-cyan-500 text-cyan-950 font-bold shadow-md shadow-cyan-500/25'
-                        : 'bg-blue-600 text-white font-bold shadow-md shadow-blue-600/25'
+                        ? 'btn-crisp-blue-dark font-bold shadow-xs'
+                        : 'btn-crisp-blue font-bold shadow-xs'
                       : isTodayDate
                         ? isDark
-                          ? 'bg-cyan-500/15 text-cyan-400 font-bold'
-                          : 'bg-blue-50 text-blue-600 font-bold'
+                          ? 'bg-cyan-500/15 text-cyan-400 font-bold border border-cyan-500/30'
+                          : 'bg-[#eff6ff] text-[#0d66e9] font-bold border border-blue-200/60'
                         : isCurMonth
                           ? isDark
                             ? 'text-neutral-200 hover:bg-white/10'
-                            : 'text-slate-800 hover:bg-slate-100'
+                            : 'text-[#0f172b] hover:bg-slate-100'
                           : isDark
                             ? 'text-neutral-600 hover:bg-white/5'
-                            : 'text-slate-300 hover:bg-slate-50',
+                            : 'text-[#90a1b9] hover:bg-slate-50',
                   )}
                 >
                   {format(day, 'd')}

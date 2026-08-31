@@ -150,7 +150,7 @@ function AreaCustomTooltip(props: CustomTooltipProps) {
             : 'bg-white text-slate-900 border-slate-200/90 shadow-slate-200',
         )}
       >
-        <span>{item.label}</span> • <span className="text-[#0A44FF] dark:text-cyan-400 font-black">{item.patients} Pasien</span>
+        <span>{item.label}</span> • <span className="text-[#0d66e9] dark:text-cyan-400 font-black">{item.patients} Pasien</span>
       </div>
     );
   }
@@ -188,7 +188,7 @@ function CustomizedTipBeamDot(props: TipDotProps) {
           cx={cx}
           cy={cy}
           r={7}
-          fill="#0A44FF"
+          fill="#0d66e9"
           opacity={0.4}
         />
         {/* Layer 3: Solid Core Dot */}
@@ -196,7 +196,7 @@ function CustomizedTipBeamDot(props: TipDotProps) {
           cx={cx}
           cy={cy}
           r={4.5}
-          fill="#0A44FF"
+          fill="#0d66e9"
           stroke="#ffffff"
           strokeWidth={2}
           filter="url(#tipBeamGlowFilter)"
@@ -260,7 +260,7 @@ export function ClinicAnalyticsSection(props: {
           </h3>
           <span className="flex h-2 w-2 relative">
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75" />
-            <span className="relative inline-flex rounded-full h-2 w-2 bg-[#0A44FF]" />
+            <span className="relative inline-flex rounded-full h-2 w-2 bg-[#0d66e9]" />
           </span>
         </div>
 
@@ -351,7 +351,7 @@ export function ClinicAnalyticsSection(props: {
               'flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold border',
               isDark
                 ? 'bg-blue-950/60 text-cyan-400 border-cyan-500/20'
-                : 'bg-blue-50 text-[#0A44FF] border-blue-200/60',
+                : 'bg-blue-50 text-[#0d66e9] border-blue-200/60',
             )}
           >
             <ArrowUp className="w-3 h-3 stroke-[3]" />
@@ -365,14 +365,14 @@ export function ClinicAnalyticsSection(props: {
             <AreaChart data={series} margin={{ top: 14, right: 8, left: 6, bottom: 0 }}>
               <defs>
                 <linearGradient id="clinicSmoothAreaGrad" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#0A44FF" stopOpacity={isDark ? 0.45 : 0.32} />
+                  <stop offset="0%" stopColor="#0d66e9" stopOpacity={isDark ? 0.45 : 0.32} />
                   <stop offset="65%" stopColor="#38BDF8" stopOpacity={isDark ? 0.15 : 0.08} />
-                  <stop offset="100%" stopColor="#0A44FF" stopOpacity={0.0} />
+                  <stop offset="100%" stopColor="#0d66e9" stopOpacity={0.0} />
                 </linearGradient>
 
                 {/* SVG Beam Glow Drop Shadow Filter */}
                 <filter id="tipBeamGlowFilter" x="-50%" y="-50%" width="200%" height="200%">
-                  <feDropShadow dx="0" dy="0" stdDeviation="3" floodColor="#0A44FF" floodOpacity="0.9" />
+                  <feDropShadow dx="0" dy="0" stdDeviation="3" floodColor="#0d66e9" floodOpacity="0.9" />
                 </filter>
               </defs>
 
@@ -398,7 +398,7 @@ export function ClinicAnalyticsSection(props: {
               <Tooltip
                 content={<AreaCustomTooltip isDark={isDark} />}
                 cursor={{
-                  stroke: '#0A44FF',
+                  stroke: '#0d66e9',
                   strokeWidth: 1.5,
                   strokeDasharray: '2 2',
                   strokeOpacity: 0.35,
@@ -409,13 +409,13 @@ export function ClinicAnalyticsSection(props: {
                 key={monthIndex}
                 type="monotone"
                 dataKey="patients"
-                stroke="#0A44FF"
+                stroke="#0d66e9"
                 strokeWidth={2.5}
                 fill="url(#clinicSmoothAreaGrad)"
                 dot={<CustomizedTipBeamDot dataLength={series.length} />}
                 activeDot={{
                   r: 5.5,
-                  fill: '#0A44FF',
+                  fill: '#0d66e9',
                   stroke: '#ffffff',
                   strokeWidth: 2,
                 }}
@@ -450,7 +450,7 @@ export function ClinicAnalyticsSection(props: {
                 Baru
               </span>
             </div>
-            <span className="font-black text-[13px] text-[#0A44FF] dark:text-cyan-400 tabular-nums">
+            <span className="font-black text-[13px] text-[#0d66e9] dark:text-cyan-400 tabular-nums">
               <AnimatedNumber target={totalNewPatients} />
             </span>
           </div>
@@ -476,7 +476,7 @@ export function ClinicAnalyticsSection(props: {
             {/* Header */}
             <div className="flex items-center justify-between border-b pb-3 border-slate-100 dark:border-white/10">
               <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-2xl bg-blue-500/10 text-[#0A44FF] flex items-center justify-center font-bold">
+                <div className="w-9 h-9 rounded-2xl bg-blue-500/10 text-[#0d66e9] flex items-center justify-center font-bold">
                   <TrendingUp className="w-5 h-5" />
                 </div>
                 <div className="flex flex-col">
@@ -514,7 +514,7 @@ export function ClinicAnalyticsSection(props: {
                   <span className="text-[10px] text-slate-400 dark:text-neutral-500 font-semibold block mb-0.5">
                     Pasien Baru
                   </span>
-                  <span className="text-base font-extrabold text-[#0A44FF] dark:text-cyan-400">
+                  <span className="text-base font-extrabold text-[#0d66e9] dark:text-cyan-400">
                     {totalNewPatients.toLocaleString()} Pasien
                   </span>
                 </div>

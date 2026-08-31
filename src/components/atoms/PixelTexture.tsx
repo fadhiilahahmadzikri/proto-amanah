@@ -19,7 +19,7 @@ export type PixelTextureProps = {
   customColors?: string[];
 
   /**
-   * Primary color override (defaults to '#0a44ff' or cyan-400)
+   * Primary color override (defaults to '#0d66e9' or cyan-400)
    */
   primaryColor?: string;
 
@@ -121,7 +121,7 @@ export function PixelTexture(props: PixelTextureProps) {
   const patternId = useId().replace(/:/g, '-');
 
   const colorMode = props.colorMode ?? 'theme';
-  const primaryColor = props.primaryColor ?? '#0a44ff';
+  const primaryColor = props.primaryColor ?? '#0d66e9';
   const secondaryColor = props.secondaryColor ?? '#00d4ff';
   const opacity = props.opacity ?? 0.35;
   const maskVariant = props.maskVariant ?? 'curved-convex';

@@ -53,7 +53,7 @@ export function CredentialsConfigModal(props: {
         {/* Header */}
         <div className="flex items-center justify-between pb-4 border-b border-neutral-200/40 dark:border-white/10">
           <div className="flex items-center gap-2.5">
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-blue-600/15 text-blue-600 dark:bg-blue-500/25 dark:text-blue-400">
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#eff6ff] text-[#0d66e9] dark:bg-white/10 dark:text-cyan-400">
               <KeyRound className="h-5 w-5" />
             </div>
             <div>
@@ -83,15 +83,15 @@ export function CredentialsConfigModal(props: {
               className={cn(
                 'flex flex-col gap-2.5 p-4 rounded-2xl border transition-all',
                 isDark
-                  ? 'bg-neutral-800/60 border-white/10 hover:border-blue-500/40'
-                  : 'bg-neutral-50/80 border-neutral-200/80 hover:border-blue-500/40',
+                  ? 'bg-neutral-800/60 border-white/10 hover:border-cyan-400/40'
+                  : 'bg-neutral-50/80 border-neutral-200/80 hover:border-[#0d66e9]/40',
               )}
             >
               {/* User Header */}
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <span className="font-bold text-sm">{user.name}</span>
-                  <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-600 dark:bg-blue-500/20 dark:text-blue-400">
+                  <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-[#eff6ff] text-[#0d66e9] dark:bg-white/10 dark:text-cyan-400">
                     {user.id}
                   </span>
                 </div>
@@ -102,7 +102,7 @@ export function CredentialsConfigModal(props: {
                       props.onSelectUser?.(user);
                       props.onClose();
                     }}
-                    className="inline-flex items-center gap-1 text-[11px] font-bold text-blue-600 dark:text-blue-400 hover:underline cursor-pointer"
+                    className="inline-flex items-center gap-1 text-[11px] font-bold text-[#0d66e9] dark:text-cyan-400 hover:underline cursor-pointer"
                   >
                     <UserCheck className="h-3.5 w-3.5" />
                     <span>Gunakan Akun</span>
@@ -121,7 +121,7 @@ export function CredentialsConfigModal(props: {
                 <button
                   type="button"
                   onClick={() => handleCopy(user.email, `${user.id}-email`)}
-                  className="p-1 hover:text-blue-600 transition-colors cursor-pointer text-neutral-400"
+                  className="p-1 hover:text-[#0d66e9] transition-colors cursor-pointer text-neutral-400"
                 >
                   {copiedField === `${user.id}-email` ? (
                     <Check className="h-3.5 w-3.5 text-emerald-500" />
@@ -142,7 +142,7 @@ export function CredentialsConfigModal(props: {
                 <button
                   type="button"
                   onClick={() => handleCopy(user.phone, `${user.id}-phone`)}
-                  className="p-1 hover:text-blue-600 transition-colors cursor-pointer text-neutral-400"
+                  className="p-1 hover:text-[#0d66e9] transition-colors cursor-pointer text-neutral-400"
                 >
                   {copiedField === `${user.id}-phone` ? (
                     <Check className="h-3.5 w-3.5 text-emerald-500" />
@@ -163,7 +163,7 @@ export function CredentialsConfigModal(props: {
                 <button
                   type="button"
                   onClick={() => handleCopy(user.password, `${user.id}-pass`)}
-                  className="p-1 hover:text-blue-600 transition-colors cursor-pointer text-neutral-400"
+                  className="p-1 hover:text-[#0d66e9] transition-colors cursor-pointer text-neutral-400"
                 >
                   {copiedField === `${user.id}-pass` ? (
                     <Check className="h-3.5 w-3.5 text-emerald-500" />

@@ -197,23 +197,42 @@ const DeckCarouselCard = React.forwardRef<
       <svg
         className={cn(
           'absolute inset-0 w-full h-full pointer-events-none',
-          props.isDark ? 'opacity-10' : 'opacity-[0.06]',
+          props.isDark ? 'opacity-15' : 'opacity-[0.09]',
         )}
         xmlns="http://www.w3.org/2000/svg"
         viewBox="0 0 400 180"
         preserveAspectRatio="none"
       >
+        <defs>
+          <linearGradient id={`carousel-ribbon-grad-${props.index}`} x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop
+              offset="0%"
+              stopColor={props.isDark ? '#38bdf8' : '#ffffff'}
+              stopOpacity={props.isDark ? 0.9 : 0.95}
+            />
+            <stop
+              offset="45%"
+              stopColor={props.isDark ? '#0284c7' : '#0d66e9'}
+              stopOpacity={1}
+            />
+            <stop
+              offset="100%"
+              stopColor={props.isDark ? '#0369a1' : '#1d58ac'}
+              stopOpacity={props.isDark ? 0.7 : 0.85}
+            />
+          </linearGradient>
+        </defs>
         <path
           d="M-20,60 C80,140 180,-20 300,90 C360,140 420,70 440,50"
           fill="none"
-          stroke={props.isDark ? '#38BDF8' : '#0A44FF'}
+          stroke={`url(#carousel-ribbon-grad-${props.index})`}
           strokeWidth="28"
           strokeLinecap="round"
         />
         <path
           d="M-10,130 C120,40 220,180 340,80 C390,40 430,100 450,110"
           fill="none"
-          stroke={props.isDark ? '#38BDF8' : '#0A44FF'}
+          stroke={`url(#carousel-ribbon-grad-${props.index})`}
           strokeWidth="14"
           strokeLinecap="round"
         />

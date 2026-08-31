@@ -13,9 +13,9 @@ export function ClayIcon(props: {
   onClick?: () => void;
 }) {
   const size = props.size ?? 30;
-  const colorPrimary = props.colorPrimary ?? '#2563EB';
-  const colorLight = props.colorLight ?? '#60A5FA';
-  const colorDark = props.colorDark ?? '#1D4ED8';
+  const colorPrimary = props.colorPrimary ?? '#0d66e9';
+  const colorLight = props.colorLight ?? '#38bdf8';
+  const colorDark = props.colorDark ?? '#1d58ac';
   const borderRadius = Math.round(size * 0.28);
 
   return (
