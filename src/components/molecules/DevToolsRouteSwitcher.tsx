@@ -87,6 +87,8 @@ export function DevToolsRouteSwitcher(props: {
   onZoomIn?: () => void;
   onZoomOut?: () => void;
   onResetZoom?: () => void;
+  isCollapsed?: boolean;
+  onExpand?: () => void;
   onSelectCredential?: (user: {
     name: string;
     email: string;
@@ -317,6 +319,7 @@ export function DevToolsRouteSwitcher(props: {
     <div className={cn('relative z-50 select-none', props.className)}>
       {/* 1. Authentic Apple MacBook Notch Island docked to top wall */}
       <div
+        onClick={props.isCollapsed ? props.onExpand : undefined}
         className={cn(
           'relative group/notch flex items-center justify-center pt-0.5 pb-1 px-5 sm:px-6 transition-all duration-300',
           isDark

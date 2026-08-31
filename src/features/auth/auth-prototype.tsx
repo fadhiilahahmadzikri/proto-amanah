@@ -137,6 +137,10 @@ export function AuthPrototype() {
   }, []);
 
   const scrollContainerRef = React.useRef<HTMLDivElement>(null);
+  const [isNotchCollapsed, setIsNotchCollapsed] = React.useState(false);
+  const [isHoveredTop, setIsHoveredTop] = React.useState(false);
+  const lastScrollTopRef = React.useRef(0);
+  const scrollIdleTimerRef = React.useRef<NodeJS.Timeout | null>(null);
 
   React.useLayoutEffect(() => {
     if (isSplitting) {
@@ -147,6 +151,52 @@ export function AuthPrototype() {
         window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
       }
     }
+  }, [isSplitting]);
+
+  React.useEffect(() => {
+    const handleScrollEvent = (e: Event) => {
+      const target = e.target;
+      const scrollTop =
+        target === document
+          ? window.scrollY || document.documentElement.scrollTop
+          : (target as HTMLElement)?.scrollTop ?? window.scrollY;
+
+      const delta = Math.abs(scrollTop - lastScrollTopRef.current);
+
+      // Collapse whenever user is actively scrolling (scroll up OR scroll down)
+      if (scrollTop > 20 && delta > 2) {
+        setIsNotchCollapsed(true);
+      } else if (scrollTop <= 10) {
+        // When returned to very top edge, stay fully visible
+        setIsNotchCollapsed(false);
+      }
+
+      lastScrollTopRef.current = Math.max(0, scrollTop);
+
+      // Auto-reappear: When user stops scrolling, smoothly slide notch back into view
+      if (scrollIdleTimerRef.current) {
+        clearTimeout(scrollIdleTimerRef.current);
+      }
+      scrollIdleTimerRef.current = setTimeout(() => {
+        setIsNotchCollapsed(false);
+      }, 750);
+    };
+
+    window.addEventListener('scroll', handleScrollEvent, { passive: true, capture: true });
+    const container = scrollContainerRef.current;
+    if (container) {
+      container.addEventListener('scroll', handleScrollEvent, { passive: true });
+    }
+
+    return () => {
+      window.removeEventListener('scroll', handleScrollEvent, { capture: true });
+      if (container) {
+        container.removeEventListener('scroll', handleScrollEvent);
+      }
+      if (scrollIdleTimerRef.current) {
+        clearTimeout(scrollIdleTimerRef.current);
+      }
+    };
   }, [isSplitting]);
 
   const toggleSplitting = () => {
@@ -174,6 +224,13 @@ export function AuthPrototype() {
             : 'bg-gradient-to-br from-[#f8fafc] via-[#f1f5f9] to-[#e2e8f0] text-neutral-900',
       )}
     >
+      {/* Top Edge Hover Trigger Zone (Expands Notch when mouse approaches top 16px) */}
+      <div
+        onMouseEnter={() => setIsHoveredTop(true)}
+        className="fixed top-0 inset-x-0 h-4 z-50 pointer-events-auto"
+        aria-hidden="true"
+      />
+
       {/* Apple Studio Frosted Glass Blurry Ambient Mesh Layers */}
       {!isEmulatorMode && (
         theme === 'dark' ? (
@@ -192,11 +249,17 @@ export function AuthPrototype() {
         )
       )}
 
-      {/* Apple MacBook Notch DevTools (Docked Flush to Top Viewport Edge) */}
+      {/* Apple MacBook Notch DevTools (Docked Flush to Top Edge with Scroll Slide-Collapse Animation) */}
       {prototypeConfig.enableDevTools && (
         <div
+          onMouseEnter={() => setIsHoveredTop(true)}
+          onMouseLeave={() => setIsHoveredTop(false)}
           className={cn(
             'fixed top-0 left-1/2 -translate-x-1/2 z-50 flex items-center justify-center pointer-events-auto',
+            'transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] will-change-transform',
+            isNotchCollapsed && !isHoveredTop
+              ? '-translate-y-full opacity-0 pointer-events-none shadow-none'
+              : 'translate-y-0 opacity-100 pointer-events-auto',
             isEmulatorMode && 'scale-90',
           )}
         >
@@ -215,6 +278,8 @@ export function AuthPrototype() {
             onZoomIn={handleZoomIn}
             onZoomOut={handleZoomOut}
             onResetZoom={handleResetZoom}
+            isCollapsed={isNotchCollapsed && !isHoveredTop}
+            onExpand={() => setIsNotchCollapsed(false)}
             onSelectCredential={handleSelectCredential}
           />
         </div>
