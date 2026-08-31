@@ -27,14 +27,15 @@ export function Input(props: {
   return (
     <div className={cn('relative w-full', props.className)}>
       <div
+        style={{ borderWidth: '0.5px', borderStyle: 'solid' }}
         className={cn(
-          'group flex items-center w-full rounded-2xl border px-4 py-3.5 transition-all duration-200',
+          'input-stroke-thin group flex items-center w-full rounded-2xl px-4 py-3.5 transition-all duration-200',
           isDark
-            ? 'bg-white/5 border-white/15 focus-within:bg-white/10 focus-within:border-cyan-400 focus-within:ring-2 focus-within:ring-cyan-400/20'
-            : 'bg-neutral-50/70 border-neutral-200/90 hover:border-neutral-300 focus-within:bg-white focus-within:ring-2 focus-within:ring-neutral-950/10 focus-within:border-neutral-950',
+            ? 'bg-white/[0.04] border-white/10 focus-within:bg-white/[0.07] focus-within:border-cyan-400 focus-within:ring-1 focus-within:ring-cyan-400/20'
+            : 'bg-neutral-50/70 border-neutral-200/80 hover:border-neutral-300 focus-within:bg-white focus-within:ring-1 focus-within:ring-neutral-950/10 focus-within:border-neutral-950',
           props.error && (isDark
-            ? 'border-red-500/80 bg-red-950/30 focus-within:border-red-500 focus-within:ring-red-500/20'
-            : 'border-red-400 bg-red-50/30 focus-within:border-red-600 focus-within:ring-red-500/10'),
+            ? 'border-red-500/70 bg-red-950/30 focus-within:border-red-500 focus-within:ring-1 focus-within:ring-red-500/20'
+            : 'border-red-400 bg-red-50/30 focus-within:border-red-600 focus-within:ring-1 focus-within:ring-red-500/10'),
           props.disabled && (isDark ? 'opacity-60 bg-white/5 cursor-not-allowed' : 'opacity-60 bg-neutral-100 cursor-not-allowed'),
         )}
       >

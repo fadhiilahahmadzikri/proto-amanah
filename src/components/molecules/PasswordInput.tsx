@@ -75,7 +75,7 @@ export function PasswordInput(props: {
         theme={props.theme}
       />
       {props.showStrength && value.length > 0 && (
-        <div className="mt-0.5">
+        <div className="pt-2.5 pb-0.5">
           <PasswordStrengthTicker password={value} theme={props.theme} />
         </div>
       )}

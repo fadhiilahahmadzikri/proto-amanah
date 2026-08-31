@@ -117,17 +117,18 @@ export function OtpInput(props: {
               onPaste={handlePaste}
               autoFocus={props.autoFocus ? index === 0 : false}
               aria-label={`Digit ke ${index + 1}`}
+              style={{ borderWidth: '0.5px', borderStyle: 'solid' }}
               className={cn(
-                'h-13 w-11 sm:h-14 sm:w-12 text-center text-xl font-bold rounded-2xl border transition-all duration-200 focus:outline-none',
+                'input-stroke-thin h-13 w-11 sm:h-14 sm:w-12 text-center text-xl font-bold rounded-2xl transition-all duration-200 focus:outline-none',
                 isDark
                   ? isFilled
                     ? 'border-cyan-400/60 bg-white/10 text-white shadow-2xs ring-1 ring-cyan-400/30'
-                    : 'border-white/20 bg-white/5 text-white hover:border-white/30 focus:border-cyan-400 focus:bg-white/10 focus:ring-2 focus:ring-cyan-500/25'
+                    : 'border-white/10 bg-white/5 text-white hover:border-white/20 focus:border-cyan-400 focus:bg-white/10 focus:ring-1 focus:ring-cyan-500/25'
                   : isFilled
-                    ? 'border-[#0d66e9] bg-blue-50/60 text-[#0d66e9] shadow-2xs ring-2 ring-blue-500/20'
-                    : 'border-slate-300 bg-white text-slate-900 hover:border-slate-400 focus:border-[#0d66e9] focus:ring-2 focus:ring-blue-500/25',
+                    ? 'border-[#0d66e9] bg-blue-50/60 text-[#0d66e9] shadow-2xs ring-1 ring-blue-500/20'
+                    : 'border-slate-300/80 bg-white text-slate-900 hover:border-slate-400 focus:border-[#0d66e9] focus:ring-1 focus:ring-blue-500/25',
                 props.error
-                  ? 'border-red-400 bg-red-50/40 text-red-700 ring-2 ring-red-500/20'
+                  ? 'border-red-400 bg-red-50/40 text-red-700 ring-1 ring-red-500/20'
                   : '',
                 props.disabled ? 'opacity-50 cursor-not-allowed bg-neutral-100 dark:bg-white/5' : '',
               )}

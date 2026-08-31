@@ -106,7 +106,7 @@ export function LoginScreen(props: {
             </Button>
 
             {/* Divider */}
-            <div className="relative flex items-center justify-center my-1">
+            <div className="relative flex items-center justify-center py-2.5 my-0.5">
               <div className={cn(
                 'w-full border-t transition-colors',
                 isDark ? 'border-white/10' : 'border-neutral-200',
