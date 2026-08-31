@@ -188,7 +188,7 @@ export function MobileAuthTemplate(props: {
       {/* Sheet Header Actions (Back & Close) */}
       <div
         className={cn(
-          'relative z-20 flex items-center justify-between px-5 pt-0.5 pb-2 shrink-0 h-11 border-b border-inherit',
+          'relative z-20 flex items-center justify-between px-5 pt-1 pb-2 shrink-0 h-12 border-b border-inherit',
           props.headerClassName,
         )}
       >
@@ -249,7 +249,7 @@ export function MobileAuthTemplate(props: {
       {/* Screen Content with Mobile-Native Hidden Scrollbar */}
       <div
         ref={contentRef}
-        className="flex w-full flex-1 flex-col px-6 pt-1 pb-6 overflow-y-auto no-scrollbar select-text"
+        className="flex w-full flex-1 flex-col px-6 pt-5 pb-6 overflow-y-auto no-scrollbar select-text"
       >
         {props.children}
       </div>

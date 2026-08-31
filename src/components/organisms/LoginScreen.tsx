@@ -32,9 +32,9 @@ export function LoginScreen(props: {
       onClose={props.onClose}
       theme={props.theme}
     >
-      <div className="flex flex-col gap-5 pt-1 pb-4">
+      <div className="flex flex-col gap-5 pb-4">
         {/* Screen Title & Subtitle */}
-        <div className="flex flex-col gap-1">
+        <div className="flex flex-col gap-1.5">
           <h2 className={cn(
             'text-2xl font-bold tracking-tight leading-snug transition-colors',
             isDark ? 'text-white' : 'text-neutral-900',
