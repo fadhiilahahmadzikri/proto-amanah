@@ -22,10 +22,10 @@ export function SuccessScreen(props: {
       onClose={props.onClose}
       theme={props.theme}
     >
-      <div className="flex flex-col items-center justify-center gap-5 pt-2 pb-4 text-center">
-        {/* Lottie Animation Visual Feedback */}
-        <div className="pt-2">
-          <LottieCheckAnimation size={110} />
+      <div className="flex flex-col items-center justify-center gap-6 pt-6 sm:pt-8 pb-4 text-center">
+        {/* 3D Game Emblem Shield Checkmark Visual Feedback */}
+        <div className="pt-4 sm:pt-6">
+          <LottieCheckAnimation size={124} theme={props.theme} />
         </div>
 
         <div className="flex flex-col gap-1.5">
