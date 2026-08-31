@@ -16,10 +16,11 @@ export function QueueActivationOverlay(props: {
   onRedraw?: () => void;
   onActionClick?: () => void;
   onRevealApex?: () => void;
+  initialDetailOpen?: boolean;
   theme?: 'dark' | 'light';
   className?: string;
 }) {
-  const [showDetail, setShowDetail] = React.useState(false);
+  const [showDetail, setShowDetail] = React.useState(Boolean(props.initialDetailOpen));
   const isDark = (props.theme ?? 'dark') === 'dark';
 
   if (!props.showSuccess) {

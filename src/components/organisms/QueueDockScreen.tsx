@@ -21,7 +21,152 @@ import {
 } from '@/types/queue-dock.types';
 
 import { usePokemonCards } from '@/hooks/use-pokemon-cards';
-import { runGenieAnimation } from '@/lib/genie-renderer';
+import { renderGenieFrame, runGenieAnimation } from '@/lib/genie-renderer';
+
+function GenieSuctionView(props: {
+  card?: QueueDockCardData;
+  theme?: 'dark' | 'light';
+  onBack?: () => void;
+  className?: string;
+}) {
+  const canvasRef = React.useRef<HTMLCanvasElement>(null);
+  const containerRef = React.useRef<HTMLDivElement>(null);
+  const isDark = (props.theme ?? 'dark') === 'dark';
+  const activeCard = props.card ?? DEFAULT_DOCK_CARDS[0] ?? {
+    id: 'queue-02',
+    queueNumber: '#C2',
+    patientName: 'Siti Rahmawati',
+    complaint: 'Pemeriksaan rutin anak & flu batuk',
+    poly: 'Poli Anak',
+    doctorName: 'dr. Sarah Wijaya, Sp.A',
+    doctorImage: '/assets/images/doctors/woman-docter-3.png',
+    watermarkUrl: '/assets/images/wm.svg',
+    priority: 'Prioritas',
+    timeSlot: '08:45 WIB',
+    age: 6,
+    gender: 'P',
+  };
+
+  React.useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    const dpr = typeof window !== 'undefined' ? Math.min(window.devicePixelRatio || 1, 2) : 1;
+    const width = 375;
+    const height = 812;
+    canvas.width = width * dpr;
+    canvas.height = height * dpr;
+    ctx.scale(dpr, dpr);
+
+    // Create offscreen card
+    const offscreen = document.createElement('canvas');
+    const cardW = 270;
+    const cardH = 375;
+    offscreen.width = cardW * dpr;
+    offscreen.height = cardH * dpr;
+    const oCtx = offscreen.getContext('2d');
+    if (oCtx) {
+      oCtx.scale(dpr, dpr);
+      // Card background
+      oCtx.fillStyle = isDark ? '#0c1427' : '#ffffff';
+      if (typeof (oCtx as any).roundRect === 'function') {
+        (oCtx as any).roundRect(0, 0, cardW, cardH, 22);
+      } else {
+        oCtx.beginPath();
+        oCtx.rect(0, 0, cardW, cardH);
+        oCtx.closePath();
+      }
+      oCtx.fill();
+
+      // Border
+      oCtx.strokeStyle = isDark ? 'rgba(56, 189, 248, 0.4)' : 'rgba(13, 102, 233, 0.3)';
+      oCtx.lineWidth = 1.5;
+      oCtx.stroke();
+
+      // Card Header
+      oCtx.fillStyle = isDark ? '#38bdf8' : '#0d66e9';
+      oCtx.font = 'bold 26px sans-serif';
+      oCtx.fillText(activeCard.queueNumber || '#C2', 20, 44);
+
+      // Avatar Circle Placeholder
+      oCtx.fillStyle = isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.05)';
+      oCtx.beginPath();
+      oCtx.arc(cardW / 2, 145, 60, 0, Math.PI * 2);
+      oCtx.fill();
+
+      // Patient Name
+      oCtx.fillStyle = isDark ? '#ffffff' : '#0f172a';
+      oCtx.font = 'bold 16px sans-serif';
+      oCtx.textAlign = 'center';
+      oCtx.fillText(activeCard.patientName || 'Siti Rahmawati', cardW / 2, 245);
+
+      // Complaint
+      oCtx.fillStyle = isDark ? '#94a3b8' : '#64748b';
+      oCtx.font = '12px sans-serif';
+      oCtx.fillText(activeCard.complaint || 'Pemeriksaan rutin anak & flu batuk', cardW / 2, 270);
+
+      // Poli Badge
+      oCtx.fillStyle = isDark ? '#38bdf8' : '#0d66e9';
+      oCtx.font = 'bold 12px sans-serif';
+      oCtx.fillText(activeCard.poly || 'Poli Anak', cardW / 2, 335);
+    }
+
+    const dockPoint = { x: width / 2, y: height - 60 };
+    const windowPoint = { x: (width - cardW) / 2, y: 110 };
+
+    renderGenieFrame(
+      ctx,
+      offscreen,
+      width,
+      height,
+      0.54,
+      'minimize',
+      dockPoint,
+      windowPoint,
+      cardW,
+      cardH,
+      'bottom',
+      dpr,
+    );
+  }, [activeCard, isDark]);
+
+  return (
+    <div
+      ref={containerRef}
+      className={cn(
+        'relative h-full w-full flex flex-col justify-between overflow-hidden select-none font-sans',
+        isDark ? 'bg-[#0a0e1a] text-white' : 'bg-[#f4f7ff] text-slate-900',
+        props.className,
+      )}
+    >
+      {/* Top Header */}
+      <div className="relative z-30 flex items-center justify-between px-5 pt-4 pb-2">
+        <span className="text-sm font-bold tracking-tight">Antrean Terpilih</span>
+        <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-cyan-500/15 border border-cyan-500/30 text-cyan-300 text-[10px] font-bold">
+          <span>Genie Suction</span>
+        </div>
+      </div>
+
+      {/* Interactive Mathematical Genie Mesh Canvas */}
+      <canvas
+        ref={canvasRef}
+        className="absolute inset-0 w-full h-full pointer-events-none z-20"
+        style={{ width: '100%', height: '100%' }}
+      />
+
+      {/* Bottom Notched Dock Floor with Radiant Emitter */}
+      <BottomNotchedDock
+        isActivating={true}
+        dragProgress={1}
+        isLongPressing={false}
+        theme={props.theme}
+        label="Ditarik ke slot dock antrean..."
+      />
+    </div>
+  );
+}
 
 export function QueueDockScreen(props: {
   cards?: QueueDockCardData[];
@@ -40,17 +185,37 @@ export function QueueDockScreen(props: {
     props.initialVariant === 'queue-dock-collection' ? cards.slice(0, 3) : [],
   );
   const [currentIndex, setCurrentIndex] = React.useState(1);
-  const [activationStage, setActivationStage] = React.useState<'idle' | 'plunging' | 'activating'>('idle');
-  const [ejectionStage, setEjectionStage] = React.useState<EjectionStage>('idle');
+  const [activationStage, setActivationStage] = React.useState<'idle' | 'plunging' | 'activating'>(
+    props.initialVariant === 'queue-dock-morphing' ? 'activating' : 'idle',
+  );
+  const [ejectionStage, setEjectionStage] = React.useState<EjectionStage>(
+    props.initialVariant === 'queue-dock-eject'
+      ? 'atm_peek'
+      : props.initialVariant === 'queue-dock-morphing'
+        ? 'atm_plunge'
+        : 'idle',
+  );
   const [showSuccess, setShowSuccess] = React.useState(
-    props.initialVariant === 'queue-dock-activation',
+    props.initialVariant === 'queue-dock-activation' ||
+    props.initialVariant === 'queue-dock-patient-detail' ||
+    props.initialVariant === 'queue-dock-genie-minimize',
   );
   const [isGenieSettled, setIsGenieSettled] = React.useState(
-    props.initialVariant === 'queue-dock-activation',
+    props.initialVariant === 'queue-dock-activation' ||
+    props.initialVariant === 'queue-dock-patient-detail' ||
+    props.initialVariant === 'queue-dock-genie-minimize',
   );
-  const [dragProgress, setDragProgress] = React.useState(0);
+  const [dragProgress, setDragProgress] = React.useState(
+    props.initialVariant === 'queue-dock-sliding'
+      ? 0.88
+      : props.initialVariant === 'queue-dock-morphing'
+        ? 1
+        : 0,
+  );
   const [isLongPressing, setIsLongPressing] = React.useState(false);
-  const [dotCount, setDotCount] = React.useState(0);
+  const [dotCount, setDotCount] = React.useState(
+    props.initialVariant === 'queue-dock-morphing' ? 2 : 0,
+  );
   const [showMenu, setShowMenu] = React.useState(false);
 
   const [showInfoModal, setShowInfoModal] = React.useState(
@@ -372,6 +537,28 @@ export function QueueDockScreen(props: {
     ejectionTimersRef.current.push(t1, t2, t3, t4);
   }, [clearEjectionTimers]);
 
+  // Automated Genie Minimize trigger for the dedicated suction transition frame
+  React.useEffect(() => {
+    if (props.initialVariant === 'queue-dock-genie-minimize') {
+      const timer = setTimeout(() => {
+        void handleCloseOverlay();
+      }, 700);
+      return () => clearTimeout(timer);
+    }
+    return undefined;
+  }, [props.initialVariant, handleCloseOverlay]);
+
+  if (props.initialVariant === 'queue-dock-genie-minimize') {
+    return (
+      <GenieSuctionView
+        card={cards[currentIndex] ?? cards[0]}
+        theme={props.theme}
+        onBack={props.onBack}
+        className={props.className}
+      />
+    );
+  }
+
   if (viewMode === 'collection') {
     return (
       <PokemonCollectionGridScreen
@@ -554,6 +741,8 @@ export function QueueDockScreen(props: {
         isActivating={isPlungingOrActive}
         ejectionStage={ejectionStage}
         showSuccess={showSuccess}
+        initialDragY={props.initialVariant === 'queue-dock-sliding' ? 58 : undefined}
+        initialDragAxis={props.initialVariant === 'queue-dock-sliding' ? 'y' : undefined}
         theme={props.theme}
       />
 
@@ -571,6 +760,7 @@ export function QueueDockScreen(props: {
         isActivating={isMorphingActive}
         showSuccess={showSuccess}
         isGenieSettled={isGenieSettled}
+        initialDetailOpen={props.initialVariant === 'queue-dock-patient-detail'}
         activeCard={selectedActiveCard ?? currentCard}
         cardRef={heroCardRef}
         theme={props.theme}

@@ -17,6 +17,8 @@ export function QueueDock3DCarousel(props: {
   isActivating: boolean;
   ejectionStage?: EjectionStage;
   showSuccess: boolean;
+  initialDragY?: number;
+  initialDragAxis?: 'x' | 'y';
   theme?: 'dark' | 'light';
   className?: string;
 }) {
@@ -30,12 +32,14 @@ export function QueueDock3DCarousel(props: {
     isActivating,
     ejectionStage = 'idle',
     showSuccess,
+    initialDragY,
+    initialDragAxis,
   } = props;
 
   const isDark = props.theme !== 'light';
-  const [isDragging, setIsDragging] = React.useState(false);
-  const [dragOffset, setDragOffset] = React.useState({ x: 0, y: 0 });
-  const [dragAxis, setDragAxis] = React.useState<'x' | 'y' | null>(null);
+  const [isDragging, setIsDragging] = React.useState(Boolean(initialDragY || initialDragAxis));
+  const [dragOffset, setDragOffset] = React.useState({ x: 0, y: initialDragY ?? 0 });
+  const [dragAxis, setDragAxis] = React.useState<'x' | 'y' | null>(initialDragAxis ?? (initialDragY ? 'y' : null));
   const [isLongPressing, setIsLongPressing] = React.useState(false);
 
   // Stable references to prevent listener re-attachment on every frame

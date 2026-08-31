@@ -176,61 +176,29 @@ const SplittingSingleFrameInstance = React.memo(function SplittingSingleFrameIns
     );
   };
 
-  const getBadgeStyle = () => {
-    if (!artboard.isModalVariant) {
-      if (artboard.category === 'Dashboard') {
-        return isDark ? 'bg-blue-500/20 text-cyan-300 border-blue-500/30' : 'bg-blue-50 text-[#0d66e9] border-blue-200';
-      }
-      return isDark ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30' : 'bg-emerald-50 text-emerald-700 border-emerald-200';
-    }
-
-    const trigger = artboard.modalVariant?.triggerType;
-    if (trigger === 'add') {
-      return isDark ? 'bg-emerald-500/25 text-emerald-300 border-emerald-400/40 shadow-xs' : 'bg-emerald-100 text-emerald-800 border-emerald-300 shadow-xs';
-    }
-    if (trigger === 'edit') {
-      return isDark ? 'bg-amber-500/25 text-amber-300 border-amber-400/40 shadow-xs' : 'bg-amber-100 text-amber-800 border-amber-300 shadow-xs';
-    }
-    if (trigger === 'delete') {
-      return isDark ? 'bg-rose-500/25 text-rose-300 border-rose-400/40 shadow-xs' : 'bg-rose-100 text-rose-800 border-rose-300 shadow-xs';
-    }
-    if (trigger === 'detail') {
-      return isDark ? 'bg-purple-500/25 text-purple-300 border-purple-400/40 shadow-xs' : 'bg-purple-100 text-purple-800 border-purple-300 shadow-xs';
-    }
-    return isDark ? 'bg-cyan-500/25 text-cyan-300 border-cyan-400/40 shadow-xs' : 'bg-cyan-100 text-cyan-800 border-cyan-300 shadow-xs';
-  };
-
   return (
     <div className="flex flex-col items-center select-none shrink-0">
-      {/* Minimal Header Capsule Indicator */}
+      {/* Minimal Clean Annotation Indicator (No Glow, No Pills, Breadcrumb Diagonal Separator) */}
       <div
         className={cn(
-          'flex items-center gap-2 px-3.5 py-1.5 mb-2.5 rounded-full border text-xs font-semibold backdrop-blur-md transition-all shadow-xs',
-          artboard.isModalVariant
-            ? isDark
-              ? 'bg-neutral-900/95 border-cyan-500/30 text-white ring-1 ring-cyan-500/20'
-              : 'bg-white border-blue-300 text-slate-900 ring-1 ring-blue-500/10'
-            : isDark
-              ? 'bg-neutral-900/90 border-white/10 text-neutral-200'
-              : 'bg-white/95 border-slate-200 text-slate-800',
+          'flex items-center px-3.5 py-1 mb-2.5 rounded-full border text-xs font-semibold backdrop-blur-md transition-colors',
+          isDark
+            ? 'bg-neutral-900/90 border-white/10 text-neutral-200'
+            : 'bg-white/95 border-slate-200 text-slate-800',
         )}
       >
         <span className="text-[10.5px] font-bold opacity-60">
           #{String(props.index + 1).padStart(2, '0')}
         </span>
-        <span className="truncate max-w-[150px] font-medium">
-          {artboard.label}
+        <span className="mx-2 text-[11px] opacity-30 font-light select-none">/</span>
+        <span className="truncate max-w-[260px] font-medium inline-flex items-center">
+          <span>{artboard.label}</span>
           {artboard.subLabel && (
-            <span className="opacity-75 text-[11px] font-normal"> · {artboard.subLabel}</span>
+            <>
+              <span className="mx-2 text-[11px] opacity-30 font-light select-none">/</span>
+              <span className="opacity-80 text-[11.5px] font-normal">{artboard.subLabel}</span>
+            </>
           )}
-        </span>
-        <span
-          className={cn(
-            'px-2 py-0.5 rounded-md text-[9.5px] font-bold tracking-tight border',
-            getBadgeStyle(),
-          )}
-        >
-          {artboard.badgeLabel}
         </span>
       </div>
 

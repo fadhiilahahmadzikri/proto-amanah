@@ -85,9 +85,9 @@ export function QueueDockCardItem(props: {
       rotateY = 35;
       opacity = 0;
     } else {
-      // Center card plunged deep in slot
+      // Center card plunged or emerging from slot
       x = 0;
-      y = 650;
+      y = props.ejectionStage === 'atm_plunge' ? 110 : 650;
       z = 20;
       zIndex = 50;
       rotateY = 0;
