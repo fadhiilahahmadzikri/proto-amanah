@@ -323,7 +323,7 @@ function DeckCarouselNotchedIndicator(props: {
   onSelectSlide: (index: number) => void;
 }) {
   return (
-    <div className="absolute bottom-0 h-[22px] sm:h-[23px] left-1/2 -translate-x-1/2 z-40 flex items-center justify-center gap-1.5 px-3 pointer-events-auto select-none">
+    <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-[5px] h-[22px] sm:h-[23px] z-40 flex items-center justify-center gap-1.5 px-3 pointer-events-auto select-none">
       {Array.from({ length: props.totalSlides }).map((_, index) => {
         const isActive = index === props.currentIndex;
         return (
