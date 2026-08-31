@@ -21,19 +21,20 @@ import { TodayActivitySection } from '@/components/organisms/TodayActivitySectio
 import { prototypeConfig } from '@/config/prototype.config';
 import portalData from '@/data/portal/portal-data.json';
 import { useDoctorStore } from '@/features/doctor/hooks/use-doctor-store';
-import { useModalStore } from '@/features/portal/hooks/use-modal-store';
+import { ModalProvider, useModalStore } from '@/features/portal/hooks/use-modal-store';
 import { useScheduleStore } from '@/features/schedule/hooks/use-schedule-store';
 import { cn } from '@/lib/utils';
 import type { PortalData } from '@/types/portal.types';
 
 const TAB_ORDER: BottomNavTab[] = ['home', 'schedule', 'qr', 'notification', 'account'];
 
-export function DoctorDashboardScreen(props: {
+function DoctorDashboardContent(props: {
   data?: PortalData;
   theme?: 'dark' | 'light';
   onLogout?: () => void;
   activeTab?: BottomNavTab;
   onTabChange?: (tab: BottomNavTab) => void;
+  initialModalVariant?: string;
   className?: string;
 }) {
   const data = (props.data ?? portalData) as PortalData;
@@ -54,7 +55,9 @@ export function DoctorDashboardScreen(props: {
   const presenceScreenRef = React.useRef<HTMLDivElement>(null);
 
   // Sub-screen Notification state & animation refs (triggered from top right header Bell)
-  const [showNotification, setShowNotification] = React.useState(false);
+  const [showNotification, setShowNotification] = React.useState(
+    props.initialModalVariant === 'notification-center',
+  );
   const notificationScreenRef = React.useRef<HTMLDivElement>(null);
 
   // Sub-screen 3D Doctor ID Card state & animation refs
@@ -62,7 +65,9 @@ export function DoctorDashboardScreen(props: {
   const idCardScreenRef = React.useRef<HTMLDivElement>(null);
 
   // Sub-screen 3D Queue Dock state & animation refs
-  const [showQueueDock, setShowQueueDock] = React.useState(false);
+  const [showQueueDock, setShowQueueDock] = React.useState(
+    Boolean(props.initialModalVariant?.startsWith('queue-dock')),
+  );
   const queueDockScreenRef = React.useRef<HTMLDivElement>(null);
 
   const tabContentRef = React.useRef<HTMLDivElement>(null);
@@ -380,6 +385,7 @@ export function DoctorDashboardScreen(props: {
         {activeTab === 'schedule' && (
           <ScheduleTabScreen
             theme={props.theme}
+            initialModalVariant={props.initialModalVariant}
             onBack={() => handleTabChange('home')}
           />
         )}
@@ -387,6 +393,7 @@ export function DoctorDashboardScreen(props: {
         {activeTab === 'qr' && (
           <QrScannerTabScreen
             theme={props.theme}
+            initialModalVariant={props.initialModalVariant}
             onBack={() => handleTabChange('home')}
           />
         )}
@@ -394,6 +401,7 @@ export function DoctorDashboardScreen(props: {
         {activeTab === 'notification' && (
           <LeavePermissionTabScreen
             theme={props.theme}
+            initialModalVariant={props.initialModalVariant}
             onBack={() => handleTabChange('home')}
           />
         )}
@@ -401,6 +409,7 @@ export function DoctorDashboardScreen(props: {
         {activeTab === 'account' && (
           <AccountTabScreen
             theme={props.theme}
+            initialModalVariant={props.initialModalVariant}
             onBack={() => handleTabChange('home')}
             onLogout={props.onLogout}
           />
@@ -479,6 +488,7 @@ export function DoctorDashboardScreen(props: {
         >
           <QueueDockScreen
             theme={props.theme}
+            initialVariant={props.initialModalVariant}
             onBack={() => handleBackFromQueueDock()}
           />
         </div>
@@ -493,3 +503,20 @@ export function DoctorDashboardScreen(props: {
     </div>
   );
 }
+
+export function DoctorDashboardScreen(props: {
+  data?: PortalData;
+  theme?: 'dark' | 'light';
+  onLogout?: () => void;
+  activeTab?: BottomNavTab;
+  onTabChange?: (tab: BottomNavTab) => void;
+  initialModalVariant?: string;
+  className?: string;
+}) {
+  return (
+    <ModalProvider>
+      <DoctorDashboardContent {...props} />
+    </ModalProvider>
+  );
+}
+

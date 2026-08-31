@@ -77,6 +77,7 @@ function formatDateIndo(dateStr: string) {
 export function LeavePermissionTabScreen(props: {
   theme?: 'dark' | 'light';
   onBack?: () => void;
+  initialModalVariant?: string;
   className?: string;
 }) {
   const isDark = props.theme === 'dark';
@@ -94,13 +95,19 @@ export function LeavePermissionTabScreen(props: {
   const [statusFilter, setStatusFilter] = React.useState<'all' | PermissionStatus>('all');
 
   // Detail Drawer state
-  const [detailRecord, setDetailRecord] = React.useState<PermissionRecord | null>(null);
-  const [isDetailDrawerOpen, setIsDetailDrawerOpen] = React.useState(false);
+  const [detailRecord, setDetailRecord] = React.useState<PermissionRecord | null>(
+    props.initialModalVariant === 'detail-record' ? (records[0] ?? null) : null,
+  );
+  const [isDetailDrawerOpen, setIsDetailDrawerOpen] = React.useState(
+    props.initialModalVariant === 'detail-record',
+  );
   const detailDrawerRef = React.useRef<HTMLDivElement>(null);
   const isClosingDetailRef = React.useRef(false);
 
   // Form Drawer state (Create & Edit)
-  const [isFormDrawerOpen, setIsFormDrawerOpen] = React.useState(false);
+  const [isFormDrawerOpen, setIsFormDrawerOpen] = React.useState(
+    props.initialModalVariant === 'add-form',
+  );
   const [editingRecordId, setEditingRecordId] = React.useState<string | null>(null);
   const formDrawerRef = React.useRef<HTMLDivElement>(null);
   const isClosingFormRef = React.useRef(false);
@@ -122,7 +129,9 @@ export function LeavePermissionTabScreen(props: {
   const [isSubmitting, setIsSubmitting] = React.useState(false);
 
   // Cancel Confirmation Modal state
-  const [recordToCancel, setRecordToCancel] = React.useState<PermissionRecord | null>(null);
+  const [recordToCancel, setRecordToCancel] = React.useState<PermissionRecord | null>(
+    props.initialModalVariant === 'cancel-dialog' ? (records[0] ?? null) : null,
+  );
   const [toastMessage, setToastMessage] = React.useState<string | null>(null);
 
   const showToast = (message: string) => {

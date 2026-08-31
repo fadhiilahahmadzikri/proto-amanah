@@ -428,6 +428,7 @@ const SelectionModal = (props: {
 export function ScheduleTabScreen(props: {
   theme?: 'dark' | 'light';
   onBack?: () => void;
+  initialModalVariant?: string;
   className?: string;
 }) {
   const isDark = props.theme === 'dark';
@@ -444,19 +445,36 @@ export function ScheduleTabScreen(props: {
     setDaySettings: setDaySettingsMap,
   } = useScheduleStore();
 
+  const sampleSchedule = (schedulesMap['2026-08-26'] ?? [])[0] ?? null;
+  const samplePatient = sampleSchedule?.bookedPatients?.[0] ?? null;
+
   // Add / Edit Master Drawer State
-  const [isDrawerOpen, setIsDrawerOpen] = React.useState(false);
-  const [editingSchedule, setEditingSchedule] = React.useState<DoctorSchedule | null>(null);
+  const [isDrawerOpen, setIsDrawerOpen] = React.useState(
+    props.initialModalVariant === 'add-schedule' || props.initialModalVariant === 'edit-schedule',
+  );
+  const [editingSchedule, setEditingSchedule] = React.useState<DoctorSchedule | null>(
+    props.initialModalVariant === 'edit-schedule' ? sampleSchedule : null,
+  );
 
   // Detail Sheet Drawer State
-  const [isDetailDrawerOpen, setIsDetailDrawerOpen] = React.useState(false);
-  const [detailSchedule, setDetailSchedule] = React.useState<DoctorSchedule | null>(null);
+  const [isDetailDrawerOpen, setIsDetailDrawerOpen] = React.useState(
+    props.initialModalVariant === 'session-detail',
+  );
+  const [detailSchedule, setDetailSchedule] = React.useState<DoctorSchedule | null>(
+    props.initialModalVariant === 'patient-detail' || props.initialModalVariant === 'session-detail'
+      ? sampleSchedule
+      : null,
+  );
   const detailDrawerRef = React.useRef<HTMLDivElement>(null);
   const isClosingDetailRef = React.useRef(false);
 
   // Single Patient Detail Modal State (Keluhan & Rekam Pasien)
-  const [isPatientDetailModalOpen, setIsPatientDetailModalOpen] = React.useState(false);
-  const [detailPatient, setDetailPatient] = React.useState<BookedPatient | null>(null);
+  const [isPatientDetailModalOpen, setIsPatientDetailModalOpen] = React.useState(
+    props.initialModalVariant === 'patient-detail',
+  );
+  const [detailPatient, setDetailPatient] = React.useState<BookedPatient | null>(
+    props.initialModalVariant === 'patient-detail' ? samplePatient : null,
+  );
 
   const triggerClosePatientDetailModal = React.useCallback(() => {
     setIsPatientDetailModalOpen(false);
@@ -466,7 +484,9 @@ export function ScheduleTabScreen(props: {
   const [formStatus, setFormStatus] = React.useState<'menunggu' | 'buka' | 'cuti'>('buka');
 
   // Doc Schedule Big Calendar Drawer State
-  const [isDocScheduleDrawerOpen, setIsDocScheduleDrawerOpen] = React.useState(false);
+  const [isDocScheduleDrawerOpen, setIsDocScheduleDrawerOpen] = React.useState(
+    props.initialModalVariant === 'monthly-calendar',
+  );
   const [docScheduleMonth, setDocScheduleMonth] = React.useState<Date>(baseToday);
   const docScheduleDrawerRef = React.useRef<HTMLDivElement>(null);
   const isClosingDocScheduleRef = React.useRef(false);
@@ -512,7 +532,13 @@ export function ScheduleTabScreen(props: {
 
   // View Mode: 'overview' (Showcase Pasien Booking) vs 'sessions' (Halaman Detail Jadwal Sesi Praktik) vs 'session-patients' (Halaman Daftar Pasien Booking Sesi)
   const VIEW_MODE_ORDER: ('overview' | 'sessions' | 'session-patients')[] = ['overview', 'sessions', 'session-patients'];
-  const [viewMode, setViewModeState] = React.useState<'overview' | 'sessions' | 'session-patients'>('overview');
+  const [viewMode, setViewModeState] = React.useState<'overview' | 'sessions' | 'session-patients'>(
+    props.initialModalVariant === 'sessions-management'
+      ? 'sessions'
+      : props.initialModalVariant === 'session-patients'
+        ? 'session-patients'
+        : 'overview',
+  );
   const [viewModeDirection, setViewModeDirection] = React.useState<'forward' | 'backward'>('forward');
   const contentViewportRef = React.useRef<HTMLDivElement>(null);
 

@@ -29,15 +29,28 @@ import { cn } from '@/lib/utils';
 export function QrScannerTabScreen(props: {
   theme?: 'dark' | 'light';
   onBack?: () => void;
+  initialModalVariant?: string;
   className?: string;
 }) {
   const isDark = props.theme === 'dark';
   const { profile: doctorProfile } = useDoctorStore();
   const { openModal, closeModal } = useModalStore();
   const [isFlashOn, setIsFlashOn] = React.useState(false);
-  const [isScanned, setIsScanned] = React.useState(false);
-  const [isDrawerOpen, setIsDrawerOpen] = React.useState(true);
-  const [drawerView, setDrawerView] = React.useState<'menu' | 'manual-pin' | 'my-qr' | 'upload-qr'>('menu');
+  const [isScanned, setIsScanned] = React.useState(
+    props.initialModalVariant === 'qr-success',
+  );
+  const [isDrawerOpen, setIsDrawerOpen] = React.useState(
+    props.initialModalVariant !== 'qr-camera-only' && props.initialModalVariant !== 'qr-success',
+  );
+  const [drawerView, setDrawerView] = React.useState<'menu' | 'manual-pin' | 'my-qr' | 'upload-qr'>(
+    props.initialModalVariant === 'qr-manual'
+      ? 'manual-pin'
+      : props.initialModalVariant === 'qr-myqr'
+        ? 'my-qr'
+        : props.initialModalVariant === 'qr-upload'
+          ? 'upload-qr'
+          : 'menu',
+  );
   const [manualPin, setManualPin] = React.useState('');
   const [pinError, setPinError] = React.useState<string | null>(null);
   const [copiedFeedback, setCopiedFeedback] = React.useState(false);

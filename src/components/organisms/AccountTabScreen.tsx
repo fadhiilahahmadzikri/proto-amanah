@@ -115,6 +115,7 @@ export function AccountTabScreen(props: {
   theme?: 'dark' | 'light';
   onBack?: () => void;
   onLogout?: () => void;
+  initialModalVariant?: string;
   className?: string;
 }) {
   const isDark = props.theme === 'dark';
@@ -124,7 +125,9 @@ export function AccountTabScreen(props: {
   const fileInputRef = React.useRef<HTMLInputElement>(null);
 
   // Edit Profile States
-  const [showEditModal, setShowEditModal] = React.useState(false);
+  const [showEditModal, setShowEditModal] = React.useState(
+    props.initialModalVariant === 'edit-profile',
+  );
   const [draftName, setDraftName] = React.useState(profile.name);
   const [draftPhone, setDraftPhone] = React.useState(profile.phone);
   const [draftEmail, setDraftEmail] = React.useState(profile.email);

@@ -2,51 +2,89 @@
 
 import React from 'react';
 
-type ModalStoreListener = () => void;
+type ModalContextType = {
+  isModalOpen: boolean;
+  openModal: () => void;
+  closeModal: () => void;
+  reset: () => void;
+};
 
-let activeModalCount = 0;
-const listeners = new Set<ModalStoreListener>();
+const ModalContext = React.createContext<ModalContextType | null>(null);
 
-function emitChange() {
-  for (const listener of listeners) {
+export function ModalProvider(props: { children: React.ReactNode }) {
+  const [activeModalCount, setActiveModalCount] = React.useState(0);
+
+  const openModal = React.useCallback(() => {
+    setActiveModalCount(prev => prev + 1);
+  }, []);
+
+  const closeModal = React.useCallback(() => {
+    setActiveModalCount(prev => Math.max(0, prev - 1));
+  }, []);
+
+  const reset = React.useCallback(() => {
+    setActiveModalCount(0);
+  }, []);
+
+  const value = React.useMemo(() => ({
+    isModalOpen: activeModalCount > 0,
+    openModal,
+    closeModal,
+    reset,
+  }), [activeModalCount, openModal, closeModal, reset]);
+
+  return React.createElement(ModalContext.Provider, { value }, props.children);
+}
+
+// Global fallback if used outside a provider
+let globalModalCount = 0;
+const globalListeners = new Set<() => void>();
+function emitGlobalChange() {
+  for (const listener of globalListeners) {
     listener();
   }
 }
 
 export const modalStore = {
-  getIsModalOpen: () => activeModalCount > 0,
-  subscribe: (listener: ModalStoreListener) => {
-    listeners.add(listener);
+  getIsModalOpen: () => globalModalCount > 0,
+  subscribe: (listener: () => void) => {
+    globalListeners.add(listener);
     return () => {
-      listeners.delete(listener);
+      globalListeners.delete(listener);
     };
   },
   openModal: () => {
-    activeModalCount += 1;
-    emitChange();
+    globalModalCount += 1;
+    emitGlobalChange();
   },
   closeModal: () => {
-    activeModalCount = Math.max(0, activeModalCount - 1);
-    emitChange();
+    globalModalCount = Math.max(0, globalModalCount - 1);
+    emitGlobalChange();
   },
   reset: () => {
-    activeModalCount = 0;
-    emitChange();
+    globalModalCount = 0;
+    emitGlobalChange();
   },
 };
 
 /**
  * Shared reactive hook to coordinate modal and drawer visibility with the main app shell and bottom navigation bar.
+ * Uses local ModalContext when wrapped in ModalProvider, or falls back to global store.
  */
-export function useModalStore() {
-  const isModalOpen = React.useSyncExternalStore(
+export function useModalStore(): ModalContextType {
+  const context = React.useContext(ModalContext);
+  const isGlobalOpen = React.useSyncExternalStore(
     modalStore.subscribe,
     modalStore.getIsModalOpen,
     modalStore.getIsModalOpen,
   );
 
+  if (context) {
+    return context;
+  }
+
   return {
-    isModalOpen,
+    isModalOpen: isGlobalOpen,
     openModal: modalStore.openModal,
     closeModal: modalStore.closeModal,
     reset: modalStore.reset,

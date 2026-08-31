@@ -28,23 +28,34 @@ export function QueueDockScreen(props: {
   theme?: 'dark' | 'light';
   onBack?: () => void;
   onSelectCard?: (card: QueueDockCardData) => void;
+  initialVariant?: string;
   className?: string;
 }) {
   const pokemonData = usePokemonCards();
   const cards = props.cards ?? (pokemonData.cards.length > 0 ? pokemonData.cards : DEFAULT_DOCK_CARDS);
-  const [viewMode, setViewMode] = React.useState<'dock' | 'collection'>('dock');
-  const [collectedCards, setCollectedCards] = React.useState<QueueDockCardData[]>([]);
+  const [viewMode, setViewMode] = React.useState<'dock' | 'collection'>(
+    props.initialVariant === 'queue-dock-collection' ? 'collection' : 'dock',
+  );
+  const [collectedCards, setCollectedCards] = React.useState<QueueDockCardData[]>(
+    props.initialVariant === 'queue-dock-collection' ? cards.slice(0, 3) : [],
+  );
   const [currentIndex, setCurrentIndex] = React.useState(1);
   const [activationStage, setActivationStage] = React.useState<'idle' | 'plunging' | 'activating'>('idle');
   const [ejectionStage, setEjectionStage] = React.useState<EjectionStage>('idle');
-  const [showSuccess, setShowSuccess] = React.useState(false);
-  const [isGenieSettled, setIsGenieSettled] = React.useState(false);
+  const [showSuccess, setShowSuccess] = React.useState(
+    props.initialVariant === 'queue-dock-activation',
+  );
+  const [isGenieSettled, setIsGenieSettled] = React.useState(
+    props.initialVariant === 'queue-dock-activation',
+  );
   const [dragProgress, setDragProgress] = React.useState(0);
   const [isLongPressing, setIsLongPressing] = React.useState(false);
   const [dotCount, setDotCount] = React.useState(0);
   const [showMenu, setShowMenu] = React.useState(false);
 
-  const [showInfoModal, setShowInfoModal] = React.useState(false);
+  const [showInfoModal, setShowInfoModal] = React.useState(
+    props.initialVariant === 'queue-dock-info',
+  );
   const infoDrawerRef = React.useRef<HTMLDivElement>(null);
   const infoContentRef = React.useRef<HTMLDivElement>(null);
   const infoStartYRef = React.useRef(0);

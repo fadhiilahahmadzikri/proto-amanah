@@ -122,3 +122,275 @@ export const PROTOTYPE_ROUTES: PrototypeRouteDefinition[] = [
     description: 'Layar animasi status sukses operasi akun.',
   },
 ];
+
+export type ModalTriggerType = 'add' | 'edit' | 'detail' | 'delete' | 'action' | 'overlay';
+
+export type ScreenModalVariant = {
+  id: string;
+  label: string;
+  badgeLabel: string;
+  modalKey: string;
+  triggerType: ModalTriggerType;
+  description: string;
+};
+
+export type SplittingArtboardDefinition = {
+  id: string;
+  routeId: string;
+  screen: AuthScreen;
+  tab?: BottomNavTab;
+  category: 'Dashboard' | 'Auth';
+  label: string;
+  subLabel?: string;
+  badgeLabel: string;
+  isModalVariant: boolean;
+  modalVariant?: ScreenModalVariant;
+};
+
+/**
+ * Registry of modal, drawer, and overlay sub-states mapped to their parent route ID.
+ * Used by Splitting Mode to duplicate artboards with pre-opened modals.
+ */
+export const SCREEN_MODAL_REGISTRY: Record<string, ScreenModalVariant[]> = {
+  // 1. Jadwal Praktek (dash-schedule)
+  'dash-schedule': [
+    {
+      id: 'schedule-add-drawer',
+      label: 'Tambah Jadwal Praktik',
+      badgeLabel: 'Drawer: Tambah Jadwal',
+      modalKey: 'add-schedule',
+      triggerType: 'add',
+      description: 'Drawer form pembuatan sesi jadwal praktik baru dan pengaturan kuota.',
+    },
+    {
+      id: 'schedule-edit-drawer',
+      label: 'Ubah Jadwal Praktik',
+      badgeLabel: 'Drawer: Ubah Jadwal',
+      modalKey: 'edit-schedule',
+      triggerType: 'edit',
+      description: 'Drawer pengubahan jam sesi praktik, ruang poli, dan status ketersediaan.',
+    },
+    {
+      id: 'schedule-session-detail',
+      label: 'Detail Sesi Praktik',
+      badgeLabel: 'Drawer: Detail Sesi',
+      modalKey: 'session-detail',
+      triggerType: 'detail',
+      description: 'Drawer inspeksi rincian sesi praktik dan daftar pasien terdaftar.',
+    },
+    {
+      id: 'schedule-patient-detail',
+      label: 'Detail Pasien Antrean',
+      badgeLabel: 'Drawer: Detail Pasien',
+      modalKey: 'patient-detail',
+      triggerType: 'detail',
+      description: 'Drawer detail rekam medis pasien, status antrean, dan panggil pasien.',
+    },
+    {
+      id: 'schedule-calendar-drawer',
+      label: 'Kalender Bulanan Jadwal',
+      badgeLabel: 'Drawer: Kalender',
+      modalKey: 'monthly-calendar',
+      triggerType: 'action',
+      description: 'Drawer kalender bulanan interaktif untuk navigasi tanggal jadwal.',
+    },
+    {
+      id: 'schedule-sessions-mgmt',
+      label: 'Kelola Slot Sesi Praktik',
+      badgeLabel: 'Layar: Kelola Sesi',
+      modalKey: 'sessions-management',
+      triggerType: 'action',
+      description: 'Halaman manajemen dan konfigurasi slot sesi jam praktik dokter.',
+    },
+    {
+      id: 'schedule-session-patients',
+      label: 'Daftar Pasien Booking Sesi',
+      badgeLabel: 'Layar: Pasien Sesi',
+      modalKey: 'session-patients',
+      triggerType: 'detail',
+      description: 'Halaman daftar pasien yang terdaftar dalam sesi poli tertentu.',
+    },
+  ],
+
+  // 2. Presensi QR (dash-qr)
+  'dash-qr': [
+    {
+      id: 'qr-scanner-manual',
+      label: 'Input PIN Presensi Manual',
+      badgeLabel: 'Drawer: PIN Manual',
+      modalKey: 'qr-manual',
+      triggerType: 'add',
+      description: 'Drawer input 6-digit PIN kode presensi manual alternatif scanner.',
+    },
+    {
+      id: 'qr-scanner-myqr',
+      label: 'Tampilkan QR Presensi Dokter',
+      badgeLabel: 'Drawer: QR Dokter',
+      modalKey: 'qr-myqr',
+      triggerType: 'detail',
+      description: 'Drawer kode QR dokter dan 5-digit angka presensi untuk dipindai resepsionis.',
+    },
+    {
+      id: 'qr-scanner-upload',
+      label: 'Upload File QR Code',
+      badgeLabel: 'Drawer: Upload QR',
+      modalKey: 'qr-upload',
+      triggerType: 'add',
+      description: 'Drawer unggah berkas gambar kode QR dari galeri ponsel.',
+    },
+    {
+      id: 'qr-scanner-success',
+      label: 'Status Presensi Masuk Berhasil',
+      badgeLabel: 'Card: Presensi Sukses',
+      modalKey: 'qr-success',
+      triggerType: 'detail',
+      description: 'Banner notifikasi verifikasi presensi kehadiran dokter berhasil tercatat.',
+    },
+  ],
+
+  // 3. Perizinan Dokter (dash-notif)
+  'dash-notif': [
+    {
+      id: 'permission-add-form',
+      label: 'Form Pengajuan Cuti Baru',
+      badgeLabel: 'Modal: Tambah Cuti',
+      modalKey: 'add-form',
+      triggerType: 'add',
+      description: 'Drawer form permohonan cuti/izin, pilih tanggal, dan unggah dokumen.',
+    },
+    {
+      id: 'permission-detail-drawer',
+      label: 'Detail Status Izin',
+      badgeLabel: 'Drawer: Detail Izin',
+      modalKey: 'detail-record',
+      triggerType: 'detail',
+      description: 'Drawer inspeksi rincian izin, status persetujuan, dan catatan verifikator.',
+    },
+    {
+      id: 'permission-cancel-dialog',
+      label: 'Dialog Batalkan Izin',
+      badgeLabel: 'Dialog: Batalkan Izin',
+      modalKey: 'cancel-dialog',
+      triggerType: 'delete',
+      description: 'Alert dialog konfirmasi pembatalan permohonan izin dokter.',
+    },
+  ],
+
+  // 4. Profil Dokter (dash-account)
+  'dash-account': [
+    {
+      id: 'account-edit-profile',
+      label: 'Edit Identitas Dokter',
+      badgeLabel: 'Drawer: Edit Profil',
+      modalKey: 'edit-profile',
+      triggerType: 'edit',
+      description: 'Drawer formulir pembaruan data SIP, STR, telepon, dan bio dokter.',
+    },
+  ],
+
+  // 4. Home Dashboard (dash-home)
+  'dash-home': [
+    {
+      id: 'home-notification-center',
+      label: 'Pusat Notifikasi & IGD',
+      badgeLabel: 'Drawer: Notifikasi',
+      modalKey: 'notification-center',
+      triggerType: 'overlay',
+      description: 'Drawer notifikasi panggilan darurat IGD dan broadcast pengumuman.',
+    },
+    {
+      id: 'home-queue-dock-main',
+      label: 'Rel 3D Antrean Poli',
+      badgeLabel: 'Layar: Rel Antrean',
+      modalKey: 'queue-dock-main',
+      triggerType: 'overlay',
+      description: 'Layar rel 3D antrean pasien poli dengan interaksi fisik pull-to-activate.',
+    },
+    {
+      id: 'home-queue-dock-info',
+      label: 'Panduan Alur Antrean',
+      badgeLabel: 'Drawer: Panduan Antrean',
+      modalKey: 'queue-dock-info',
+      triggerType: 'detail',
+      description: 'Drawer panduan langkah alur pemanggilan dan proses antrean pasien.',
+    },
+    {
+      id: 'home-queue-dock-activation',
+      label: 'Aktivasi Pasien & Genie',
+      badgeLabel: 'Overlay: Panggil Pasien',
+      modalKey: 'queue-dock-activation',
+      triggerType: 'action',
+      description: 'Layar animasi 3D genie emergence dan panggilan pasien aktif.',
+    },
+    {
+      id: 'home-queue-dock-collection',
+      label: 'Riwayat Koleksi Antrean',
+      badgeLabel: 'Layar: Riwayat Antrean',
+      modalKey: 'queue-dock-collection',
+      triggerType: 'detail',
+      description: 'Layar grid riwayat pasien yang telah selesai dilayani dokter.',
+    },
+  ],
+};
+
+/**
+ * Core Algorithm: Generates all Splitting Canvas artboards,
+ * multiplying base screens with their pre-opened modal/drawer duplicate views.
+ */
+export function generateSplittingArtboards(options?: {
+  viewMode?: 'all' | 'base-only' | 'modals-only';
+  categoryFilter?: 'all' | 'Dashboard' | 'Auth';
+  triggerFilter?: 'all' | ModalTriggerType;
+}): SplittingArtboardDefinition[] {
+  const viewMode = options?.viewMode ?? 'all';
+  const categoryFilter = options?.categoryFilter ?? 'all';
+  const triggerFilter = options?.triggerFilter ?? 'all';
+
+  const artboards: SplittingArtboardDefinition[] = [];
+
+  for (const baseRoute of PROTOTYPE_ROUTES) {
+    if (categoryFilter !== 'all' && baseRoute.category !== categoryFilter) {
+      continue;
+    }
+
+    // 1. Include Base Screen
+    if (viewMode === 'all' || viewMode === 'base-only') {
+      artboards.push({
+        id: `base-${baseRoute.id}`,
+        routeId: baseRoute.id,
+        screen: baseRoute.screen,
+        tab: baseRoute.tab,
+        category: baseRoute.category,
+        label: baseRoute.label,
+        badgeLabel: baseRoute.category,
+        isModalVariant: false,
+      });
+    }
+
+    // 2. Duplicate and Invert for Registered Modal/Drawer States
+    if (viewMode === 'all' || viewMode === 'modals-only') {
+      const modalVariants = SCREEN_MODAL_REGISTRY[baseRoute.id] || [];
+
+      for (const variant of modalVariants) {
+        if (triggerFilter !== 'all' && variant.triggerType !== triggerFilter) {
+          continue;
+        }
+
+        artboards.push({
+          id: `modal-${variant.id}`,
+          routeId: baseRoute.id,
+          screen: baseRoute.screen,
+          tab: baseRoute.tab,
+          category: baseRoute.category,
+          label: baseRoute.label,
+          subLabel: variant.label,
+          badgeLabel: variant.badgeLabel,
+          isModalVariant: true,
+          modalVariant: variant,
+        });
+      }
+    }
+  }
+
+  return artboards;
+}
