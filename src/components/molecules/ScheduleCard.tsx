@@ -222,16 +222,20 @@ export function ScheduleCard(props: {
             </span>
           </div>
 
-          {/* Clean Integrated Booking Pill in Liquid Glass Pill Style */}
+          {/* Clean Integrated Booking Pill (Zero Stroke & Normalized Text) */}
           <div
             className={cn(
               'px-2.5 py-1 rounded-full text-[11px] font-bold tracking-tight shadow-2xs shrink-0 flex items-center gap-1 tabular-nums',
               isDark
-                ? 'bg-white/10 border border-white/20 text-white backdrop-blur-md'
-                : 'bg-slate-100 border border-slate-200 text-[#0f172b]',
+                ? 'bg-white/10 text-white backdrop-blur-md'
+                : 'bg-slate-100 text-[#0f172b]',
             )}
           >
-            <span>{props.schedule.slotCount} {props.schedule.slotText}</span>
+            <span>
+              {props.schedule.slotText?.startsWith(props.schedule.slotCount) || /^\d+/.test(props.schedule.slotText ?? '')
+                ? props.schedule.slotText
+                : `${props.schedule.slotCount} ${props.schedule.slotText ?? 'Pasien'}`}
+            </span>
           </div>
         </div>
       </div>

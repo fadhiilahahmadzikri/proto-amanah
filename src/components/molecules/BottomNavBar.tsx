@@ -57,18 +57,18 @@ export function BottomNavBar(props: {
         <span className="text-[10px]">Jadwal</span>
       </button>
 
-      {/* 3. Floating Center QR Action Button */}
+      {/* 3. Floating Center QR Action Button (Permanent Heroic Action) */}
       <div className="relative w-16 flex justify-center">
         <button
           type="button"
           aria-label="Pindai QR Presensi"
           onClick={() => props.onTabChange?.('qr')}
           className={cn(
-            'absolute bottom-1 w-14 h-14 rounded-[20px] flex items-center justify-center text-2xl shadow-lg transform hover:scale-105 active:scale-95 transition-all cursor-pointer focus:outline-none',
-            activeTab === 'qr' && (isDark ? 'ring-2 ring-cyan-300' : 'ring-2 ring-blue-500'),
+            'absolute bottom-1 w-14 h-14 rounded-[20px] flex items-center justify-center text-white text-2xl shadow-lg transform hover:scale-105 active:scale-95 transition-all cursor-pointer focus:outline-none',
+            activeTab === 'qr' && (isDark ? 'ring-2 ring-cyan-300 scale-105' : 'ring-2 ring-blue-400 scale-105'),
             isDark
-              ? 'btn-crisp-blue-dark ring-4 ring-neutral-950'
-              : 'btn-crisp-blue ring-4 ring-white',
+              ? 'btn-crisp-blue-dark ring-4 ring-neutral-950 shadow-[0_8px_24px_rgba(56,189,248,0.3)]'
+              : 'btn-crisp-blue ring-4 ring-white shadow-[0_8px_24px_rgba(13,102,233,0.35)]',
           )}
         >
           <QrCode className="h-7 w-7 stroke-[2]" />
