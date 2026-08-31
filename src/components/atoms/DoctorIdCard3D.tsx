@@ -18,6 +18,7 @@ import {
 import { MeshLineGeometry, MeshLineMaterial } from 'meshline';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import * as THREE from 'three';
+import { cn } from '@/lib/utils';
 
 extend({ MeshLineGeometry, MeshLineMaterial });
 
@@ -764,9 +765,16 @@ export function DoctorIdCard3D(props: {
 
   return (
     <ThreeErrorBoundary>
-      <div className="relative w-full h-full select-none cursor-grab active:cursor-grabbing" data-interactive="true">
+      <div
+        className={cn(
+          'relative w-full h-full select-none cursor-grab active:cursor-grabbing',
+          '[&>div]:!w-full [&>div]:!h-full [&_canvas]:!w-full [&_canvas]:!h-full [&_canvas]:!block',
+          props.className,
+        )}
+        data-interactive="true"
+      >
         <Canvas
-          dpr={[2, 3.5]}
+          dpr={[1, 2]}
           gl={{
             antialias: true,
             alpha: true,
@@ -774,7 +782,7 @@ export function DoctorIdCard3D(props: {
             outputColorSpace: THREE.SRGBColorSpace,
           }}
           camera={{ position: [0, 0.05, 11.8], fov: 27.5 }}
-          style={{ backgroundColor: 'transparent' }}
+          style={{ width: '100%', height: '100%', backgroundColor: 'transparent' }}
         >
           <ambientLight intensity={1.8} />
           <directionalLight position={[0, 6, 8]} intensity={1.2} />
