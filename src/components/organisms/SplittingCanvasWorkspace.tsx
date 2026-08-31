@@ -260,13 +260,20 @@ export const SplittingCanvasWorkspace = React.memo(function SplittingCanvasWorks
       <div className="grid grid-cols-5 gap-7 sm:gap-8 min-w-[2050px] w-max justify-items-center items-start shrink-0">
         {artboards.map((artboard, index) => (
           <ModalProvider key={artboard.id}>
-            <SplittingSingleFrameInstance
-              artboard={artboard}
-              index={index}
-              theme={props.theme}
-              isFrameless={props.isFrameless}
-              onNavigateToSingle={props.onNavigateToSingle}
-            />
+            <div
+              style={{
+                contentVisibility: 'auto',
+                containIntrinsicSize: '393px 920px',
+              }}
+            >
+              <SplittingSingleFrameInstance
+                artboard={artboard}
+                index={index}
+                theme={props.theme}
+                isFrameless={props.isFrameless}
+                onNavigateToSingle={props.onNavigateToSingle}
+              />
+            </div>
           </ModalProvider>
         ))}
       </div>

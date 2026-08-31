@@ -91,35 +91,35 @@ export function PhoneFrame(props: {
   return (
     <div className={cn('relative mx-auto my-2 sm:my-4 select-text', props.className)}>
       {/* Outer iPhone Pro Chassis with Space Black Titanium Edge & 1:1 Black Hardware Buttons */}
-      <div className="relative h-[790px] w-[375px] rounded-[52px] bg-neutral-950 p-[10px] shadow-[0_30px_90px_-20px_rgba(0,0,0,0.65),0_0_0_1px_rgba(255,255,255,0.12)_inset,0_0_0_2.5px_rgba(0,0,0,0.95)] ring-1 ring-neutral-800/90 sm:h-[844px] sm:w-[393px] sm:rounded-[56px] sm:p-[12px]">
+      <div className="relative h-[790px] w-[375px] rounded-[52px] bg-neutral-950 p-[10px] sm:h-[844px] sm:w-[393px] sm:rounded-[56px] sm:p-[12px] border border-neutral-800/80 ring-1 ring-black/40">
         {/* 1:1 Black Titanium iPhone Side Buttons */}
         {/* Left Side: Action Button */}
         <div
-          className="absolute top-[112px] -left-[4px] h-[30px] w-[4px] rounded-l-[3px] bg-gradient-to-r from-neutral-900 via-neutral-800 to-neutral-950 border-y border-l border-neutral-700/60 shadow-[-2px_0_4px_rgba(0,0,0,0.8)] ring-[0.5px] ring-neutral-950"
+          className="absolute top-[112px] -left-[3px] h-[28px] w-[3px] rounded-l-[2px] bg-neutral-800 border-y border-l border-neutral-700/60"
           aria-hidden="true"
         />
 
         {/* Left Side: Volume Up Button */}
         <div
-          className="absolute top-[156px] -left-[4px] h-[54px] w-[4px] rounded-l-[3px] bg-gradient-to-r from-neutral-900 via-neutral-800 to-neutral-950 border-y border-l border-neutral-700/60 shadow-[-2px_0_4px_rgba(0,0,0,0.8)] ring-[0.5px] ring-neutral-950"
+          className="absolute top-[154px] -left-[3px] h-[52px] w-[3px] rounded-l-[2px] bg-neutral-800 border-y border-l border-neutral-700/60"
           aria-hidden="true"
         />
 
         {/* Left Side: Volume Down Button */}
         <div
-          className="absolute top-[222px] -left-[4px] h-[54px] w-[4px] rounded-l-[3px] bg-gradient-to-r from-neutral-900 via-neutral-800 to-neutral-950 border-y border-l border-neutral-700/60 shadow-[-2px_0_4px_rgba(0,0,0,0.8)] ring-[0.5px] ring-neutral-950"
+          className="absolute top-[218px] -left-[3px] h-[52px] w-[3px] rounded-l-[2px] bg-neutral-800 border-y border-l border-neutral-700/60"
           aria-hidden="true"
         />
 
         {/* Right Side: Power / Side Button */}
         <div
-          className="absolute top-[172px] -right-[4px] h-[82px] w-[4px] rounded-r-[3px] bg-gradient-to-l from-neutral-900 via-neutral-800 to-neutral-950 border-y border-r border-neutral-700/60 shadow-[2px_0_4px_rgba(0,0,0,0.8)] ring-[0.5px] ring-neutral-950"
+          className="absolute top-[168px] -right-[3px] h-[80px] w-[3px] rounded-r-[2px] bg-neutral-800 border-y border-r border-neutral-700/60"
           aria-hidden="true"
         />
 
         {/* Right Side: Camera Control / Capture Button */}
         <div
-          className="absolute top-[510px] -right-[3px] h-[64px] w-[3px] rounded-r-[2px] bg-gradient-to-l from-neutral-900 via-neutral-800 to-neutral-950 border-y border-r border-neutral-700/50 shadow-[1.5px_0_3px_rgba(0,0,0,0.7)] ring-[0.5px] ring-neutral-950"
+          className="absolute top-[510px] -right-[2.5px] h-[60px] w-[2.5px] rounded-r-[2px] bg-neutral-850 border-y border-r border-neutral-700/40"
           aria-hidden="true"
         />
 
@@ -130,7 +130,10 @@ export function PhoneFrame(props: {
           onPointerMove={handlePointerMove}
           onPointerUp={handlePointerUp}
           onPointerCancel={handlePointerUp}
-          className="relative flex h-full w-full flex-col overflow-hidden rounded-[42px] bg-neutral-950 shadow-inner sm:rounded-[46px] cursor-none"
+          className={cn(
+            'relative flex h-full w-full flex-col overflow-hidden rounded-[42px] shadow-inner sm:rounded-[46px] cursor-none transition-colors duration-300',
+            isDark ? 'bg-neutral-950 text-white' : 'bg-[#f8faff] text-slate-900',
+          )}
         >
           {/* Authentic iOS Liquid Glass Touch Cursor */}
           <GlassTouchCursor containerRef={screenRef} isDark={isDark} />
@@ -195,7 +198,7 @@ export function PhoneFrame(props: {
               'relative z-40 flex items-center justify-between px-7 pt-3.5 pb-2.5 text-xs font-semibold tracking-tight transition-all duration-300 shrink-0 select-none border-b',
               isDark
                 ? 'bg-neutral-950/40 text-white border-white/10 shadow-[0_4px_30px_rgba(0,0,0,0.25)]'
-                : 'bg-white/55 text-neutral-900 border-white/40 shadow-[0_4px_25px_rgba(0,0,0,0.05)]',
+                : 'bg-[#f8faff]/90 text-neutral-900 border-slate-200/60 shadow-[0_2px_12px_rgba(0,0,0,0.03)]',
             )}
             style={{
               backdropFilter: 'blur(24px) saturate(180%)',
@@ -302,7 +305,7 @@ export function PhoneFrame(props: {
               'backdrop-blur-2xl',
               isDark
                 ? 'bg-neutral-950/45 border-white/10 shadow-[0_-4px_24px_rgba(0,0,0,0.3)]'
-                : 'bg-white/55 border-white/40 shadow-[0_-4px_20px_rgba(0,0,0,0.06)]',
+                : 'bg-[#f8faff]/90 border-slate-200/60 shadow-[0_-2px_12px_rgba(0,0,0,0.03)]',
             )}
             style={{
               backdropFilter: 'blur(24px) saturate(180%)',
@@ -318,7 +321,7 @@ export function PhoneFrame(props: {
                 'h-[4.5px] w-36 rounded-full transition-all duration-200 shadow-xs',
                 isDark
                   ? 'bg-white/80 shadow-[0_1px_4px_rgba(0,0,0,0.5)]'
-                  : 'bg-neutral-900/70 shadow-[0_1px_3px_rgba(0,0,0,0.2)]',
+                  : 'bg-neutral-800/80 shadow-[0_1px_2px_rgba(0,0,0,0.1)]',
               )}
             />
           </footer>
