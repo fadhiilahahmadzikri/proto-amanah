@@ -6,6 +6,7 @@ import {
   Check,
   CheckCircle2,
   ChevronDown,
+  Columns3,
   Compass,
   Copy,
   CreditCard,
@@ -17,10 +18,13 @@ import {
   Lock,
   Mail,
   Mails,
+  Minus,
   Moon,
+  Plus,
   QrCode,
   RotateCcw,
   Sliders,
+  Smartphone,
   Sun,
   User,
   UserCheck,
@@ -42,6 +46,32 @@ import { useScheduleStore } from '@/features/schedule/hooks/use-schedule-store';
 import { cn } from '@/lib/utils';
 import type { AuthScreen } from '@/types/auth.types';
 
+function AppleNotchBackground(props: { isDark: boolean }) {
+  const { isDark } = props;
+  return (
+    <svg
+      className="absolute inset-0 w-full h-full pointer-events-none transition-colors duration-300"
+      viewBox="0 0 100 38"
+      preserveAspectRatio="none"
+      fill="none"
+    >
+      {/* S-Curve Filleted Notch Body matching the user's diagram */}
+      <path
+        d="M 0 0 C 2.2 0, 4.2 3.5, 4.8 11 L 4.8 26 C 4.8 33.5, 6.8 38, 9.5 38 L 90.5 38 C 93.2 38, 95.2 33.5, 95.2 26 L 95.2 11 C 95.8 3.5, 97.8 0, 100 0 Z"
+        fill={isDark ? 'rgba(10, 10, 10, 0.96)' : 'rgba(255, 255, 255, 0.97)'}
+      />
+
+      {/* Sub-pixel Rim Stroke along the bottom & curved ears */}
+      <path
+        d="M 0 0 C 2.2 0, 4.2 3.5, 4.8 11 L 4.8 26 C 4.8 33.5, 6.8 38, 9.5 38 L 90.5 38 C 93.2 38, 95.2 33.5, 95.2 26 L 95.2 11 C 95.8 3.5, 97.8 0, 100 0"
+        stroke={isDark ? 'rgba(255, 255, 255, 0.12)' : 'rgba(0, 0, 0, 0.08)'}
+        strokeWidth="0.75"
+        vectorEffect="non-scaling-stroke"
+      />
+    </svg>
+  );
+}
+
 export function DevToolsRouteSwitcher(props: {
   currentScreen: AuthScreen;
   activeTab?: BottomNavTab;
@@ -49,6 +79,14 @@ export function DevToolsRouteSwitcher(props: {
   onNavigateTab?: (tab: BottomNavTab) => void;
   theme: 'dark' | 'light';
   onToggleTheme: () => void;
+  isSplitting?: boolean;
+  onToggleSplitting?: () => void;
+  isFrameless?: boolean;
+  onToggleFrameless?: () => void;
+  zoomLevel?: number;
+  onZoomIn?: () => void;
+  onZoomOut?: () => void;
+  onResetZoom?: () => void;
   onSelectCredential?: (user: {
     name: string;
     email: string;
@@ -277,17 +315,26 @@ export function DevToolsRouteSwitcher(props: {
 
   return (
     <div className={cn('relative z-50 select-none', props.className)}>
-      {/* 1. Minimalist Floating Capsule */}
+      {/* 1. Authentic Apple MacBook Notch Island docked to top wall */}
       <div
         className={cn(
-          'flex items-center gap-1 p-1 rounded-full border shadow-lg backdrop-blur-xl transition-colors duration-200',
+          'relative group/notch flex items-center justify-center pt-0.5 pb-1 px-5 sm:px-6 transition-all duration-300',
           isDark
-            ? 'bg-neutral-900/90 border-white/10 text-neutral-200'
-            : 'bg-white/90 border-slate-200 text-slate-800',
+            ? 'drop-shadow-[0_4px_14px_rgba(0,0,0,0.55)] drop-shadow-[0_1px_2px_rgba(0,0,0,0.35)]'
+            : 'drop-shadow-[0_4px_12px_rgba(0,0,0,0.06)] drop-shadow-[0_1px_2px_rgba(0,0,0,0.04)]',
         )}
       >
-        {/* Route Trigger */}
-        <button
+        {/* Organic S-Curve Notch SVG Backdrop */}
+        <AppleNotchBackground isDark={isDark} />
+
+        <div
+          className={cn(
+            'relative z-10 flex items-center gap-1 py-0.5 text-xs transition-colors duration-200',
+            isDark ? 'text-neutral-200' : 'text-slate-800',
+          )}
+        >
+          {/* Route Trigger */}
+          <button
           type="button"
           onClick={() => {
             setActiveMenuTab('routes');
@@ -369,6 +416,93 @@ export function DevToolsRouteSwitcher(props: {
           {isDark ? <Sun className="h-3.5 w-3.5" /> : <Moon className="h-3.5 w-3.5" />}
         </button>
 
+        {/* Splitting Multi-Frame Canvas Toggle Trigger */}
+        {props.onToggleSplitting && (
+          <button
+            type="button"
+            aria-label={props.isSplitting ? 'Kembali ke Layar Tunggal' : 'Mode Splitting (Multi-Frame 5-Kolom)'}
+            title={props.isSplitting ? 'Kembali ke Layar Tunggal' : 'Mode Splitting (Multi-Frame 5-Kolom)'}
+            onClick={props.onToggleSplitting}
+            className={cn(
+              'p-1.5 rounded-full transition-all cursor-pointer',
+              props.isSplitting
+                ? (isDark ? 'bg-cyan-500/20 text-cyan-300 ring-1 ring-cyan-400/40 font-bold' : 'bg-blue-50 text-[#0d66e9] ring-1 ring-blue-500/40 font-bold')
+                : (isDark ? 'hover:bg-white/10 text-neutral-300' : 'hover:bg-slate-100 text-slate-600'),
+            )}
+          >
+            <Columns3 className="h-3.5 w-3.5" />
+          </button>
+        )}
+
+        {/* Frameless Artboard Mode Toggle Trigger (Mutates & Appears only when Splitting is Active) */}
+        {props.isSplitting && props.onToggleFrameless && (
+          <button
+            type="button"
+            aria-label={props.isFrameless ? 'Gunakan Mockup iPhone' : 'Lepas Mockup iPhone (Mode Artboard)'}
+            title={props.isFrameless ? 'Gunakan Mockup iPhone' : 'Lepas Mockup iPhone (Mode Artboard)'}
+            onClick={props.onToggleFrameless}
+            className={cn(
+              'p-1.5 rounded-full transition-all cursor-pointer',
+              props.isFrameless
+                ? (isDark ? 'bg-indigo-500/25 text-indigo-300 ring-1 ring-indigo-400/50 font-bold shadow-xs' : 'bg-indigo-50 text-indigo-600 ring-1 ring-indigo-500/50 font-bold shadow-xs')
+                : (isDark ? 'hover:bg-white/10 text-neutral-300' : 'hover:bg-slate-100 text-slate-600'),
+            )}
+          >
+            <Smartphone className="h-3.5 w-3.5" />
+          </button>
+        )}
+
+        {/* Native Browser Zoom Controller (Blink/Webkit Engine Level Zoom) */}
+        {props.isSplitting && (
+          <div
+            className={cn(
+              'flex items-center gap-0.5 px-1 py-0.5 rounded-full border text-[11px] font-bold tracking-tight transition-colors select-none',
+              isDark
+                ? 'bg-white/5 border-white/10 text-neutral-200'
+                : 'bg-slate-100/90 border-slate-200 text-slate-700',
+            )}
+          >
+            <button
+              type="button"
+              aria-label="Zoom Out"
+              title="Zoom Out (Kecilkan Kanvas)"
+              onClick={props.onZoomOut}
+              className={cn(
+                'p-1 rounded-full transition-colors cursor-pointer active:scale-90',
+                isDark ? 'hover:bg-white/15 text-neutral-300' : 'hover:bg-slate-200 text-slate-700',
+              )}
+            >
+              <Minus className="h-3 w-3" />
+            </button>
+
+            <button
+              type="button"
+              aria-label="Reset Zoom"
+              title="Klik untuk Reset Zoom"
+              onClick={props.onResetZoom}
+              className={cn(
+                'px-1 py-0.5 text-[10px] font-bold hover:underline cursor-pointer tabular-nums select-none min-w-[32px] text-center',
+                isDark ? 'text-cyan-300' : 'text-[#0d66e9]',
+              )}
+            >
+              {Math.round((props.zoomLevel ?? 0.5) * 100)}%
+            </button>
+
+            <button
+              type="button"
+              aria-label="Zoom In"
+              title="Zoom In (Perbesar Kanvas)"
+              onClick={props.onZoomIn}
+              className={cn(
+                'p-1 rounded-full transition-colors cursor-pointer active:scale-90',
+                isDark ? 'hover:bg-white/15 text-neutral-300' : 'hover:bg-slate-200 text-slate-700',
+              )}
+            >
+              <Plus className="h-3 w-3" />
+            </button>
+          </div>
+        )}
+
         {/* Standalone iPhone Emulator Pop-out Trigger */}
         <button
           type="button"
@@ -384,6 +518,7 @@ export function DevToolsRouteSwitcher(props: {
         >
           <AppWindow className="h-3.5 w-3.5" />
         </button>
+        </div>
       </div>
 
       {/* 2. Minimalist Modal Panel */}

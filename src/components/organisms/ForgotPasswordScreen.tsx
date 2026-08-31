@@ -49,7 +49,6 @@ export function ForgotPasswordScreen(props: {
             }}
             startIcon={<Mail className="h-4 w-4 text-neutral-400" />}
             error={props.errors.email}
-            autoFocus
             autoComplete="email"
           />
 

@@ -20,8 +20,10 @@ export function GlassTouchCursor(props: {
 
     const handlePointerMove = (e: PointerEvent) => {
       const rect = container.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
+      const scaleX = rect.width / (container.offsetWidth || 1);
+      const scaleY = rect.height / (container.offsetHeight || 1);
+      const x = (e.clientX - rect.left) / (scaleX || 1);
+      const y = (e.clientY - rect.top) / (scaleY || 1);
 
       setPosition({ x, y });
       setIsVisible(true);

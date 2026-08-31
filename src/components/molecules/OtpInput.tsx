@@ -9,6 +9,7 @@ export function OtpInput(props: {
   onChange: (otp: string) => void;
   onComplete?: (otp: string) => void;
   disabled?: boolean;
+  autoFocus?: boolean;
   error?: string;
   className?: string;
   theme?: 'dark' | 'light';
@@ -114,7 +115,7 @@ export function OtpInput(props: {
                 handleKeyDown(index, e);
               }}
               onPaste={handlePaste}
-              autoFocus={index === 0}
+              autoFocus={props.autoFocus ? index === 0 : false}
               aria-label={`Digit ke ${index + 1}`}
               className={cn(
                 'h-13 w-11 sm:h-14 sm:w-12 text-center text-xl font-bold rounded-2xl border transition-all duration-200 focus:outline-none',
