@@ -276,15 +276,47 @@ export const SCREEN_MODAL_REGISTRY: Record<string, ScreenModalVariant[]> = {
     },
   ],
 
-  // 4. Profil Dokter (dash-account)
+  // 4. Profil & Pengaturan Dokter (dash-account)
   'dash-account': [
     {
       id: 'account-edit-profile',
-      label: 'Edit Identitas Dokter',
-      badgeLabel: 'Drawer: Edit Profil',
+      label: 'Edit identitas dokter',
+      badgeLabel: 'Drawer: edit profil',
       modalKey: 'edit-profile',
       triggerType: 'edit',
       description: 'Drawer formulir pembaruan data SIP, STR, telepon, dan bio dokter.',
+    },
+    {
+      id: 'settings-account',
+      label: 'Akun & identitas dokter',
+      badgeLabel: 'Layar: akun dokter',
+      modalKey: 'settings-account',
+      triggerType: 'detail',
+      description: 'Layar dedikasi pengaturan akun dan identitas dokter.',
+    },
+    {
+      id: 'settings-security',
+      label: 'Privasi & keamanan',
+      badgeLabel: 'Layar: keamanan',
+      modalKey: 'settings-security',
+      triggerType: 'detail',
+      description: 'Layar dedikasi pengaturan privasi, PIN, dan keamanan.',
+    },
+    {
+      id: 'settings-data',
+      label: 'Data & penyimpanan',
+      badgeLabel: 'Layar: data SIMRS',
+      modalKey: 'settings-data',
+      triggerType: 'detail',
+      description: 'Layar dedikasi pengaturan data laporan dan penyimpanan SIMRS.',
+    },
+    {
+      id: 'settings-help',
+      label: 'Bantuan teknisi IT',
+      badgeLabel: 'Layar: bantuan IT',
+      modalKey: 'settings-help',
+      triggerType: 'detail',
+      description: 'Layar dedikasi bantuan dan support teknisi IT.',
     },
   ],
 
@@ -376,6 +408,8 @@ export const SCREEN_MODAL_REGISTRY: Record<string, ScreenModalVariant[]> = {
 /**
  * Core Algorithm: Generates all Splitting Canvas artboards,
  * multiplying base screens with their pre-opened modal/drawer duplicate views.
+ * @param options Generation filter and view mode options.
+ * @returns Array of artboard definitions for Splitting Canvas.
  */
 export function generateSplittingArtboards(options?: {
   viewMode?: 'all' | 'base-only' | 'modals-only';

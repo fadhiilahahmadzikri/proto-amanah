@@ -2,15 +2,11 @@
 
 import { gsap } from 'gsap';
 import {
-  Bell,
-  Calendar,
   Check,
   ChevronLeft,
   ChevronRight,
   Database,
-  FileText,
   HelpCircle,
-  Laptop,
   LogOut,
   Mail,
   Pencil,
@@ -22,12 +18,20 @@ import {
 import React from 'react';
 import { ClayIcon } from '@/components/atoms/ClayIcon';
 import { DoctorAvatar } from '@/components/atoms/DoctorAvatar';
+import {
+  AccountIdentitySettingsScreen,
+  DataStorageSettingsScreen,
+  ItSupportSettingsScreen,
+  PrivacySecuritySettingsScreen,
+} from '@/components/organisms/settings';
 import { useDoctorStore } from '@/features/doctor/hooks/use-doctor-store';
 import { useModalStore } from '@/features/portal/hooks/use-modal-store';
 import { cn } from '@/lib/utils';
 
+type SettingsCategory = 'account' | 'security' | 'data' | 'help';
+
 type SettingsItem = {
-  id: string;
+  id: SettingsCategory;
   title: string;
   subtitle: string;
   colorPrimary: string;
@@ -39,71 +43,35 @@ type SettingsItem = {
 const SETTINGS_ITEMS: SettingsItem[] = [
   {
     id: 'account',
-    title: 'Akun & Identitas Dokter',
-    subtitle: 'SIP, STR, NIK, Bio Medis',
+    title: 'Akun & identitas dokter',
+    subtitle: 'SIP, STR, NIK, bio medis',
     colorPrimary: '#0d66e9',
     colorLight: '#38bdf8',
     colorDark: '#1d58ac',
     icon: User,
   },
   {
-    id: 'practice',
-    title: 'Pengaturan Praktik & Shift',
-    subtitle: 'Poli Spesialis, Kuota Pasien, Jadwal',
-    colorPrimary: '#F59E0B',
-    colorLight: '#FCD34D',
-    colorDark: '#D97706',
-    icon: Calendar,
-  },
-  {
     id: 'security',
-    title: 'Privasi & Keamanan',
-    subtitle: 'PIN Presensi, Biometrik, Akses Data',
+    title: 'Privasi & keamanan',
+    subtitle: 'PIN presensi, biometrik, akses data',
     colorPrimary: '#10B981',
     colorLight: '#6EE7B7',
     colorDark: '#059669',
     icon: ShieldCheck,
   },
   {
-    id: 'notifications',
-    title: 'Notifikasi & Pengingat',
-    subtitle: 'Panggilan Darurat IGD, Suara, Alarm Shift',
-    colorPrimary: '#EF4444',
-    colorLight: '#FCA5A5',
-    colorDark: '#DC2626',
-    icon: Bell,
-  },
-  {
     id: 'data',
-    title: 'Data & Penyimpanan',
-    subtitle: 'Unduh Laporan PDF, Cache SIMRS',
-    colorPrimary: '#0d66e9',
+    title: 'Data & penyimpanan',
+    subtitle: 'Unduh laporan PDF, cache SIMRS',
+    colorPrimary: '#0ea5e9',
     colorLight: '#38bdf8',
-    colorDark: '#1d58ac',
+    colorDark: '#0284c7',
     icon: Database,
   },
   {
-    id: 'documents',
-    title: 'Dokumen & Sertifikasi',
-    subtitle: 'SIP Aktif, STR KKI, IDAI',
-    colorPrimary: '#06B6D4',
-    colorLight: '#67E8F9',
-    colorDark: '#0891B2',
-    icon: FileText,
-  },
-  {
-    id: 'devices',
-    title: 'Perangkat Terhubung',
-    subtitle: 'Mobile App, Tablet Poli, Desktop RS',
-    colorPrimary: '#14B8A6',
-    colorLight: '#5EEAD4',
-    colorDark: '#0F766E',
-    icon: Laptop,
-  },
-  {
     id: 'help',
-    title: 'Bantuan & IT Support',
-    subtitle: 'Helpdesk SIMRS, Panduan Presensi',
+    title: 'Bantuan teknisi IT',
+    subtitle: 'Helpdesk SIMRS, panduan presensi',
     colorPrimary: '#8B5CF6',
     colorLight: '#C4B5FD',
     colorDark: '#6D28D9',
@@ -121,6 +89,25 @@ export function AccountTabScreen(props: {
   const isDark = props.theme === 'dark';
   const { profile, updateProfile, setAvatarUrl } = useDoctorStore();
 
+  // Sub-screen Navigation State
+  const [activeSubScreen, setActiveSubScreen] = React.useState<SettingsCategory | null>(() => {
+    if (props.initialModalVariant === 'settings-account') {
+      return 'account';
+    }
+    if (props.initialModalVariant === 'settings-security') {
+      return 'security';
+    }
+    if (props.initialModalVariant === 'settings-data') {
+      return 'data';
+    }
+    if (props.initialModalVariant === 'settings-help') {
+      return 'help';
+    }
+    return null;
+  });
+  const subScreenRef = React.useRef<HTMLDivElement>(null);
+  const isSubScreenClosingRef = React.useRef(false);
+
   // Image Upload State & Ref
   const fileInputRef = React.useRef<HTMLInputElement>(null);
 
@@ -136,16 +123,46 @@ export function AccountTabScreen(props: {
 
   const { openModal, closeModal } = useModalStore();
 
-  // Sync drawer visibility with master modal store to hide BottomNavBar
+  // Sync sub-screen and drawer visibility with master modal store to hide BottomNavBar
   React.useEffect(() => {
-    if (showEditModal) {
+    if (showEditModal || activeSubScreen !== null) {
       openModal();
       return () => {
         closeModal();
       };
     }
     return undefined;
-  }, [showEditModal, openModal, closeModal]);
+  }, [showEditModal, activeSubScreen, openModal, closeModal]);
+
+  // Sub-screen Entrance Animation
+  React.useEffect(() => {
+    if (activeSubScreen && subScreenRef.current) {
+      gsap.fromTo(
+        subScreenRef.current,
+        { x: '100%', opacity: 0.95 },
+        { x: '0%', opacity: 1, duration: 0.3, ease: 'power3.out' },
+      );
+    }
+  }, [activeSubScreen]);
+
+  const handleBackFromSubScreen = () => {
+    if (isSubScreenClosingRef.current || !subScreenRef.current) {
+      setActiveSubScreen(null);
+      return;
+    }
+    isSubScreenClosingRef.current = true;
+
+    gsap.to(subScreenRef.current, {
+      x: '100%',
+      opacity: 0.9,
+      duration: 0.28,
+      ease: 'power3.in',
+      onComplete: () => {
+        setActiveSubScreen(null);
+        isSubScreenClosingRef.current = false;
+      },
+    });
+  };
 
   // Edit Profile Drawer GSAP & Gesture Refs
   const editDrawerRef = React.useRef<HTMLDivElement>(null);
@@ -262,11 +279,12 @@ export function AccountTabScreen(props: {
   return (
     <div
       className={cn(
-        'relative w-full h-full overflow-y-auto no-scrollbar flex flex-col select-text',
+        'relative w-full h-full overflow-hidden flex flex-col select-text',
         isDark ? 'bg-[#0a0e1a] text-white' : 'bg-[#f8faff] text-slate-900',
         props.className,
       )}
     >
+      <div className="flex w-full flex-1 min-h-0 flex-col overflow-y-auto no-scrollbar">
       {/* 1. Full-Bleed Nature Masked Profile Header */}
       <div
         className={cn(
@@ -289,7 +307,7 @@ export function AccountTabScreen(props: {
         {props.onBack && (
           <button
             type="button"
-            aria-label="Kembali ke Beranda"
+            aria-label="Kembali ke beranda"
             onClick={props.onBack}
             className={cn(
               'absolute top-4 left-4 z-30 flex h-8 w-8 items-center justify-center rounded-full backdrop-blur-md transition-all active:scale-90 cursor-pointer shadow-md',
@@ -339,8 +357,8 @@ export function AccountTabScreen(props: {
               {/* Floating Camera Button (100% Optically & Geometrically Centered SVG) */}
               <button
                 type="button"
-                aria-label="Upload Foto Profil Dokter"
-                title="Upload Foto Profil"
+                aria-label="Upload foto profil dokter"
+                title="Upload foto profil"
                 onClick={() => fileInputRef.current?.click()}
                 className={cn(
                   'absolute bottom-0 right-0 flex h-7 w-7 items-center justify-center rounded-full bg-[#2AABEE] text-white shadow-md ring-2 transition-transform active:scale-90 cursor-pointer hover:bg-[#2299d6] p-0',
@@ -403,7 +421,7 @@ export function AccountTabScreen(props: {
                 )}
               >
                 <Pencil className="w-3 h-3" />
-                <span>Edit Profil</span>
+                <span>Edit profil</span>
               </button>
             </div>
           </div>
@@ -427,6 +445,7 @@ export function AccountTabScreen(props: {
               <button
                 key={item.id}
                 type="button"
+                onClick={() => setActiveSubScreen(item.id)}
                 className={cn(
                   'flex items-center justify-between px-4 py-3 transition-colors text-left cursor-pointer focus:outline-none select-none group',
                   isDark ? 'hover:bg-white/5 text-white active:bg-white/10' : 'hover:bg-slate-50 text-slate-900 active:bg-slate-100',
@@ -473,9 +492,10 @@ export function AccountTabScreen(props: {
             )}
           >
             <LogOut className="h-3.5 w-3.5" />
-            <span>Keluar dari Akun Dokter</span>
+            <span>Keluar dari akun dokter</span>
           </button>
         )}
+      </div>
       </div>
 
       {/* 3. Compact Edit Profile Master Drawer (Contained inside Phone Screen) */}
@@ -518,7 +538,7 @@ export function AccountTabScreen(props: {
               <div className={cn('relative z-20 flex items-center justify-between px-6 pt-1 pb-2.5 shrink-0 border-b', isDark ? 'border-white/5' : 'border-slate-100')}>
                 <div>
                   <h3 className={cn('text-sm font-semibold tracking-tight', isDark ? 'text-white' : 'text-slate-900')}>
-                    Edit Profil Dokter
+                    Edit profil dokter
                   </h3>
                   <p className={cn('text-[11px] font-normal mt-0.5', isDark ? 'text-neutral-400' : 'text-slate-500')}>
                     Perbarui kontak dan bio profil
@@ -526,7 +546,7 @@ export function AccountTabScreen(props: {
                 </div>
                 <button
                   type="button"
-                  aria-label="Tutup Edit Profil"
+                  aria-label="Tutup edit profil"
                   onClick={triggerCloseEditDrawer}
                   className={cn(
                     'p-1.5 -mr-2 rounded-full transition-colors cursor-pointer flex items-center justify-center shrink-0',
@@ -542,13 +562,13 @@ export function AccountTabScreen(props: {
                 {/* 1. Nama Dokter */}
                 <div className="flex flex-col gap-1.5">
                   <span className={cn('text-xs font-semibold tracking-tight', isDark ? 'text-neutral-400' : 'text-slate-500')}>
-                    Nama Lengkap Dokter
+                    Nama lengkap dokter
                   </span>
                   <input
                     type="text"
                     value={draftName}
                     onChange={(e) => setDraftName(e.target.value)}
-                    placeholder="Nama Dokter..."
+                    placeholder="Nama dokter..."
                     className={cn(
                       'w-full px-3.5 py-2.5 rounded-2xl border text-xs font-medium focus:outline-none transition-colors',
                       isDark
@@ -557,14 +577,14 @@ export function AccountTabScreen(props: {
                     )}
                   />
                   <span className="text-[10px] text-cyan-600 dark:text-cyan-400 font-medium">
-                    ✓ Terverifikasi Manajemen RS Amanah Sehat
+                    ✓ Terverifikasi manajemen RS Amanah Sehat
                   </span>
                 </div>
 
                 {/* 2. Nomor WhatsApp / Telepon */}
                 <div className="flex flex-col gap-1.5">
                   <span className={cn('text-xs font-semibold tracking-tight', isDark ? 'text-neutral-400' : 'text-slate-500')}>
-                    Nomor WhatsApp / Telepon
+                    Nomor WhatsApp / telepon
                   </span>
                   <div className="relative">
                     <Phone className={cn('absolute left-3.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5', isDark ? 'text-neutral-400' : 'text-slate-400')} />
@@ -586,7 +606,7 @@ export function AccountTabScreen(props: {
                 {/* 3. Email Dokter */}
                 <div className="flex flex-col gap-1.5">
                   <span className={cn('text-xs font-semibold tracking-tight', isDark ? 'text-neutral-400' : 'text-slate-500')}>
-                    Email Resmi
+                    Email resmi
                   </span>
                   <div className="relative">
                     <Mail className={cn('absolute left-3.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5', isDark ? 'text-neutral-400' : 'text-slate-400')} />
@@ -608,7 +628,7 @@ export function AccountTabScreen(props: {
                 {/* 4. Bio / Keterangan Profil */}
                 <div className="flex flex-col gap-1.5">
                   <span className={cn('text-xs font-semibold tracking-tight', isDark ? 'text-neutral-400' : 'text-slate-500')}>
-                    Bio Medis
+                    Bio medis
                   </span>
                   <textarea
                     rows={2}
@@ -656,12 +676,48 @@ export function AccountTabScreen(props: {
                     <span>Tersimpan</span>
                   </>
                 ) : (
-                  <span>Simpan Perubahan</span>
+                  <span>Simpan perubahan</span>
                 )}
               </button>
             </div>
           </div>
         </>
+      )}
+
+      {/* 4. Dedicated Category Sub-Screens */}
+      {activeSubScreen && (
+        <div
+          ref={subScreenRef}
+          className={cn(
+            'absolute inset-0 z-40 w-full h-full shadow-[-12px_0_30px_rgba(0,0,0,0.3)] will-change-transform',
+            isDark ? 'bg-[#0a0e1a]' : 'bg-[#f8faff]',
+          )}
+        >
+          {activeSubScreen === 'account' && (
+            <AccountIdentitySettingsScreen
+              theme={props.theme}
+              onBack={handleBackFromSubScreen}
+            />
+          )}
+          {activeSubScreen === 'security' && (
+            <PrivacySecuritySettingsScreen
+              theme={props.theme}
+              onBack={handleBackFromSubScreen}
+            />
+          )}
+          {activeSubScreen === 'data' && (
+            <DataStorageSettingsScreen
+              theme={props.theme}
+              onBack={handleBackFromSubScreen}
+            />
+          )}
+          {activeSubScreen === 'help' && (
+            <ItSupportSettingsScreen
+              theme={props.theme}
+              onBack={handleBackFromSubScreen}
+            />
+          )}
+        </div>
       )}
     </div>
   );

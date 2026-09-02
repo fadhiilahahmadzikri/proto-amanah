@@ -6,7 +6,7 @@ import { cn } from '@/lib/utils';
 
 export function ScreenHeader(props: {
   title: string;
-  subtitle?: string;
+  subtitle?: React.ReactNode;
   onBack?: () => void;
   rightAction?: React.ReactNode;
   theme?: 'dark' | 'light';
@@ -17,10 +17,10 @@ export function ScreenHeader(props: {
   return (
     <header
       className={cn(
-        'relative top-0 inset-x-0 z-30 w-full px-5 pt-3 pb-3 flex items-center justify-between transition-colors duration-300 select-none shrink-0 border-none outline-none',
+        'sticky top-0 inset-x-0 z-30 w-full px-4 h-14 flex items-center justify-between transition-colors duration-200 select-none shrink-0 border-b',
         isDark
-          ? 'bg-[#0a0e1a]/70 text-white shadow-xs'
-          : 'bg-white/75 text-slate-900 shadow-xs',
+          ? 'bg-[#0a0e1a]/95 text-white border-white/10 shadow-xs'
+          : 'bg-white/95 text-slate-900 border-slate-200/80 shadow-xs',
         props.className,
       )}
       style={{
@@ -28,32 +28,30 @@ export function ScreenHeader(props: {
         WebkitBackdropFilter: 'blur(24px) saturate(180%)',
       }}
     >
-      {/* 1. Leading / Start (Vector-Only Back Button or Balance Spacer) */}
-      <div className="relative z-10 flex items-center justify-start min-w-9 shrink-0">
+      <div className="relative z-30 flex items-center justify-start shrink-0">
         {props.onBack ? (
           <button
             type="button"
             aria-label="Kembali"
             onClick={props.onBack}
             className={cn(
-              'p-1.5 -ml-1.5 rounded-full transition-all cursor-pointer active:scale-90 flex items-center justify-center',
+              'h-10 w-10 -ml-1.5 rounded-full transition-all cursor-pointer active:scale-90 flex items-center justify-center select-none',
               isDark
-                ? 'text-neutral-200 hover:text-white hover:bg-white/10'
-                : 'text-slate-700 hover:text-slate-950 hover:bg-slate-100',
+                ? 'text-neutral-200 hover:text-white hover:bg-white/10 active:bg-white/15'
+                : 'text-slate-700 hover:text-slate-950 hover:bg-slate-100 active:bg-slate-200',
             )}
           >
-            <ArrowLeft className="h-6 w-6 stroke-[2]" />
+            <ArrowLeft className="h-5 w-5 stroke-[2.2]" />
           </button>
         ) : (
-          <div className="w-9 h-9" />
+          <div className="w-10 h-10" />
         )}
       </div>
 
-      {/* 2. Absolute Optical Center: Guaranteed 100% exact optical midpoint across all screens */}
-      <div className="absolute inset-x-0 inset-y-0 flex flex-col items-center justify-center pointer-events-none px-20">
+      <div className="absolute inset-x-0 inset-y-0 flex flex-col items-center justify-center pointer-events-none px-14">
         <h2
           className={cn(
-            'text-base sm:text-lg font-bold tracking-tight text-center truncate leading-tight pointer-events-auto',
+            'text-sm sm:text-base font-bold tracking-tight text-center truncate leading-tight',
             isDark ? 'text-white' : 'text-[#14103B]',
           )}
         >
@@ -62,7 +60,7 @@ export function ScreenHeader(props: {
         {props.subtitle && (
           <span
             className={cn(
-              'text-[11px] font-medium tracking-tight text-center truncate mt-0.5 pointer-events-auto',
+              'text-[10.5px] font-medium tracking-tight text-center truncate mt-0.5',
               isDark ? 'text-neutral-400' : 'text-slate-500',
             )}
           >
@@ -71,9 +69,8 @@ export function ScreenHeader(props: {
         )}
       </div>
 
-      {/* 3. Trailing / End (Optional Action or Balance Spacer) */}
-      <div className="relative z-10 flex items-center justify-end min-w-9 shrink-0">
-        {props.rightAction ?? <div className="w-9 h-9" />}
+      <div className="relative z-30 flex items-center justify-end shrink-0">
+        {props.rightAction ?? <div className="w-10 h-10" />}
       </div>
     </header>
   );
