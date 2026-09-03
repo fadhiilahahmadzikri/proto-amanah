@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Empty Box Component</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      margin: 0;
+      background-color: #f8fafc;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+  </style>
+</head>
+<body class="p-4">
+  <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-8 flex flex-col items-center justify-center w-full max-w-sm">
+    <div class="relative w-full aspect-square max-w-[320px]">
+      <canvas id="illustrationCanvas" class="w-full h-full block"></canvas>
+    </div>
+    <div class="mt-4 flex items-center gap-2">
+      <button id="replayBtn" class="px-3 py-1.5 text-xs font-medium rounded-md border border-slate-200 text-slate-600 hover:bg-slate-50 transition-colors">
+        Ulangi Animasi
+      </button>
+      <button id="toggleAnimationBtn" class="px-3 py-1.5 text-xs font-medium rounded-md border border-slate-200 text-slate-600 hover:bg-slate-50 transition-colors">
+        Jeda Animasi
+      </button>
+    </div>
+  </div>
+
+  <script>
+    const SCENE_CONFIG = {
+      BOX: {
+        RADIUS_X: 64,
+        RADIUS_Y: 34,
+        HEIGHT: 62,
+        DEPTH: 46,
+        FLAP_LENGTH: 0.52,
+        MAX_FLAP_ANGLE: 3.65
+      },
+      TIMING: {
+        CYCLE_DURATION: 7.5,
+        BOX_OPEN_START: 0.8,
+        BOX_OPEN_END: 2.2,
+        FLY_EMERGE_START: 2.2,
+        FLY_EMERGE_END: 4.6,
+        HOLD_END: 6.8
+      },
+      COLORS: {
+        EXTERIOR_LEFT: "#F1F5F9",
+        EXTERIOR_RIGHT: "#D8E1ED",
+        INTERIOR_BACK_LEFT: "#B9C6D8",
+        INTERIOR_BACK_RIGHT: "#A4B4CC",
+        INTERIOR_FLOOR: "#91A2BC",
+        FLAP_BACK_LEFT: "#E2E9F3",
+        FLAP_BACK_RIGHT: "#CBD6E6",
+        FLAP_FRONT_LEFT: "#F1F5F9",
+        FLAP_FRONT_RIGHT: "#C6D3E4",
+        STROKE_BOX: "rgba(180, 195, 215, 0.45)",
+        STROKE_TRAIL: "#A4B3C8",
+        SPARKLE: "#B8C5D8",
+        INSECT_BODY: "#59667A",
+        INSECT_WING: "rgba(195, 208, 226, 0.75)",
+        CAPTION: "#94A3B8"
+      }
+    };
+
+    class IsometricProjector {
+      constructor(radiusX, radiusY, height) {
+        this.radiusX = radiusX;
+        this.radiusY = radiusY;
+        this.height = height;
+      }
+
+      project(x, y, z, originX, originY) {
+        return {
+          x: originX + (x - y) * this.radiusX,
+          y: originY + (x + y - 1) * this.radiusY + (1 - z) * this.height
+        };
+      }
+    }
+
+    class BoxGeometry {
+      constructor(projector, flapLength, maxFlapAngle) {
+        this.projector = projector;
+        this.flapLength = flapLength;
+        this.maxFlapAngle = maxFlapAngle;
+      }
+
+      computeFlapBackLeft(angle, cx, cy) {
+        const xOffset = this.flapLength * Math.cos(angle);
+        const zOffset = 1 + this.flapLength * Math.sin(angle);
+        return [
+          this.projector.project(0, 1, 1, cx, cy),
+          this.projector.project(0, 0, 1, cx, cy),
+          this.projector.project(xOffset, 0, zOffset, cx, cy),
+          this.projector.project(xOffset, 1, zOffset, cx, cy)
+        ];
+      }
+
+      computeFlapBackRight(angle, cx, cy) {
+        const yOffset = this.flapLength * Math.cos(angle);
+        const zOffset = 1 + this.flapLength * Math.sin(angle);
+        return [
+          this.projector.project(0, 0, 1, cx, cy),
+          this.projector.project(1, 0, 1, cx, cy),
+          this.projector.project(1, yOffset, zOffset, cx, cy),
+          this.projector.project(0, yOffset, zOffset, cx, cy)
+        ];
+      }
+
+      computeFlapFrontLeft(angle, cx, cy) {
+        const yOffset = 1 - this.flapLength * Math.cos(angle);
+        const zOffset = 1 + this.flapLength * Math.sin(angle);
+        return [
+          this.projector.project(0, 1, 1, cx, cy),
+          this.projector.project(1, 1, 1, cx, cy),
+          this.projector.project(1, yOffset, zOffset, cx, cy),
+          this.projector.project(0, yOffset, zOffset, cx, cy)
+        ];
+      }
+
+      computeFlapFrontRight(angle, cx, cy) {
+        const xOffset = 1 - this.flapLength * Math.cos(angle);
+        const zOffset = 1 + this.flapLength * Math.sin(angle);
+        return [
+          this.projector.project(1, 0, 1, cx, cy),
+          this.projector.project(1, 1, 1, cx, cy),
+          this.projector.project(xOffset, 1, zOffset, cx, cy),
+          this.projector.project(xOffset, 0, zOffset, cx, cy)
+        ];
+      }
+
+      computeInterior(cx, cy, depth) {
+        const zFloor = 1 - depth / SCENE_CONFIG.BOX.HEIGHT;
+        return {
+          backLeft: [
+            this.projector.project(0, 1, 1, cx, cy),
+            this.projector.project(0, 0, 1, cx, cy),
+            this.projector.project(0, 0, zFloor, cx, cy),
+            this.projector.project(0, 1, zFloor, cx, cy)
+          ],
+          backRight: [
+            this.projector.project(0, 0, 1, cx, cy),
+            this.projector.project(1, 0, 1, cx, cy),
+            this.projector.project(1, 0, zFloor, cx, cy),
+            this.projector.project(0, 0, zFloor, cx, cy)
+          ],
+          floor: [
+            this.projector.project(0, 1, zFloor, cx, cy),
+            this.projector.project(0, 0, zFloor, cx, cy),
+            this.projector.project(1, 0, zFloor, cx, cy),
+            this.projector.project(1, 1, zFloor, cx, cy)
+          ]
+        };
+      }
+
+      computeExterior(cx, cy) {
+        return {
+          left: [
+            this.projector.project(0, 1, 1, cx, cy),
+            this.projector.project(1, 1, 1, cx, cy),
+            this.projector.project(1, 1, 0, cx, cy),
+            this.projector.project(0, 1, 0, cx, cy)
+          ],
+          right: [
+            this.projector.project(1, 1, 1, cx, cy),
+            this.projector.project(1, 0, 1, cx, cy),
+            this.projector.project(1, 0, 0, cx, cy),
+            this.projector.project(1, 1, 0, cx, cy)
+          ]
+        };
+      }
+    }
+
+    class FlightTrajectory {
+      constructor(sampleCount) {
+        this.sampleCount = sampleCount;
+      }
+
+      evaluateCubic(p0, p1, p2, p3, t) {
+        const oneMinusT = 1 - t;
+        return {
+          x: Math.pow(oneMinusT, 3) * p0.x + 3 * Math.pow(oneMinusT, 2) * t * p1.x + 3 * oneMinusT * Math.pow(t, 2) * p2.x + Math.pow(t, 3) * p3.x,
+          y: Math.pow(oneMinusT, 3) * p0.y + 3 * Math.pow(oneMinusT, 2) * t * p1.y + 3 * oneMinusT * Math.pow(t, 2) * p2.y + Math.pow(t, 3) * p3.y
+        };
+      }
+
+      computeSegmentPoint(segmentIndex, u, cx, cy, targetX, targetY) {
+        const segments = [
+          [{ x: cx, y: cy + 16 }, { x: cx - 16, y: cy - 10 }, { x: cx - 30, y: cy - 36 }, { x: cx - 18, y: cy - 54 }],
+          [{ x: cx - 18, y: cy - 54 }, { x: cx - 6, y: cy - 70 }, { x: cx + 20, y: cy - 65 }, { x: cx + 16, y: cy - 46 }],
+          [{ x: cx + 16, y: cy - 46 }, { x: cx + 12, y: cy - 30 }, { x: cx - 10, y: cy - 38 }, { x: cx - 2, y: cy - 68 }],
+          [{ x: cx - 2, y: cy - 68 }, { x: cx + 4, y: cy - 88 }, { x: cx + 12, y: cy - 98 }, { x: targetX, y: targetY + 6 }]
+        ];
+        const seg = segments[segmentIndex];
+        return this.evaluateCubic(seg[0], seg[1], seg[2], seg[3], u);
+      }
+
+      buildPoints(cx, cy, targetX, targetY) {
+        const points = [];
+        for (let i = 0; i <= this.sampleCount; i++) {
+          const t = i / this.sampleCount;
+          const segmentIndex = Math.min(Math.floor(t * 4), 3);
+          const u = t * 4 - segmentIndex;
+          points.push(this.computeSegmentPoint(segmentIndex, u, cx, cy, targetX, targetY));
+        }
+        return points;
+      }
+
+      getPointAtProgress(points, progress) {
+        const clampedProgress = Math.max(0, Math.min(1, progress));
+        const index = Math.min(Math.floor(clampedProgress * (points.length - 1)), points.length - 1);
+        return points[index];
+      }
+    }
+
+    class SceneRenderer {
+      constructor(context, colors) {
+        this.context = context;
+        this.colors = colors;
+      }
+
+      drawPolygon(points, fillColor) {
+        this.context.save();
+        this.context.beginPath();
+        this.context.moveTo(points[0].x, points[0].y);
+        for (let i = 1; i < points.length; i++) {
+          this.context.lineTo(points[i].x, points[i].y);
+        }
+        this.context.closePath();
+        this.context.fillStyle = fillColor;
+        this.context.fill();
+        this.context.strokeStyle = this.colors.STROKE_BOX;
+        this.context.lineWidth = 1;
+        this.context.stroke();
+        this.context.restore();
+      }
+
+      drawGroundShadow(cx, cy, radiusX) {
+        this.context.save();
+        this.context.beginPath();
+        this.context.ellipse(cx, cy + 12, radiusX * 1.1, 14, 0, 0, Math.PI * 2);
+        this.context.fillStyle = "rgba(226, 232, 240, 0.65)";
+        this.context.fill();
+        this.context.restore();
+      }
+
+      drawDottedTrail(points, progress, elapsed) {
+        if (progress <= 0) return;
+        const targetIndex = Math.floor(progress * (points.length - 1));
+        this.context.save();
+        this.context.beginPath();
+        this.context.setLineDash([3, 4]);
+        this.context.lineDashOffset = -elapsed * 12;
+        this.context.strokeStyle = this.colors.STROKE_TRAIL;
+        this.context.lineWidth = 1.4;
+        this.context.lineCap = "round";
+        this.context.moveTo(points[0].x, points[0].y);
+        for (let i = 1; i <= targetIndex; i++) {
+          this.context.lineTo(points[i].x, points[i].y);
+        }
+        this.context.stroke();
+        this.context.restore();
+      }
+
+      drawWing(baseAngle) {
+        this.context.save();
+        this.context.rotate(baseAngle);
+        this.context.beginPath();
+        this.context.ellipse(-5, -4, 6, 2.5, 0, 0, Math.PI * 2);
+        this.context.fill();
+        this.context.restore();
+      }
+
+      drawInsect(x, y, elapsed, opacity) {
+        if (opacity <= 0) return;
+        this.context.save();
+        this.context.globalAlpha = opacity;
+        this.context.translate(x, y);
+        const wingFlap = Math.sin(elapsed * 26) * 0.25;
+        this.context.fillStyle = this.colors.INSECT_WING;
+        this.drawWing(-0.8 + wingFlap);
+        this.drawWing(0.8 - wingFlap);
+        this.context.fillStyle = this.colors.INSECT_BODY;
+        this.context.beginPath();
+        this.context.ellipse(0, 0, 3.5, 5, 0.1, 0, Math.PI * 2);
+        this.context.fill();
+        this.context.beginPath();
+        this.context.arc(0, -5, 2, 0, Math.PI * 2);
+        this.context.fill();
+        this.context.restore();
+      }
+
+      drawStar(x, y, outerRadius) {
+        const innerRadius = outerRadius * 0.26;
+        this.context.save();
+        this.context.fillStyle = this.colors.SPARKLE;
+        this.context.beginPath();
+        for (let i = 0; i < 8; i++) {
+          const radius = i % 2 === 0 ? outerRadius : innerRadius;
+          const angle = (i * Math.PI) / 4 - Math.PI / 2;
+          const px = x + Math.cos(angle) * radius;
+          const py = y + Math.sin(angle) * radius;
+          if (i === 0) this.context.moveTo(px, py);
+          else this.context.lineTo(px, py);
+        }
+        this.context.closePath();
+        this.context.fill();
+        this.context.restore();
+      }
+
+      drawSparkles(cx, cy, elapsed, opacity) {
+        if (opacity <= 0) return;
+        this.context.save();
+        this.context.globalAlpha = opacity;
+        const pulse = Math.sin(elapsed * 2.5) * 1.5;
+        this.drawStar(cx - 74, cy - 48, 6.5 + pulse);
+        this.drawStar(cx - 82, cy + 44, 5 + pulse);
+        this.drawStar(cx + 84, cy + 46, 7 - pulse);
+        this.context.fillStyle = this.colors.SPARKLE;
+        const dots = [{ x: cx - 94, y: cy + 2, r: 2.2 }, { x: cx - 80, y: cy + 68, r: 1.8 }, { x: cx + 70, y: cy - 18, r: 2.4 }, { x: cx + 22, y: cy - 32, r: 1.5 }];
+        for (const dot of dots) {
+          this.context.beginPath();
+          this.context.arc(dot.x, dot.y, dot.r, 0, Math.PI * 2);
+          this.context.fill();
+        }
+        this.context.restore();
+      }
+
+      drawCaption(cx, cy) {
+        this.context.save();
+        this.context.font = "500 15px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
+        this.context.fillStyle = this.colors.CAPTION;
+        this.context.textAlign = "center";
+        this.context.textBaseline = "middle";
+        this.context.fillText("Empty box", cx, cy);
+        this.context.restore();
+      }
+    }
+
+    class EmptyBoxApp {
+      constructor(canvas, toggleBtn, replayBtn) {
+        this.canvas = canvas;
+        this.context = canvas.getContext("2d");
+        this.projector = new IsometricProjector(SCENE_CONFIG.BOX.RADIUS_X, SCENE_CONFIG.BOX.RADIUS_Y, SCENE_CONFIG.BOX.HEIGHT);
+        this.boxGeometry = new BoxGeometry(this.projector, SCENE_CONFIG.BOX.FLAP_LENGTH, SCENE_CONFIG.BOX.MAX_FLAP_ANGLE);
+        this.trajectory = new FlightTrajectory(100);
+        this.renderer = new SceneRenderer(this.context, SCENE_CONFIG.COLORS);
+        this.isAnimating = true;
+        this.startTime = performance.now();
+        this.initCanvasSize();
+        this.bindEvents(toggleBtn, replayBtn);
+        this.startLoop();
+      }
+
+      initCanvasSize() {
+        const rect = this.canvas.getBoundingClientRect();
+        const dpr = window.devicePixelRatio || 1;
+        this.canvas.width = rect.width * dpr;
+        this.canvas.height = rect.height * dpr;
+        this.context.scale(dpr, dpr);
+        this.displayWidth = rect.width;
+        this.displayHeight = rect.height;
+      }
+
+      bindEvents(toggleBtn, replayBtn) {
+        window.addEventListener("resize", () => {
+          this.initCanvasSize();
+          if (!this.isAnimating) this.render(performance.now());
+        });
+        toggleBtn.addEventListener("click", () => {
+          this.isAnimating = !this.isAnimating;
+          toggleBtn.textContent = this.isAnimating ? "Jeda Animasi" : "Mulai Animasi";
+          if (this.isAnimating) this.startLoop();
+        });
+        replayBtn.addEventListener("click", () => {
+          this.startTime = performance.now();
+          if (!this.isAnimating) {
+            this.isAnimating = true;
+            toggleBtn.textContent = "Jeda Animasi";
+            this.startLoop();
+          }
+        });
+      }
+
+      easeInOutCubic(x) {
+        return x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
+      }
+
+      easeInOutQuad(x) {
+        return x < 0.5 ? 2 * x * x : 1 - Math.pow(-2 * x + 2, 2) / 2;
+      }
+
+      computeProgress(t, start, end) {
+        if (t <= start) return 0;
+        if (t >= end) return 1;
+        return (t - start) / (end - start);
+      }
+
+      startLoop() {
+        const loop = (timestamp) => {
+          this.render(timestamp);
+          if (this.isAnimating) {
+            requestAnimationFrame(loop);
+          }
+        };
+        requestAnimationFrame(loop);
+      }
+
+      render(timestamp) {
+        const elapsed = (timestamp - this.startTime) * 0.001;
+        const cycleTime = elapsed % SCENE_CONFIG.TIMING.CYCLE_DURATION;
+        const cx = this.displayWidth / 2;
+        const cy = this.displayHeight / 2 + 10;
+        const targetX = cx + 18;
+        const targetY = cy - 110;
+
+        this.context.clearRect(0, 0, this.displayWidth, this.displayHeight);
+        this.renderer.drawGroundShadow(cx, cy + SCENE_CONFIG.BOX.HEIGHT, SCENE_CONFIG.BOX.RADIUS_X);
+
+        const openT = this.easeInOutCubic(this.computeProgress(cycleTime, SCENE_CONFIG.TIMING.BOX_OPEN_START, SCENE_CONFIG.TIMING.BOX_OPEN_END));
+        const flapAngle = openT * SCENE_CONFIG.BOX.MAX_FLAP_ANGLE;
+
+        const interior = this.boxGeometry.computeInterior(cx, cy, SCENE_CONFIG.BOX.DEPTH);
+        this.renderer.drawPolygon(interior.backLeft, SCENE_CONFIG.COLORS.INTERIOR_BACK_LEFT);
+        this.renderer.drawPolygon(interior.backRight, SCENE_CONFIG.COLORS.INTERIOR_BACK_RIGHT);
+        this.renderer.drawPolygon(interior.floor, SCENE_CONFIG.COLORS.INTERIOR_FLOOR);
+
+        this.renderer.drawPolygon(this.boxGeometry.computeFlapBackLeft(flapAngle, cx, cy), SCENE_CONFIG.COLORS.FLAP_BACK_LEFT);
+        this.renderer.drawPolygon(this.boxGeometry.computeFlapBackRight(flapAngle, cx, cy), SCENE_CONFIG.COLORS.FLAP_BACK_RIGHT);
+
+        const exterior = this.boxGeometry.computeExterior(cx, cy);
+        this.renderer.drawPolygon(exterior.left, SCENE_CONFIG.COLORS.EXTERIOR_LEFT);
+        this.renderer.drawPolygon(exterior.right, SCENE_CONFIG.COLORS.EXTERIOR_RIGHT);
+
+        this.renderer.drawPolygon(this.boxGeometry.computeFlapFrontLeft(flapAngle, cx, cy), SCENE_CONFIG.COLORS.FLAP_FRONT_LEFT);
+        this.renderer.drawPolygon(this.boxGeometry.computeFlapFrontRight(flapAngle, cx, cy), SCENE_CONFIG.COLORS.FLAP_FRONT_RIGHT);
+
+        const flyT = this.easeInOutQuad(this.computeProgress(cycleTime, SCENE_CONFIG.TIMING.FLY_EMERGE_START, SCENE_CONFIG.TIMING.FLY_EMERGE_END));
+        const trajectoryPoints = this.trajectory.buildPoints(cx, cy, targetX, targetY);
+        this.renderer.drawDottedTrail(trajectoryPoints, flyT, elapsed);
+
+        const flyPos = this.trajectory.getPointAtProgress(trajectoryPoints, flyT);
+        const floatOffset = flyT >= 1 ? Math.sin(elapsed * 1.8) * 3 : 0;
+        const insectOpacity = Math.min(1, this.computeProgress(cycleTime, SCENE_CONFIG.TIMING.FLY_EMERGE_START, SCENE_CONFIG.TIMING.FLY_EMERGE_START + 0.3));
+        this.renderer.drawInsect(flyPos.x, flyPos.y + floatOffset, elapsed, insectOpacity);
+
+        const sparkleOpacity = this.computeProgress(cycleTime, SCENE_CONFIG.TIMING.FLY_EMERGE_START + 1.2, SCENE_CONFIG.TIMING.FLY_EMERGE_END);
+        this.renderer.drawSparkles(cx, cy, elapsed, sparkleOpacity);
+        this.renderer.drawCaption(cx, cy + SCENE_CONFIG.BOX.HEIGHT + 45);
+      }
+    }
+
+    const canvasElement = document.getElementById("illustrationCanvas");
+    const toggleButton = document.getElementById("toggleAnimationBtn");
+    const replayButton = document.getElementById("replayBtn");
+    new EmptyBoxApp(canvasElement, toggleButton, replayButton);
+  </script>
+</body>
+</html>
